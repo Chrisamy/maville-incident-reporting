@@ -1,4 +1,5 @@
 let colorSwap = 1;
+let requestNum = 1;
 
 document.getElementById("hello-world-btn").addEventListener("click", async () => {
     try {
@@ -12,21 +13,22 @@ document.getElementById("hello-world-btn").addEventListener("click", async () =>
 
 function addRequestButton() {
     var table = document.getElementById("table-request");
-    let reqProposee = prompt("Probleme?");
     let addreseProb = prompt("C'est ou le probleme?")
     let typeProb = prompt("C'est quelle type de probleme?")
     let Status = prompt("mettre le status (pour raison de teste seulement)")
 
     var row = table.insertRow(-1);
-    var cellReqProp = row.insertCell(0);
+    var cellRequestNum = row.insertCell(0);
     var cellAddProb = row.insertCell(1);
     var cellTypeProb = row.insertCell(2);
     var cellStatus = row.insertCell(3);
 
-    cellReqProp.innerHTML = reqProposee;
+    cellRequestNum.innerHTML = requestNum;
     cellAddProb.innerHTML = addreseProb;
     cellTypeProb.innerHTML = typeProb;
     cellStatus.innerHTML = Status;
+
+    requestNum += 1;
 
     console.log(colorSwap)
 
