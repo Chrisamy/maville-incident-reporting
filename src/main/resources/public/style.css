@@ -32,9 +32,10 @@ button:hover {
 
 #header-div {
 
-    margin: 0;
+    margin: 0.5%;
     border-style: solid;
     padding: 5px;
+    height: 10%;
 }
 
 #three-login-options {
@@ -57,4 +58,39 @@ button:hover {
     float: left;
     border-style: solid;
     margin: 0.5%;
+}
+
+#div-request-box {
+    height: 90%;
+    width: 80%;
+    float: left;
+    border-style: solid;
+    margin: 0.5%;
+}
+
+html,body {
+    height: 100%;
+}
+
+#button-panel {
+    height: 90%;
+    width: 17%;
+    float: right;
+    border-style: solid;
+    margin: 0.5%;
+}
+
+#table-request {
+    padding: 0.1vh;
+    width:100%;
+}
+
+#request-row-blue {
+    background-color: lightblue;
+    font-size: 3vh;
+}
+
+#request-row-green {
+    background-color: lightgreen;
+    font-size: 3vh;
 }
