@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    margin-top: 50px;
+    margin-top: 5px;
     background-color: #f4f4f9;
     color: #333;
 }
@@ -22,4 +22,75 @@ button {
 
 button:hover {
     background-color: #005a99;
+}
+
+#login-button {
+    margin-left: 90%;
+    margin-bottom: 15px;
+    scale: 200%;
+}
+
+#header-div {
+
+    margin: 0.5%;
+    border-style: solid;
+    padding: 5px;
+    height: 10%;
+}
+
+#three-login-options {
+    display: flex;
+    margin: auto;
+    margin-top: 7%;
+    width: 60%;
+    height:60%;
+    border-style: solid;
+    background: lightblue;
+    align-content: center;
+    justify-content: center;
+    place-items: center;
+
+}
+
+#div-login-user {
+    height: 30%;
+    width: 30%;
+    float: left;
+    border-style: solid;
+    margin: 0.5%;
+}
+
+#div-request-box {
+    height: 90%;
+    width: 80%;
+    float: left;
+    border-style: solid;
+    margin: 0.5%;
+}
+
+html,body {
+    height: 100%;
+}
+
+#button-panel {
+    height: 90%;
+    width: 17%;
+    float: right;
+    border-style: solid;
+    margin: 0.5%;
+}
+
+#table-request {
+    padding: 0.1vh;
+    width:100%;
+}
+
+#request-row-blue {
+    background-color: lightblue;
+    font-size: 3vh;
+}
+
+#request-row-green {
+    background-color: lightgreen;
+    font-size: 3vh;
 }
