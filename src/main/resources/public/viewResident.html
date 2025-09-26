@@ -19,7 +19,26 @@
     </table>
 </div>
 <div id="button-panel">
-    <button id="request-add-button" onclick="addRequestButton()"> Ajouter une requete </button>
+    <label for="Address">Addresse du probleme?</label>
+    <input type="text" id="Address">
+    <br>
+    <label for="type-probleme">Quelle categorie decrit le probleme le mieux</label>
+    <select id="type-probleme" name="type-prob-choose">
+        <option value="routiers">Travaux routiers</option>
+        <option value="gazElec">Travaux de gaz ou électricité</option>
+        <option value="consReno">Construction ou rénovation</option>
+        <option value="paysage">Entretien paysager</option>
+        <option value="transportsCommun">Travaux liés aux transports en commun</option>
+        <option value="signauxEclaire">Travaux de signalisation et éclairage</option>
+        <option value="sousterrains">Travaux souterrains</option>
+        <option value="resitentiel">Travaux résidentiel</option>
+        <option value="entreUrbain">Entretien urbain</option>
+        <option value="entreTelecom">Entretien des réseaux de télécommunication</option>
+    </select>
+
+
+
+    <button id="request-add-button" onclick="addRequestButton()"> Ajouter votre requete </button>
 </div>
 
 <script src="script.js"></script>
