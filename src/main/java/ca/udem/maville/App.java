@@ -11,6 +11,7 @@ public class App {
             config.staticFiles.add("/public");
         }).start(7000);
 
+
         app.get("/api/hello_world", context -> {
             Map<String, String> response = new HashMap<>();
             response.put("message", "Hello from the backend!");
