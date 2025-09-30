@@ -12,7 +12,9 @@ document.getElementById("hello-world-btn").addEventListener("click", async () =>
 });
 
 async function addRequestButton() {
-    const response = await fetch('/api/request_button')
+    const response = await fetch('/api/request_button', {
+        method: 'POST'
+    })
 
 
 }
