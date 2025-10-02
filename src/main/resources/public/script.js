@@ -11,10 +11,33 @@ document.getElementById("hello-world-btn").addEventListener("click", async () =>
     }
 });
 
-async function addRequestButton() {
-    const response = await fetch('/api/request_button', {
-        method: 'POST'
-    })
+function addRequestButton() {
+    var table = document.getElementById("table-request");
+    let typeProb = document.getElementById("type-probleme").value;
+    let addreseProb = document.getElementById("Address").value;
+    let Status = "Non traité"
+
+    var row = table.insertRow(-1);
+    var cellRequestNum = row.insertCell(0);
+
+    var cellAddProb = row.insertCell(1);
+    var cellTypeProb = row.insertCell(2);
+    var cellStatus = row.insertCell(3);
 
 
+    cellRequestNum.innerHTML = requestNum;
+
+    cellAddProb.innerHTML = addreseProb;
+    cellTypeProb.innerHTML = typeProb;
+    cellStatus.innerHTML = Status;
+
+    requestNum += 1;
+
+    if (colorSwap == 1) {
+        row.setAttribute('id', 'request-row-blue');
+        colorSwap *= -1;
+    } else {
+        row.setAttribute('id', 'request-row-green')
+        colorSwap *= -1;
+    }
 }
