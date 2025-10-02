@@ -19,8 +19,24 @@
     </table>
 </div>
 <div id="button-panel">
+    <label for="Address">Addresse du probleme?</label>
+    <input type="text" id="Address">
+    <br>
+    <label for="type-probleme">Quelle categorie decrit le probleme le mieux</label>
+    <select id="type-probleme" name="type-prob-choose">
+        <option value="Travaux routiers">Travaux routiers</option>
+        <option value="Travaux de gaz ou électricité">Travaux de gaz ou électricité</option>
+        <option value="Construction ou rénovation">Construction ou rénovation</option>
+        <option value="Entretien paysager">Entretien paysager</option>
+        <option value="Travaux liés aux transports en commun">Travaux liés aux transports en commun</option>
+        <option value="Travaux de signalisation et éclairage">Travaux de signalisation et éclairage</option>
+        <option value="Travaux souterrains">Travaux souterrains</option>
+        <option value="Travaux résidentiel">Travaux résidentiel</option>
+        <option value="Entretien urbain">Entretien urbain</option>
+        <option value="Entretien des réseaux de télécommunication">Entretien des réseaux de télécommunication</option>
+    </select>
     <button id="request-add-button" onclick="addRequestButton()"> Ajouter une requete (va pas etre la dans la vraie version) </button>
-    <button id="login-button" onclick="location.href='pdfPage.html'"> print projet </button>
+    <button onclick="location.href='pdfPage.html'"> Formulaire et fiche de projets pour prestataire </button>
 </div>
 
 <script src="script.js"></script>

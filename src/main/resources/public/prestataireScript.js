@@ -11,7 +11,8 @@ function printPDF() {
     let dateFin = prompt("Date de fin")
     let coutEstimer = prompt("Coût estimé?")
 
-    body.innerHTML = "<h1>" + nomPres + "</h1>" ;
+    body.innerHTML = "<h1> Fiche de canditature pour projets</h1>"
+    body.innerHTML = body.innerHTML + "<h1>" + nomPres + "</h1>" ;
     body.innerHTML = body.innerHTML + "<h2>" + titreProj + "</h2>";
     body.innerHTML = body.innerHTML + "<h3>" + problemCibler + "</h3>";
     body.innerHTML = body.innerHTML + "<p>" + descriptDuProj + "</p>";
