@@ -20,4 +20,6 @@ function printPDF() {
     body.innerHTML = body.innerHTML + "<h2>" + dateStart + "</h2>";
     body.innerHTML = body.innerHTML + "<h2>" + dateFin + "</h2>";
     body.innerHTML = body.innerHTML + "<h1>" + coutEstimer + "</h1>";
+
+    window.print()
 }
