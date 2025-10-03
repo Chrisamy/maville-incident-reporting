@@ -12,8 +12,217 @@
     <img src="images/udem_logo.png" alt="Université de Montréal" style="width: 10rem;">
     <hr>
 
-    <h1>Titre</h1>
-    <p>Bla bla bla je suis un rapport.</p>
+    <h1>Rapport de project - MaVille</h1>
+
+    <section>
+    <h3>Description</h3>
+    <p>
+        Le Service des Travaux Publics de Montréal (STPM) souhaite développer une application pour permettre aux résidents
+        de vérifier si un problème n'est pas déjà en cours de traitement ou signaler des problèmes urbains (trous, lampadaires défectueux, graffitis, etc.).
+        Cette application devrait aussi permettre aux prestataires de proposer/choisir des projets pour les résoudre.
+    </p>
+    <h3>Problèmes à résoudre</h3>
+    <ul>
+        <li>Manque de communication entre les acteurs.</li>
+        <li>Absence de notifications claires et en temps réel.</li>
+        <li>Processus encore manuel (appels téléphoniques, fichiers Excel, etc..)</li>
+    </ul>
+    <h3>Propositions</h3>
+    <p>
+        Création d'une application simple et interactive centralisant la gestion des problèmes et projets de travaux,
+        incluant un registre consultable et un système de notification.
+    </p>
+
+    <h3>Hypothèses</h3>
+    <ul>
+        <li>L’authentification est gérée par un système centralisé de la Ville</li>
+        <li>Les notifications sont envoyées automatiquement aux résidents et prestataires.</li>
+        <li>Les prestataires doivent être enregistrés et validés par le STPM.</li>
+    </ul>
+
+    <h3>Équipe</h3>
+    <p>
+        Étudiants : Max Gour, Alexis Labelle, Philippe Lefrançois, Damia Boudjema<br>
+        Matricules : <br>
+    </p>
+
+    <h3>Organisation</h3>
+    <p>
+        Les communications des membres de l'équipe se font sur principalement sur Discord et le
+        travail est partagé via GitHub avec un workflow simple.
+    </p>
+
+    </section>
+
+    <section>
+    <h2> Modélisation du domaine</h2>
+    <h3> Glossaire </h3>
+    <ul>
+        <li>
+            <b>STPM</b> : Le Service des Travaux Publics de Montréal, organisme responsable de la validation et du suivi des projets.
+        </li>
+        <li>
+            <b>Résident</b> : Citoyen de la ville de Montréal utilisant l'application pour signaler un problème.
+        </li>
+        <li>
+            <b>Prestataire</b> : Entreprise proposant des projets pour résoudre des problèmes.
+        </li>
+        <li>
+            <b>Projet</b> : Proposition de solution soumise par un prestataire.
+        </li>
+        <li>
+            <b>Fiche problème</b> : Formulaire contenant la description du problème signalé
+        </li>
+        <li>
+            <b>Notification</b> : Message envoyé automatiquement pour informer les acteurs.
+        </li>
+    </ul>
+
+    <h3>Diagramme d'activités</h3>
+
+    <h3>Diagramme de classes</h3>
+    </section>
+
+
+    <section>
+        <h2>Modélisation des exigences</h2>
+
+        <h3>Besoins non-fonctionnels</h3>
+        <ul>
+            <li>Application bilingue (français et anglais).</li>
+            <li>Accessible depuis mobile et desktop.</li>
+            <li>Temps de réponse inférieur à deux secondes.</li>
+            <li>Données sécurisées via HTTPS.</li>
+            <li>Disponibilité minimale de 99%.</li>
+        </ul>
+
+        <h3>Besoins fonctionnels</h3>
+
+        <h3>Diagramme de cas d'utilisation</h3>
+
+        <h3>Résumé des cas d’utilisation</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Cas d’utilisation</th>
+                <th>Acteur principal</th>
+                <th>Description rapide</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><b>Choisir paramètres de notification</b></td>
+                <td>Utilisateur civil</td>
+                <td>L’utilisateur configure ses préférences de notification.</td>
+            </tr>
+            <tr>
+                <td><b>Consulter registre des travaux</b></td>
+                <td>Utilisateur civil</td>
+                <td>L’utilisateur consulte la liste des problèmes signalés et leur état (en cours, résolu, etc.).</td>
+            </tr>
+            <tr>
+                <td><b>Signaler un problème</b></td>
+                <td>Résident</td>
+                <td>Le résident remplit un formulaire pour déclarer un problème urbain (trou, lampadaire, graffiti, etc...).</td>
+            </tr>
+            <tr>
+                <td><b>Remplir formulaire de signalement</b></td>
+                <td>Résident</td>
+                <td>Étape obligatoire pour décrire le problème (adresse, type, description).</td>
+            </tr>
+            <tr>
+                <td><b>Valider et publier appels de projet</b></td>
+                <td>STPM</td>
+                <td>L’agent du STPM examine un signalement et le valide, puis publie un appel de projet.</td>
+            </tr>
+            <tr>
+                <td><b>Consulter appels de projet</b></td>
+                <td>Prestataire</td>
+                <td>Le prestataire accède à la liste des problèmes ouverts pour proposer une solution.</td>
+            </tr>
+            <tr>
+                <td><b>Soumettre candidature</b></td>
+                <td>Prestataire</td>
+                <td>Le prestataire soumet un projet avec détails (coût, délai, ressources).</td>
+            </tr>
+            <tr>
+                <td><b>Approuver candidature</b></td>
+                <td>STPM</td>
+                <td>Le STPM approuve ou rejette une candidature en fonction des critères.</td>
+            </tr>
+            <tr>
+                <td><b>Informer STPM des changements</b></td>
+                <td>Prestataire</td>
+                <td>Le prestataire signale toute modification liée à l’avancement d’un projet.</td>
+            </tr>
+            <tr>
+                <td><b>Mise à jour du registre des travaux</b></td>
+                <td>STPM</td>
+                <td>Le registre est automatiquement mis à jour après validation ou changement (travaux complétés, en cours, etc.).</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h3>Cas d’utilisation : Signaler un problème</h3>
+        <p><b>Résumé :</b> Le résident commence en signalant un problème dans l’application MaVille. Une fois que le formulaire est rempli,
+            le problème est transmis au STPM en attente de validation.</p>
+
+        <p><b>Acteur principal :</b> Résident<br>
+            <b>Relations :</b> inclus <i>Remplir un formulaire</i>.</p>
+
+        <p><b>Pré-conditions :</b></p>
+        <ul>
+            <li>Le résident possède un compte valide.</li>
+            <li>Le résident est connecté à Internet.</li>
+        </ul>
+
+        <p><b>Post-conditions :</b></p>
+        <ul>
+            <li>Le problème est envoyé au serveur.</li>
+            <li>Si validé, le problème est publié.</li>
+            <li>Les prestataires concernés sont notifiés.</li>
+        </ul>
+
+        <p><b>Règles fonctionnelles :</b></p>
+        <ul>
+            <li>Le problème signalé ne doit pas déjà exister dans la base.</li>
+            <li>L’adresse doit être valide et située à Montréal.</li>
+        </ul>
+
+        <p><b>Exigences non-fonctionnelles :</b></p>
+        <ul>
+            <li>Le résident est informé via un pop-up de confirmation.</li>
+            <li>Le problème est affiché dans l’onglet des signalements.</li>
+        </ul>
+
+        <p><b>Scénario nominal :</b></p>
+        <ol>
+            <li>Le résident se connecte dans son compte.</li>
+            <li>Le système vérifie les identifiants.</li>
+            <li>Le résident remplit le formulaire (adresse, type de problème).</li>
+            <li>Le résident soumet le formulaire.</li>
+            <li>Le système vérifie les informations.</li>
+            <li>Le système enregistre le problème dans la liste.</li>
+        </ol>
+
+        <p><b>Scénarios alternatifs / exceptionnels :</b></p>
+        <ul>
+            <li>2a. Informations invalides : le système propose de créer un nouveau compte.</li>
+            <li>5a. Erreur de requête : le système renvoie un message d’erreur.</li>
+            <li>5b. Problème déjà existant : message d’avertissement envoyé.</li>
+        </ul>
+
+    </section>
+
+    <section>
+        <h2>Prototype</h2>
+        <p>L’application permet de choisir un profil (résident, prestataire, STPM), puis d’afficher un menu adapté à chaque cas.</p>
+    </section>
 </div>
+
+    <footer>
+        <p>Rapport de projet - Application MaVille | Université de Montréal | 2025</p>
+    </footer>
+
 </body>
 </html>
