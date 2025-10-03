@@ -3,12 +3,13 @@ package ca.udem.maville;
 import io.javalin.Javalin;
 import java.awt.Desktop;
 import java.net.URI;
-import java.net.URISyntaxException;
+
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class App {
+
     public static void main(String[] args) {
         Javalin app = Javalin.create(config -> {
             config.staticFiles.add("/public");
@@ -27,4 +28,5 @@ public class App {
             context.json(response);
         });
     }
+
 }
