@@ -15,7 +15,8 @@
     <h1>Rapport de project - MaVille</h1>
 
     <section>
-    <h3>Description</h3>
+    <h2>Description</h2>
+        <h3> Contexte </h3>
     <p>
         Le Service des Travaux Publics de Montréal (STPM) souhaite développer une application pour permettre aux résidents
         de vérifier si un problème n'est pas déjà en cours de traitement ou signaler des problèmes urbains (trous, lampadaires défectueux, graffitis, etc.).
@@ -25,31 +26,35 @@
     <ul>
         <li>Manque de communication entre les acteurs.</li>
         <li>Absence de notifications claires et en temps réel.</li>
-        <li>Processus encore manuel (appels téléphoniques, fichiers Excel, etc..)</li>
+        <li>Processus manuel et innéficace (appels téléphoniques, fichiers Excel, documents imprimés, etc..)</li>
     </ul>
     <h3>Propositions</h3>
     <p>
-        Création d'une application simple et interactive centralisant la gestion des problèmes et projets de travaux,
+        Création d'une application simple et interactive centralisant les informations pour la gestion des problèmes et projets de travaux,
         incluant un registre consultable et un système de notification.
     </p>
 
     <h3>Hypothèses</h3>
     <ul>
-        <li>L’authentification est gérée par un système centralisé de la Ville</li>
+        <li>L’authentification de compte des usagers est gérée par le service central de la ville de Montréal</li>
         <li>Les notifications sont envoyées automatiquement aux résidents et prestataires.</li>
         <li>Les prestataires doivent être enregistrés et validés par le STPM.</li>
     </ul>
 
     <h3>Équipe</h3>
     <p>
-        Étudiants : Max Gour, Alexis Labelle, Philippe Lefrançois, Damia Boudjema<br>
-        Matricules : <br>
+        Étudiants, Matricule, Discord ID, GitHub ID : <br>
+        Max Gour, 20299796, el.max.gg, MaxGour   <br>
+        Alexis Labelle, 20276112, aleksy_, Al3ksy <br>
+        Philippe Lefrançois-Racz, 20259825, philippusRachidien, Adealeus <br>
+        Damia Boudjema, 20299430, Chrisamy, Chrisamy  <br>
     </p>
 
     <h3>Organisation</h3>
     <p>
-        Les communications des membres de l'équipe se font sur principalement sur Discord et le
-        travail est partagé via GitHub avec un workflow simple.
+        Les communications des membres de l'équipe se font sur principalement sur Discord et parfois en présentiel.
+        Le travail est partagé via GitHub avec un workflow simple.
+        La communication est journalière en clavardage Discord et appels conférences pour les mises au point.
     </p>
 
     </section>
@@ -59,28 +64,38 @@
     <h3> Glossaire </h3>
     <ul>
         <li>
-            <b>STPM</b> : Le Service des Travaux Publics de Montréal, organisme responsable de la validation et du suivi des projets.
+        <b>STPM</b>: Service des Travaux Publics de Montréal. Organisation ayant comme objectif de résourdre les problèmes d'ordre public de la ville de Montréal.
         </li>
+
         <li>
-            <b>Résident</b> : Citoyen de la ville de Montréal utilisant l'application pour signaler un problème.
+        <b>Prestataire</b>: Une entreprise qui prend en charge un problème assigné par le STPM. Le prestataire s'occupe du chantier et du bon déroulement des travaux.
         </li>
-        <li>
-            <b>Prestataire</b> : Entreprise proposant des projets pour résoudre des problèmes.
-        </li>
-        <li>
-            <b>Projet</b> : Proposition de solution soumise par un prestataire.
-        </li>
-        <li>
-            <b>Fiche problème</b> : Formulaire contenant la description du problème signalé
-        </li>
-        <li>
-            <b>Notification</b> : Message envoyé automatiquement pour informer les acteurs.
-        </li>
+
+        <li><b>Utilisateur</b>: Personne qui utilise l'application MaVille, souvent un résident ou un prestataire.</li>
+
+        <li><b>Registre des travaux</b>: Onglet de l'application MaVille ou les travaux à effectuer et ceux en cours sont affichés. On peut y appercevoir des informations comme la date de début et de fin des travaux, le budget, le prestataire en charge, etc. </li>
+
+        <li><b>Formulaire de signalement</b>: Formulaire à remplir par les résidents pour signaler au STPM un problème dans leur quartier. Ces formulaires seront accessibles par l'application MaVille. </li>
+
+        <li><b>Fiche de problème</b>: Fiche décrivant un problème affiché par le STPM. Les prestatires consultent ces fiches pour prendre note des problèmes à résoudre dans la ville de Montréal. </li>
+
+        <li><b>Appels de projet</b>: Appel fait par la STPM qui indique qu'un problème est prêt à être résolu et qu'un chantier est prêt à être établi. Cet appel sert à recruter un prestataire pour entamer des travaux. </li>
+
+        <li><b>Budget</b>: Somme d'argent investie dans la résolution d'un problème. Ce montant doit être respecté le plus possible. </li>
+
+        <li><b>Candidature</b>: Requête envoyée par les prestataires pour proposer leurs services au STPM. Le STPM prend compte des différentes candidatures pour un problème particulier et choisi le meilleur candidat pour commencer les travaux.</li>
+
+        <li> <b>Priorité</b>: Degré d'importance attribué aux différents problèmes signalés par les résidents. Plus la priorité est haute, plus les travaux seront entamés rapidement. </li>
+
+
     </ul>
 
     <h3>Diagramme d'activités</h3>
+        <img src="images/diagramme_activite_actuelle-2.png" alt="le diagramme d'activité" style="width: 50em">
 
     <h3>Diagramme de classes</h3>
+        <img src="images/diagramme_de_classes-1.png" alt="le diagram de classe" style=" width: 50em; margin-left: 4em">
+
     </section>
 
 
@@ -94,11 +109,14 @@
             <li>Temps de réponse inférieur à deux secondes.</li>
             <li>Données sécurisées via HTTPS.</li>
             <li>Disponibilité minimale de 99%.</li>
+            <li>Interface simple et intuitif.</li>
         </ul>
 
-        <h3>Besoins fonctionnels</h3>
+        <h2>Besoins fonctionnels</h2>
 
         <h3>Diagramme de cas d'utilisation</h3>
+
+        <img src="images/diagramme_cas_dutilisation-1.png" alt="diagramme de cas d'utilisation" style="width: 50em">
 
         <h3>Résumé des cas d’utilisation</h3>
         <table>
@@ -164,7 +182,8 @@
         </table>
 
         <h3>Cas d’utilisation : Signaler un problème</h3>
-        <p><b>Résumé :</b> Le résident commence en signalant un problème dans l’application MaVille. Une fois que le formulaire est rempli,
+        <p><b>Résumé :</b> Le résident signale un problème dans l’application MaVille à l'aide du menu fourni. <br>
+            Une fois que le formulaire est rempli,
             le problème est transmis au STPM en attente de validation.</p>
 
         <p><b>Acteur principal :</b> Résident<br>
@@ -174,18 +193,19 @@
         <ul>
             <li>Le résident possède un compte valide.</li>
             <li>Le résident est connecté à Internet.</li>
+            <li> Le problème à signaler fait parti des choix dans le menu.</li>
         </ul>
 
         <p><b>Post-conditions :</b></p>
         <ul>
-            <li>Le problème est envoyé au serveur.</li>
-            <li>Si validé, le problème est publié.</li>
+            <li>Le signalement est envoyé au serveur.</li>
+            <li>Si le signalement est valide, le problème est formaté en tant qu'appel à projet et est publié.</li>
             <li>Les prestataires concernés sont notifiés.</li>
         </ul>
 
         <p><b>Règles fonctionnelles :</b></p>
         <ul>
-            <li>Le problème signalé ne doit pas déjà exister dans la base.</li>
+            <li>Le problème signalé ne doit pas être déjà présent dans le registre des travaux.</li>
             <li>L’adresse doit être valide et située à Montréal.</li>
         </ul>
 
