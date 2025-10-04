@@ -10,19 +10,21 @@
 <div id="div-request-box">
     <table id="table-request">
         <tr>
-            <th>Numero de requete</th>
+            <th>Numéro d'appel de projet</th>
             <th>Adresse</th>
             <th>Type</th>
             <th>Status</th>
+           <td><button id="request-add-button" > Postuler candidature </button></td>
         </tr>
 
     </table>
 </div>
 <div id="button-panel">
-    <label for="Address">Addresse du probleme?</label>
+    <button id="request-add-button" > Inscription aux alertes des travaux </button>
+    <label for="Address">Addresse du secteur d'intérêt</label>
     <input type="text" id="Address">
     <br>
-    <label for="type-probleme">Quelle categorie decrit le probleme le mieux</label>
+    <label for="type-probleme">Catégorie de problème d'intérêt</label>
     <select id="type-probleme" name="type-prob-choose">
         <option value="Travaux routiers">Travaux routiers</option>
         <option value="Travaux de gaz ou électricité">Travaux de gaz ou électricité</option>
@@ -35,8 +37,9 @@
         <option value="Entretien urbain">Entretien urbain</option>
         <option value="Entretien des réseaux de télécommunication">Entretien des réseaux de télécommunication</option>
     </select>
-    <button id="request-add-button" onclick="addRequestButton()"> Ajouter une requete (va pas etre la dans la vraie version) </button>
+    <button id="request-add-button" onclick="addRequestButton()"> Ajouter un appel de projet (va pas etre la dans la vraie version) </button>
     <button onclick="location.href='pdfPage.html'"> Formulaire et fiche de projets pour prestataire </button>
+    <button id="request-add-button" > Accéder au registre des travaux </button>
 </div>
 
 <script src="script.js"></script>
