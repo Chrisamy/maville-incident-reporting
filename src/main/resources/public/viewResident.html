@@ -10,10 +10,12 @@
 <div id="div-request-box">
     <table id="table-request">
         <tr>
-            <th>Numero de requete</th>
-            <th>Adresse</th>
+            <th>Numéro de requête</th>
+            <th>Arrondissement</th>
             <th>Type</th>
             <th>Status</th>
+            <th>Catégorie du prestataire</th>
+            <th>Nom de l'organisation</th>
         </tr>
 
     </table>
@@ -47,5 +49,40 @@
 </div>
 
 <script src="script.js"></script>
+
+<script>
+    const apiURL = "https://donnees.montreal.ca/api/3/action/datastore_search?resource_id=cc41b532-f12d-40fb-9f55-eb58c9a2b12b&limit=10";
+
+
+    async function loadRequests() {
+        try {
+            const response = await fetch(apiURL);
+            const data = await response.json();
+            const records = data.result.records;
+
+            const table = document.getElementById("table-request");
+
+
+            records.forEach(record => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                <td>${record.id || "N/A"}</td>
+                <td>${record.boroughid || "N/A"}</td>
+                <td>${record.reason_category || "N/A"}</td>
+                <td>${record.currentstatus || "N/A"}</td>
+                <td>${record.submittercategory || "N/A"}</td>
+                <td>${record.organizationname || "N/A"}</td>
+`;
+                table.appendChild(row);
+            });
+        } catch (error) {
+            console.error("Erreur lors du chargement des données :", error);
+        }
+    }
+
+    // Charger les données dès que la page s’ouvre
+    loadRequests();
+</script>
+
 </body>
 </html>
