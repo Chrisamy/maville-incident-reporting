@@ -1,35 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portail de connexion - Gouvernement du Québec</title>
+    <link rel="stylesheet" href="style_login.css" >
 </head>
 <body>
-<h1>Qui etes vous?<br></h1>
-<div id="three-login-options">
-    <div id="div-login-user">
-        <p>resident</p>
-        <input type="text" value="username" style="margin-bottom: 5px">
-        <input type="text" value="password">
-        <br>
-        <button id="login-resident" onclick="location.href='viewResident.html'">Login</button>
-    </div>
-    <div id="div-login-user">
-        <p>prestataire</p>
-        <input type="text" value="username" style="margin-bottom: 5px">
-        <input type="text" value="password">
-        <br>
-        <button id="login-prestataire" onclick="location.href='viewPrestataire.html'">Login</button>
-    </div>
-    <div id="div-login-user">
-        <p>Agent</p>
-        <input type="text" value="username" style="margin-bottom: 5px">
-        <input type="text" value="password">
-        <br>
-        <button id="login-resident" onclick="location.href='viewAgent.html'">Login</button>
-    </div>
-</div>
 
+<main>
+    <h1>Portail de connexion</h1>
+    <p class="subtitle">Bienvenue sur le portail de signalement des problèmes en milieu rural.<br>
+        Veuillez sélectionner votre type de compte pour vous connecter.
+    </p>
+
+    <div class="card-container">
+
+        <div class="login-card">
+            <div class="icon">👤</div>
+            <h3>Résidents</h3>
+            <form>
+                <label for="email-resident">Courriel</label>
+                <input type="email" id="email-resident" placeholder="votre@courriel.ca">
+
+                <label for="password-resident">Mot de passe</label>
+                <input type="password" id="password-resident" placeholder="••••••••">
+
+                <button type="button" class="btn" onclick="location.href='viewResident.html'">Se connecter</button>
+                <a href="#" class="forgot">Mot de passe oublié?</a>
+            </form>
+        </div>
+
+
+        <div class="login-card">
+            <div class="icon">🧑‍💼</div>
+            <h3>Prestataire</h3>
+            <form>
+                <label for="email-part">Courriel</label>
+                <input type="email" id="email-part" placeholder="votre@courriel.ca">
+
+                <label for="password-part">Mot de passe</label>
+                <input type="password" id="password-part" placeholder="••••••••">
+
+                <button type="button" class="btn" onclick="location.href='viewPrestataire.html'">Se connecter</button>
+                <a href="#" class="forgot">Mot de passe oublié?</a>
+            </form>
+        </div>
+
+
+        <div class="login-card">
+            <div class="icon">🛡️</div>
+            <h3>Agents</h3>
+            <form>
+                <label for="email-agent">Courriel</label>
+                <input type="email" id="email-agent" placeholder="votre@courriel.ca">
+
+                <label for="password-agent">Mot de passe</label>
+                <input type="password" id="password-agent" placeholder="••••••••">
+
+                <button type="button" class="btn" onclick="location.href='viewAgent.html'">Se connecter</button>
+                <a href="#" class="forgot">Mot de passe oublié?</a>
+            </form>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <p><strong>Première visite?</strong><br>
+            Si vous n'avez pas encore de compte, veuillez communiquer avec votre municipalité pour obtenir vos identifiants de connexion.</p>
+        <a href="#">En savoir plus</a>
+    </div>
+</main>
+
+<footer>
+    <p>© Petit Génie - 2025</p>
+</footer>
 </body>
 </html>

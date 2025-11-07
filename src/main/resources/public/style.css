@@ -1,7 +1,8 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
     text-align: center;
-    margin-top: 5px;
+    margin: 0;
+    padding: 0;
     background-color: #f4f4f9;
     color: #333;
 }
@@ -24,11 +25,6 @@ button:hover {
     background-color: #005a99;
 }
 
-#login-button {
-    margin-left: 90%;
-    margin-bottom: 15px;
-    scale: 200%;
-}
 
 #header-div {
 
@@ -52,13 +48,6 @@ button:hover {
 
 }
 
-#div-login-user {
-    height: 30%;
-    width: 30%;
-    float: left;
-    border-style: solid;
-    margin: 0.5%;
-}
 
 #div-request-box {
     height: 90%;
