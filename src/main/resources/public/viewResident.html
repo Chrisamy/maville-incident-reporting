@@ -1,14 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>prototype view resident</title>
+    <title>Tableau des requêtes - Résident</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="header-div"><h1>Bonjour resident</h1></div>
-<div id="div-request-box">
-    <table id="table-request">
+<header class="topbar">
+    <div class="left">
+        <button class="menu" onclick="location.href='loginPage.html'"> Menu principal</button>
+        <div class="divider"></div>
+        <span class="welcome">Bonjour résident</span>
+    </div>
+    <div class="right">
+        <button class="btn-outline">
+            Registre des travaux
+        </button>
+        <button class="btn-primary">
+            Signaler un problème
+        </button>
+    </div>
+</header>
+
+
+<section class="search-section">
+    <label for="searchInput"></label><input type="text" id="searchInput" placeholder="Rechercher par numéro, arrondissement ou organisation...">
+    <label for="statusFilter"></label><select id="statusFilter">
+        <option value="">Tous les statuts</option>
+        <option value="Permis émis">Permis émis</option>
+        <option value="En attente">En attente</option>
+        <option value="Fermé">Fermé</option>
+    </select>
+</section>
+
+
+<section class="table-container">
+    <table id="permitTable">
+        <thead>
         <tr>
             <th>Numéro de requête</th>
             <th>Arrondissement</th>
@@ -17,72 +45,73 @@
             <th>Catégorie du prestataire</th>
             <th>Nom de l'organisation</th>
         </tr>
-
+        </thead>
+        <tbody id="tableBody">
+        <tr><td colspan="6" class="loading">Chargement des données...</td></tr>
+        </tbody>
     </table>
-</div>
+    <p id="resultCount">Affichage des résultats...</p>
+</section>
 
-<div id="button-panel">
-    <button id="request-add-button" onclick="addRequestButton()"> Signaler un problème </button>
-    <br>
-    <label for="Address">Addresse du probleme?</label>
-    <input type="text" id="Address">
-    <br>
-    <label for="type-probleme">Quelle categorie decrit le probleme le mieux</label>
-    <select id="type-probleme" name="type-prob-choose">
-        <option value="Travaux routiers">Travaux routiers</option>
-        <option value="Travaux de gaz ou électricité">Travaux de gaz ou électricité</option>
-        <option value="Construction ou rénovation">Construction ou rénovation</option>
-        <option value="Entretien paysager">Entretien paysager</option>
-        <option value="Travaux liés aux transports en commun">Travaux liés aux transports en commun</option>
-        <option value="Travaux de signalisation et éclairage">Travaux de signalisation et éclairage</option>
-        <option value="Travaux souterrains">Travaux souterrains</option>
-        <option value="Travaux résidentiel">Travaux résidentiel</option>
-        <option value="Entretien urbain">Entretien urbain</option>
-        <option value="Entretien des réseaux de télécommunication">Entretien des réseaux de télécommunication</option>
-    </select>
-
-
-
-
-    <button id="request-add-button" > Inscription aux alertes des travaux </button>
-    <button id="request-add-button" > Accéder au registre des travaux </button>
-</div>
-
-<script src="script.js"></script>
+<footer>
+    <p>© Petit Génie - 2025</p>
+</footer>
 
 <script>
-    const apiURL = "https://donnees.montreal.ca/api/3/action/datastore_search?resource_id=cc41b532-f12d-40fb-9f55-eb58c9a2b12b&limit=10";
 
 
-    async function loadRequests() {
+    const API_URL = "https://donnees.montreal.ca/api/3/action/datastore_search?resource_id=cc41b532-f12d-40fb-9f55-eb58c9a2b12b&limit=10";
+
+    async function fetchData() {
         try {
-            const response = await fetch(apiURL);
+            const response = await fetch(API_URL);
             const data = await response.json();
             const records = data.result.records;
-
-            const table = document.getElementById("table-request");
-
-
-            records.forEach(record => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                <td>${record.id || "N/A"}</td>
-                <td>${record.boroughid || "N/A"}</td>
-                <td>${record.reason_category || "N/A"}</td>
-                <td>${record.currentstatus || "N/A"}</td>
-                <td>${record.submittercategory || "N/A"}</td>
-                <td>${record.organizationname || "N/A"}</td>
-`;
-                table.appendChild(row);
-            });
+            populateTable(records);
         } catch (error) {
-            console.error("Erreur lors du chargement des données :", error);
+            document.getElementById("tableBody").innerHTML = `<tr><td colspan='6'>Erreur de chargement des données</td></tr>`;
         }
     }
 
-    // Charger les données dès que la page s’ouvre
-    loadRequests();
-</script>
+    function populateTable(records) {
+        const tbody = document.getElementById("tableBody");
+        tbody.innerHTML = "";
 
+        records.forEach(record => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+          <td>${record.id || "N/A"}</td>
+          <td>${record.boroughid || "N/A"}</td>
+          <td>${record.reason_category || record.permitcategory || "N/A"}</td>
+          <td><span class="status">${record.currentstatus || "N/A"}</span></td>
+          <td>${record.submittercategory || "N/A"}</td>
+          <td>${record.organizationname || "N/A"}</td>
+        `;
+            tbody.appendChild(row);
+        });
+
+        document.getElementById("resultCount").textContent = `Affichage de ${records.length} requêtes`;
+    }
+
+
+    document.getElementById("searchInput").addEventListener("input", filterTable);
+    document.getElementById("statusFilter").addEventListener("change", filterTable);
+
+    function filterTable() {
+        const search = document.getElementById("searchInput").value.toLowerCase();
+        const status = document.getElementById("statusFilter").value.toLowerCase();
+        const rows = document.querySelectorAll("#permitTable tbody tr");
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll("td");
+            const matchSearch = [...cells].some(cell => cell.textContent.toLowerCase().includes(search));
+            const matchStatus = status ? row.cells[3].textContent.toLowerCase().includes(status) : true;
+
+            row.style.display = matchSearch && matchStatus ? "" : "none";
+        });
+    }
+
+    fetchData();
+</script>
 </body>
 </html>

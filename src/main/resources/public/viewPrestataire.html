@@ -1,47 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Prototype view prestataire</title>
+    <title>Tableau des requêtes - Prestataire</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="header-div"><h1>Bonjour Prestataire</h1></div>
-<div id="div-request-box">
-    <table id="table-request">
-        <tr>
-            <th>Numéro d'appel de projet</th>
-            <th>Adresse</th>
-            <th>Type</th>
-            <th>Status</th>
-           <td><button id="request-add-button" > Postuler candidature </button></td>
-        </tr>
+<header class="topbar">
+    <div class="left">
+        <button class="menu" onclick="location.href='loginPage.html'"> Menu principal</button>
+        <div class="divider"></div>
+        <span class="welcome">Bonjour prestataire</span>
+    </div>
+    <div class="right">
+        <button class="btn-outline">
+            Registre des travaux
+        </button>
+        <button class="btn-outline">
+            Mes candidatures
+        </button>
+        <button class="btn-primary">
+            Soumettre une candidature
+        </button>
+    </div>
+</header>
 
-    </table>
-</div>
-<div id="button-panel">
-    <button id="request-add-button" > Inscription aux alertes des travaux </button>
-    <label for="Address">Addresse du secteur d'intérêt</label>
-    <input type="text" id="Address">
-    <br>
-    <label for="type-probleme">Catégorie de problème d'intérêt</label>
-    <select id="type-probleme" name="type-prob-choose">
-        <option value="Travaux routiers">Travaux routiers</option>
-        <option value="Travaux de gaz ou électricité">Travaux de gaz ou électricité</option>
-        <option value="Construction ou rénovation">Construction ou rénovation</option>
-        <option value="Entretien paysager">Entretien paysager</option>
-        <option value="Travaux liés aux transports en commun">Travaux liés aux transports en commun</option>
-        <option value="Travaux de signalisation et éclairage">Travaux de signalisation et éclairage</option>
-        <option value="Travaux souterrains">Travaux souterrains</option>
-        <option value="Travaux résidentiel">Travaux résidentiel</option>
-        <option value="Entretien urbain">Entretien urbain</option>
-        <option value="Entretien des réseaux de télécommunication">Entretien des réseaux de télécommunication</option>
+<section class="search-section">
+    <label for="searchInput"></label><input type="text" id="searchInput" placeholder="Rechercher par numéro, arrondissement ou catégorie...">
+    <label for="statusFilter"></label><select id="statusFilter">
+        <option value="">Tous les statuts</option>
+        <option value="En cours">En cours</option>
+        <option value="En attente">En attente</option>
+        <option value="Terminé">Terminé</option>
     </select>
-    <button id="request-add-button" onclick="addRequestButton()"> Ajouter un appel de projet (va pas etre la dans la vraie version) </button>
-    <button onclick="location.href='pdfPage.html'"> Formulaire et fiche de projets pour prestataire </button>
-    <button id="request-add-button" > Accéder au registre des travaux </button>
-</div>
+</section>
 
-<script src="script.js"></script>
+<section class="table-container">
+    <table id="requestTable">
+        <thead>
+        <tr>
+            <th>Numéro de requête</th>
+            <th>Arrondissement</th>
+            <th>Type de travail</th>
+            <th>Statut</th>
+            <th>Date de début</th>
+            <th>Date de fin prévue</th>
+        </tr>
+        </thead>
+    </table>
+    <p id="resultCount">Affichage des requêtes</p>
+</section>
+
+<footer>
+    <p>© Petit Génie - 2025</p>
+</footer>
+
 </body>
 </html>
