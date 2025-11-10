@@ -92,7 +92,7 @@ button {
     max-width: 1000px;
     margin: 20px auto;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 12px;
     padding: 14px 18px;
@@ -119,10 +119,13 @@ button {
     min-width: 160px;
 }
 
+
 .search-section select {
     flex: 0 0 auto;
     min-width: 160px;
     background-color: #fbfdff;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .search-section input:focus,
