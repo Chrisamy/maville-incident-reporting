@@ -17,15 +17,16 @@ public class Server {
 
     static List<String> messageQueue = new ArrayList<>();
 
+    private static int port = 7000;
 
     public static void main(String[] args) {
         app = Javalin.create(config -> {
             config.staticFiles.add("/public");
-        }).start(7000);
+        }).start(port);
 
         Desktop desktop = Desktop.getDesktop();
         try {
-            desktop.browse(new URI("http://localhost:7000"));
+            desktop.browse(new URI(String.format("http://localhost:%d", port)));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -65,6 +66,10 @@ public class Server {
     public static void sendMessage(String msg){
         // Update our error message variable (if you want to use it elsewhere)
         messageQueue.add(msg);
+    }
+
+    public void showList(){
+
     }
 
 }
