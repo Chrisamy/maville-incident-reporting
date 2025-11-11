@@ -8,17 +8,15 @@ import java.io.IOException;
 import java.net.URI;
 
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Map;
+import java.util.*;
 
 public class Server {
 
     static Javalin app;
     static String ErrorMessage = "Il y a eu une erreur (default)";
 
-    static Set<Context> sseClients = new HashSet<>();
+    static List<String> messageQueue = new ArrayList<>();
+
 
     public static void main(String[] args) {
         app = Javalin.create(config -> {
@@ -41,56 +39,32 @@ public class Server {
         });
 
         app.get("/events", ctx -> {
-            // Configure HTTP headers to indicate this is an SSE stream
-            ctx.res().setContentType("text/event-stream");
+            // Set necessary headers for SSE
+            ctx.header("Content-Type", "text/event-stream");
+            ctx.header("Cache-Control", "no-cache");
             ctx.res().setCharacterEncoding("UTF-8");
-            ctx.res().setHeader("Cache-Control", "no-cache");
 
-            // Add this connection to the list of clients
-            sseClients.add(ctx);
+            int numMessagesSent = 0;
 
-            // When the connection is closed, remove it from the list
-            ctx.future(() -> { sseClients.remove(ctx); return null;});
-
-            // Flush the response to start the event stream
-            ctx.res().flushBuffer();
+            // Send events, for demonstration send a new one every 5 seconds
+            while (!Thread.interrupted()) {
+                while (numMessagesSent < messageQueue.size()) {
+                    ctx.res().getWriter().write("data: " + messageQueue.get(numMessagesSent++) + "\n\n");
+                    ctx.res().getWriter().flush();
+                }
+                Thread.sleep(1000); // chaque seconde on check pour un nouveaux message chaque seconde
+            }
         });
 
-        // route that captures the last segment as the "msg" path parameter
-
-        new Thread(() -> {
-            try {
-                // wait a few seconds to allow the browser to connect
-                Thread.sleep(5000);
-                sendMessage("Message");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-
-
+        sendMessage("Message1");
+        sendMessage("Message2");
 
 
     }
 
     public static void sendMessage(String msg){
         // Update our error message variable (if you want to use it elsewhere)
-        ErrorMessage = msg;
-
-
-        // For every connected client...
-        sseClients.forEach(ctx -> {
-            try {
-                // SSE messages are sent in the format "data: message\n\n"
-                ctx.res().getWriter().write("data: " + msg + "\n\n");
-
-                // Force the data to actually be sent immediately
-                ctx.res().flushBuffer();
-            } catch (IOException e) {
-                // If a client disconnects or errors out, remove it
-                sseClients.remove(ctx);
-            }
-        });
+        messageQueue.add(msg);
     }
 
 }

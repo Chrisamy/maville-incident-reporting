@@ -42,10 +42,9 @@ function addRequestButton() {
     }
 }
 
-const eventSource = new EventSource("/events");
-
-eventSource.onmessage = (event) => {
-    window.alert("Message from backend: " + event.data);
-};
-
+if (!window.eventSource) {
+    window.eventSource = new EventSource("/events");
+    window.eventSource.onmessage = (event) => {
+        alert(event.data);
+        };
 }
