@@ -41,3 +41,11 @@ function addRequestButton() {
         colorSwap *= -1;
     }
 }
+
+const eventSource = new EventSource("/events");
+
+eventSource.onmessage = (event) => {
+    window.alert("Message from backend: " + event.data);
+};
+
+}
