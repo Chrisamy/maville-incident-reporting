@@ -1,0 +1,150 @@
+:root {
+    --primary: #007acc;
+    --primary-hover: #005a99;
+    --accent: #1c4587;
+    --bg: #f4f4f9;
+    --text: #333;
+    --text-light: #555;
+    --border: #ccc;
+    --danger-bg: #fff3f3;
+    --danger-border: #e64e4e;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+main {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+main h1 {
+    color: var(--primary);
+    font-size: 1.8em;
+}
+
+.subtitle {
+    color: var(--text-light);
+    margin-bottom: 40px;
+}
+
+.card-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.login-card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    width: 280px;
+    padding: 25px;
+    text-align: left;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.icon {
+    font-size: 2em;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.login-card h3 {
+    text-align: center;
+    color: var(--primary);
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+.login-card label {
+    display: block;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    color: var(--text-light);
+}
+
+.login-card input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-size: 0.95em;
+}
+
+.btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95em;
+    transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+    background-color: var(--primary-hover);
+}
+
+
+.forgot {
+    display: block;
+    text-align: center;
+    font-size: 0.85em;
+    margin-top: 10px;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.forgot:hover {
+    text-decoration: underline;
+}
+
+.info-box {
+    background-color: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    border-radius: 8px;
+    width: 70%;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: left;
+    max-width: 800px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.info-box p {
+    margin: 0 0 10px 0;
+}
+
+.info-box a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.info-box a:hover {
+    text-decoration: underline;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.85em;
+    color: #666;
+}
+
