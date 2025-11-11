@@ -2,11 +2,11 @@ package ca.udem.maville;
 
 public class ResFormHandler {
     FormResident form;
-    int id;
+    String id;
 
     String priority;
 
-    public void setId(int id){
+    public void setId(String id){
         this.id = id;
     }
 
