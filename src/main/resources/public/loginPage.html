@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portail de connexion - Gouvernement du Québec</title>
-    <link rel="stylesheet" href="style_login.css" >
+    <link rel="stylesheet" href="login.css" >
 </head>
 <body>
 
@@ -26,7 +26,7 @@
                 <label for="password-resident">Mot de passe</label>
                 <input type="password" id="password-resident" placeholder="••••••••">
 
-                <button type="button" class="btn" onclick="location.href='viewResident.html'">Se connecter</button>
+                <button type="button" class="btn" id="resident-Login" onclick="location.href='viewResident.html'">Se connecter</button>
                 <a href="#" class="forgot">Mot de passe oublié?</a>
             </form>
         </div>
@@ -74,5 +74,18 @@
 <footer>
     <p>© Petit Génie - 2025</p>
 </footer>
+<script>
+    document.getElementById("resident-Login").addEventListener("click", async () => {
+        try {
+            const username = document.getElementById("email-resident").value;
+            const password = document.getElementById("password-resident").value;
+            let response = await fetch("/api/resident-log-in", { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),});
+            let data = await response.json();
+        } catch (err) {
+            alert(err);
+        }
+    });
+</script>
 </body>
 </html>

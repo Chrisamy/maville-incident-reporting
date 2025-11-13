@@ -1,19 +1,21 @@
+:root {
+    --primary: #007acc;
+    --primary-hover: #005a99;
+    --accent: #1c4587;
+    --bg: #f4f4f9;
+    --text: #333;
+    --text-light: #555;
+    --border: #ccc;
+    --danger-bg: #fff3f3;
+    --danger-border: #e64e4e;
+}
+
 body {
     font-family: "Segoe UI", Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
-    color: #333;
-}
-
-header h2 {
-    margin: 0;
-    font-size: 1.2em;
-}
-
-header p {
-    margin: 0;
-    font-size: 0.9em;
+    background-color: var(--bg);
+    color: var(--text);
 }
 
 main {
@@ -22,15 +24,14 @@ main {
 }
 
 main h1 {
-    color: #007acc;
+    color: var(--primary);
     font-size: 1.8em;
 }
 
 .subtitle {
-    color: #555;
+    color: var(--text-light);
     margin-bottom: 40px;
 }
-
 
 .card-container {
     display: flex;
@@ -42,11 +43,17 @@ main h1 {
 
 .login-card {
     background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     width: 280px;
     padding: 25px;
     text-align: left;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .icon {
@@ -57,44 +64,50 @@ main h1 {
 
 .login-card h3 {
     text-align: center;
-    color: #007acc;
+    color: var(--primary);
     margin-bottom: 20px;
+    font-size: 1.2em;
 }
 
 .login-card label {
     display: block;
     font-size: 0.9em;
     margin-bottom: 5px;
+    color: var(--text-light);
 }
 
 .login-card input {
     width: 100%;
     padding: 8px;
     margin-bottom: 15px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-size: 0.95em;
 }
 
 .btn {
-    background-color: #007acc;
+    background-color: var(--primary);
     color: white;
     border: none;
     width: 100%;
     padding: 10px;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
+    font-size: 0.95em;
+    transition: background-color 0.2s ease;
 }
 
 .btn:hover {
-    background-color: #005a99;
+    background-color: var(--primary-hover);
 }
+
 
 .forgot {
     display: block;
     text-align: center;
     font-size: 0.85em;
     margin-top: 10px;
-    color: #1c4587;
+    color: var(--accent);
     text-decoration: none;
 }
 
@@ -103,14 +116,15 @@ main h1 {
 }
 
 .info-box {
-    background-color: #fff3f3;
-    border: 1px solid #e64e4e;
+    background-color: var(--danger-bg);
+    border: 1px solid var(--danger-border);
     border-radius: 8px;
     width: 70%;
     margin: 0 auto;
     padding: 20px;
     text-align: left;
     max-width: 800px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
 .info-box p {
@@ -118,8 +132,9 @@ main h1 {
 }
 
 .info-box a {
-    color: #1c4587;
+    color: var(--accent);
     text-decoration: none;
+    font-weight: 500;
 }
 
 .info-box a:hover {
