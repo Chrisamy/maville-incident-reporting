@@ -1,34 +1,67 @@
 package ca.udem.maville;
 
 public class FormResident {
-
-    public String location;
-    public String description;
-    public String priority;
-
-    private String id;
-    private EnumWorkType WorkType;
-    private String username;
-    private PriorityEnum priorityEnum;
+    EnumWorkType WorkType;
+    String location;
+    String username;
+    Priority priority = Priority.notAssigned;
+    String id;
+    String descritption;
 
     public void receiveForm(){
 
     }
 
-    public EnumWorkType getWorkType(){
+    //Constructor
+
+    public FormResident(EnumWorkType WorkType, String location, String username, Priority priority, String descritption) {
+        this.WorkType = EnumWorkType.notDefined;
+        this.location = location;
+        this.username = username;
+        this.priority = priority;
+        this.id = "";
+        this.descritption = descritption;
+    }
+
+    //Getters
+
+    public EnumWorkType getWorkType() {
         return WorkType;
     }
-
-    public String getLocation(){
+    public String getLocation() {
         return location;
     }
-
-    public String getId(){
+    public String getUsername() {
+        return username;
+    }
+    public Priority getPriority() {
+        return priority;
+    }
+    public String getId() {
         return id;
     }
+    public String getDescritption() {
+        return descritption;
+    }
 
-    public void setId(String id){
+    //Setters
+
+    public void setWorkType(EnumWorkType WorkType) {
+        this.WorkType = WorkType;
+    }
+    public void setLocation(String location) {
+        this.location = location;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+    public void setId(String id) {
         this.id = id;
     }
+    public void setDescritption(String descritption) {
+        this.descritption = descritption;
+    }
 }
-
