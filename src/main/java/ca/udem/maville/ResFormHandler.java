@@ -6,19 +6,8 @@ public class ResFormHandler {
 
     String priority;
 
-    public void setId(String id){
-        this.id = id;
+    public ResFormHandler(FormResident form) {
+        this.form = form;
     }
 
-    public void setPriority(String priority){
-        this.priority = priority;
-    }
-
-    public Boolean isFormValid(){
-        return true;
-    }
-
-    public Boolean isFormDuplicate(){
-        return false;
-    }
 }

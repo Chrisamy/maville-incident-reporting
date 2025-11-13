@@ -7,8 +7,6 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 
-
-import java.text.Normalizer;
 import java.util.*;
 
 public class Server {
@@ -69,8 +67,8 @@ public class Server {
         });
 
         app.post("/api/resident-form-send", ctx -> {
-            FormResident formResident = new FormResident();
-            formResident.receiveForm(ctx.formParam("address"), ctx.formParam("details"), ctx.formParam("priority"));
+            FormResident formResident = new FormResident(ctx.formParam("address"), currentResident.getUsername(),
+                    ctx.formParam("details"));
             ctx.json(formResident);
             currentResident.submitForm(formResident);
         });

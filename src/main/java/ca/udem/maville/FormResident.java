@@ -14,11 +14,10 @@ public class FormResident {
 
     //Constructor
 
-    public FormResident(EnumWorkType WorkType, String location, String username, Priority priority, String descritption) {
+    public FormResident(String location, String username, String descritption) {
         this.WorkType = EnumWorkType.notDefined;
         this.location = location;
         this.username = username;
-        this.priority = priority;
         this.id = "";
         this.descritption = descritption;
     }
