@@ -1,6 +1,7 @@
 package ca.udem.maville;
 
 public enum EnumWorkType {
+    notDefined,
     RoadWork,
     GazOrElectric,
     ConstructionOrRenovation,
