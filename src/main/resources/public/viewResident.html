@@ -33,7 +33,7 @@
                 <input id="addressInput" class="form-control" name="address" type="text" placeholder="Ex: 123 Rue Principale, Montréal" required>
             </label>
 
-            <fieldset class="priority-group">
+            <fieldset class="priority-group" id="priorityGroup">
                 <legend>Niveau de priorité estimé <span class="required">*</span></legend>
                 <label><input type="radio" name="priority" value="low"> Basse - Problème mineur, pas urgent</label>
                 <label><input type="radio" name="priority" value="medium" checked> Moyenne - Problème à traiter dans un délai raisonnable</label>
@@ -177,6 +177,7 @@
                 return;
             }
             const fd = new FormData(form);
+            console.log(FormData)
             if (fileInput.files[0]) fd.append('photo', fileInput.files[0]);
             // TODO: send fd via fetch to server endpoint
 
@@ -184,7 +185,7 @@
             try {
                 let response = await fetch("/api/resident-form-send", {
                     method: 'POST',
-                    body: JSON.stringify(fd),
+                    body: fd,
                 });
                 let data = await response.json();
             } catch (err) {

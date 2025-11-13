@@ -7,7 +7,7 @@ public class Resident extends User{
     }
 
     public void submitForm(FormResident form){
-        System.out.println(form.getLocation());
+
     }
 
 }
