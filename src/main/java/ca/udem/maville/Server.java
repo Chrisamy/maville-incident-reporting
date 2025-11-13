@@ -19,7 +19,7 @@ public class Server {
 
     static List<User> userList = new ArrayList<>();
 
-    static User currentUser;
+    static Resident currentResident;
 
     private static int port = 7000;
 
@@ -62,13 +62,15 @@ public class Server {
         });
 
         app.post("/api/resident-log-in", ctx -> {
-            currentUser = ctx.bodyAsClass(User.class);
-            ctx.json(currentUser);
-            System.out.println(currentUser.getUsername());
+            currentResident = ctx.bodyAsClass(Resident.class);
+            ctx.json(currentResident);
+            System.out.println(currentResident.getUsername());
         });
 
         app.post("/api/resident-form-send", ctx -> {
-
+            FormResident formResident = ctx.bodyAsClass(FormResident.class);
+            ctx.json(formResident);
+            currentResident.submitForm(formResident);
         });
 
 

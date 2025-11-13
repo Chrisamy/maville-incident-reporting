@@ -182,10 +182,9 @@
 
 
             try {
-                const username = document.getElementById("email-resident").value;
                 let response = await fetch("/api/resident-form-send", {
                     method: 'POST',
-                    body: fd,
+                    body: JSON.stringify(fd),
                 });
                 let data = await response.json();
             } catch (err) {

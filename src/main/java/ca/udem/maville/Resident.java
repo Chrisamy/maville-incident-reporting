@@ -6,8 +6,8 @@ public class Resident extends User{
         super();
     }
 
-    private void submitForm(){
-
+    public void submitForm(FormResident form){
+        System.out.println(form.getLocation());
     }
 
 }
