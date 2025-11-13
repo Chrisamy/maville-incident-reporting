@@ -22,6 +22,45 @@
     </div>
 </header>
 
+<div id="problemModalOverlay" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
+        <h2 id="modalTitle" class="modal-title">Signaler un problème</h2>
+        <p class="modal-sub">Remplissez le formulaire ci-dessous pour signaler un problème dans votre secteur.</p>
+
+        <form id="problemForm" class="modal-form">
+            <label>Adresse du problème <span class="required">*</span>
+                <input id="addressInput" class="form-control" name="address" type="text" placeholder="Ex: 123 Rue Principale, Montréal" required>
+            </label>
+
+            <fieldset class="priority-group">
+                <legend>Niveau de priorité estimé <span class="required">*</span></legend>
+                <label><input type="radio" name="priority" value="low"> Basse - Problème mineur, pas urgent</label>
+                <label><input type="radio" name="priority" value="medium" checked> Moyenne - Problème à traiter dans un délai raisonnable</label>
+                <label><input type="radio" name="priority" value="high"> Haute - Problème urgent, danger potentiel</label>
+            </fieldset>
+
+            <label>Description détaillée <span class="required">*</span>
+                <textarea id="detailsInput" class="form-control" name="details" rows="5" placeholder="Décrivez le problème en détail..." required></textarea>
+            </label>
+
+            <label>Photo (optionnel)</label>
+            <div id="fileDrop" class="file-drop">
+                <input id="fileInput" type="file" accept="image/png, image/jpeg" />
+                <div class="file-drop-inner">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v10" stroke="#7b8794" stroke-width="1.5"/><path d="M8 7l4-4 4 4" stroke="#7b8794" stroke-width="1.5"/></svg>
+                    <div class="file-drop-text">Cliquez pour ajouter une photo ou glissez-déposez<br><small>PNG, JPG jusqu'à 10MB</small></div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-outline" id="cancelBtn">Annuler</button>
+                <button type="submit" class="btn-primary">Soumettre</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 <section class="search-section">
     <label for="searchInput"></label><input type="text" id="searchInput" placeholder="Rechercher par numéro, arrondissement ou organisation...">
@@ -58,8 +97,6 @@
 </footer>
 
 <script>
-
-
     const API_URL = "https://donnees.montreal.ca/api/3/action/datastore_search?resource_id=cc41b532-f12d-40fb-9f55-eb58c9a2b12b&limit=10";
 
     async function fetchData() {
@@ -112,6 +149,65 @@
     }
 
     fetchData();
+
+    (function(){
+        const openBtn = document.querySelector('.btn-primary');
+        const overlay = document.getElementById('problemModalOverlay');
+        const closeBtn = document.getElementById('modalCloseBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const form = document.getElementById('problemForm');
+        const fileDrop = document.getElementById('fileDrop');
+        const fileInput = document.getElementById('fileInput');
+
+        function openModal(){ overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+        function closeModal(){ overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); document.body.style.overflow=''; form.reset(); clearFilePreview(); }
+
+        if(openBtn) openBtn.addEventListener('click', (e)=>{ e.preventDefault(); openModal(); });
+
+        closeBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+        overlay.addEventListener('click', (e)=> { if(e.target === overlay) closeModal(); });
+
+        document.querySelector('.modal-card').addEventListener('click', e=> e.stopPropagation());
+
+        form.addEventListener('submit', function(e){
+            e.preventDefault();
+            if(!form.checkValidity()){ form.reportValidity(); return; }
+            const fd = new FormData(form);
+            if(fileInput.files[0]) fd.append('photo', fileInput.files[0]);
+            // TODO: send fd via fetch to server endpoint
+            console.log('Submit form:', Object.fromEntries(fd.entries()));
+            closeModal();
+        });
+
+        fileDrop.addEventListener('click', ()=> fileInput.click());
+        fileDrop.addEventListener('dragover', e=> { e.preventDefault(); fileDrop.style.borderColor='#a0a9b5'; });
+        fileDrop.addEventListener('dragleave', e=> { e.preventDefault(); fileDrop.style.borderColor=''; });
+        fileDrop.addEventListener('drop', e=> {
+            e.preventDefault();
+            fileDrop.style.borderColor='';
+            const files = e.dataTransfer.files;
+            if(files && files.length) {
+                fileInput.files = files;
+                showFileName(files[0]);
+            }
+        });
+        fileInput.addEventListener('change', ()=> { if(fileInput.files[0]) showFileName(fileInput.files[0]); });
+
+        function showFileName(file){
+            const name = document.createElement('div');
+            name.className = 'file-name';
+            name.textContent = file.name + ' (' + Math.round(file.size/1024) + ' KB)';
+            // remove previous small preview text if any
+            const existing = fileDrop.querySelector('.file-name');
+            if(existing) existing.remove();
+            fileDrop.appendChild(name);
+        }
+        function clearFilePreview(){
+            const existing = fileDrop.querySelector('.file-name');
+            if(existing) existing.remove();
+        }
+    })();
 </script>
 </body>
 </html>
