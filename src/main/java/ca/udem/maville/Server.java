@@ -62,9 +62,15 @@ public class Server {
         });
 
         app.post("/api/resident-log-in", ctx -> {
-            currentUser = new Resident(ctx.formParam("username"), ctx.formParam("password"));
+            currentUser = ctx.bodyAsClass(User.class);
+            ctx.json(currentUser);
+            System.out.println(currentUser.getUsername());
+        });
+
+        app.post("/api/resident-form-send", ctx -> {
 
         });
+
 
 
     }
@@ -75,6 +81,10 @@ public class Server {
     }
 
     public void showList(){
+
+    }
+
+    private void sendForm(){
 
     }
 

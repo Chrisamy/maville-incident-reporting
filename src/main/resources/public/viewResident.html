@@ -170,21 +170,26 @@
 
         document.querySelector('.modal-card').addEventListener('click', e=> e.stopPropagation());
 
-        form.addEventListener('submit', function(e){
+        form.addEventListener('submit', async function (e) {
             e.preventDefault();
-            if(!form.checkValidity()){ form.reportValidity(); return; }
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
             const fd = new FormData(form);
-            if(fileInput.files[0]) fd.append('photo', fileInput.files[0]);
+            if (fileInput.files[0]) fd.append('photo', fileInput.files[0]);
             // TODO: send fd via fetch to server endpoint
 
 
             try {
                 const username = document.getElementById("email-resident").value;
-                let response = await fetch("/api/resident-form-send", { method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),});
+                let response = await fetch("/api/resident-form-send", {
+                    method: 'POST',
+                    body: fd,
+                });
                 let data = await response.json();
             } catch (err) {
-
+                console.log(err);
             }
 
 
