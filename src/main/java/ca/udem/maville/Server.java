@@ -12,10 +12,14 @@ import java.util.*;
 
 public class Server {
 
-    static Javalin app;
+    public static Javalin app;
     static String ErrorMessage = "Il y a eu une erreur (default)";
 
     static List<String> messageQueue = new ArrayList<>();
+
+    static List<User> userList = new ArrayList<>();
+
+    static User currentUser;
 
     private static int port = 7000;
 
@@ -57,8 +61,10 @@ public class Server {
             }
         });
 
-        sendMessage("Message1");
-        sendMessage("Message2");
+        app.post("/api/resident-log-in", ctx -> {
+            currentUser = new Resident(ctx.formParam("username"), ctx.formParam("password"));
+
+        });
 
 
     }

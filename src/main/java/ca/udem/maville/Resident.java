@@ -8,6 +8,6 @@ public class Resident extends User{
 
     private void submitForm(){
 
-        return;
     }
+
 }
