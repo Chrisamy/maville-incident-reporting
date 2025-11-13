@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 
 
+import java.text.Normalizer;
 import java.util.*;
 
 public class Server {
@@ -19,7 +20,7 @@ public class Server {
 
     static List<User> userList = new ArrayList<>();
 
-    static User currentUser;
+    static Resident currentResident;
 
     private static int port = 7000;
 
@@ -62,9 +63,18 @@ public class Server {
         });
 
         app.post("/api/resident-log-in", ctx -> {
-            currentUser = new Resident(ctx.formParam("username"), ctx.formParam("password"));
-
+            currentResident = ctx.bodyAsClass(Resident.class);
+            ctx.json(currentResident);
+            System.out.println(currentResident.getUsername());
         });
+
+        app.post("/api/resident-form-send", ctx -> {
+            FormResident formResident = new FormResident();
+            formResident.receiveForm(ctx.formParam("address"), ctx.formParam("details"), ctx.formParam("priority"));
+            ctx.json(formResident);
+            currentResident.submitForm(formResident);
+        });
+
 
 
     }
@@ -75,6 +85,10 @@ public class Server {
     }
 
     public void showList(){
+
+    }
+
+    private void sendForm(){
 
     }
 
