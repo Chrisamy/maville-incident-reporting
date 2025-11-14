@@ -8,9 +8,6 @@ public class FormResident {
     String id;
     String descritption;
 
-    public void receiveForm(){
-
-    }
 
     //Constructor
 

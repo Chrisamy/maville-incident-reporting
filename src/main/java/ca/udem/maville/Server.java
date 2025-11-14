@@ -16,6 +16,9 @@ public class Server {
 
     static List<String> messageQueue = new ArrayList<>();
 
+    public static ProblemRepository problemList = ProblemRepository.getInstance();
+    public static DemandRepository demandeList = DemandRepository.getInstance();
+
     static List<User> userList = new ArrayList<>();
 
     static Resident currentResident;

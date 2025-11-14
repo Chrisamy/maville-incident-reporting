@@ -7,7 +7,7 @@ public class Resident extends User{
     }
 
     public void submitForm(FormResident form){
-        ResFormHandler resHandler = new ResFormHandler(form);
+        Server.problemList.addForm(form);
     }
 
 }
