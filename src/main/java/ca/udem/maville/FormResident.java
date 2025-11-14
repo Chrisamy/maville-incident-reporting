@@ -1,13 +1,13 @@
 package ca.udem.maville;
 
 public class FormResident {
-    private EnumWorkType WorkType;
-    private String location;
-    private String username;
-    private Priority priority = Priority.notAssigned;
-    private String id;
-    private String descritption;
-
+    EnumWorkType WorkType;
+    String location;
+    String username;
+    Priority priority;
+    String id;
+    String descritption;
+    Status status;
 
     //Constructor
 
@@ -15,8 +15,10 @@ public class FormResident {
         this.WorkType = EnumWorkType.notDefined;
         this.location = location;
         this.username = username;
-        this.id = "";
+        this.priority = Priority.notAssigned;
+        this.id = IdGenerator.generateID();
         this.descritption = descritption;
+        this.status = Status.waitingForApproval;
     }
 
     //Getters
@@ -39,6 +41,9 @@ public class FormResident {
     public String getDescritption() {
         return descritption;
     }
+    public Status getStatus() {
+        return status;
+    }
 
     //Setters
 
@@ -59,5 +64,8 @@ public class FormResident {
     }
     public void setDescritption(String descritption) {
         this.descritption = descritption;
+    }
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }

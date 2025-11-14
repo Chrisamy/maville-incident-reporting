@@ -24,7 +24,7 @@ public class ProblemRepository {
         return FormList;
     }
 
-    public void addForm(FormResident form){
+    public static void addForm(FormResident form){
         FormList.add(form);
     }
 }

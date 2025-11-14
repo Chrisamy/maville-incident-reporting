@@ -1,13 +1,8 @@
 package ca.udem.maville;
 
+import java.util.ArrayList;
+
 public class Agent extends User {
 
 
-    private void ChangePriority(String NewPriority){
-
-    }
-
-    private void AcceptProject(boolean isAccepted){
-
-    }
 }
