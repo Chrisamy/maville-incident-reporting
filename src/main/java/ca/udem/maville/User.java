@@ -9,11 +9,4 @@ public class User {
         return username;
     }
 
-    private void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword() {
-        this.password = password;
-    }
 }

@@ -12,20 +12,16 @@ import java.util.*;
 public class Server {
 
     public static Javalin app;
-    static String ErrorMessage = "Il y a eu une erreur (default)";
 
-    static List<String> messageQueue = new ArrayList<>();
+    private static List<String> messageQueue = new ArrayList<>();
 
     public static ProblemRepository problemList = ProblemRepository.getInstance();
     public static DemandRepository demandeList = DemandRepository.getInstance();
 
-    static List<User> userList = new ArrayList<>();
-
     static Resident currentResident;
 
-    private static int port = 7000;
-
     public static void main(String[] args) {
+        int port = 7000;
         app = Javalin.create(config -> {
             config.staticFiles.add("/public");
         }).start(port);

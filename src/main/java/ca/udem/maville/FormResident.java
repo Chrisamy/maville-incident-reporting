@@ -1,12 +1,12 @@
 package ca.udem.maville;
 
 public class FormResident {
-    EnumWorkType WorkType;
-    String location;
-    String username;
-    Priority priority = Priority.notAssigned;
-    String id;
-    String descritption;
+    private EnumWorkType WorkType;
+    private String location;
+    private String username;
+    private Priority priority = Priority.notAssigned;
+    private String id;
+    private String descritption;
 
 
     //Constructor
