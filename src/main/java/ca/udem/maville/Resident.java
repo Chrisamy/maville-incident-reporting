@@ -6,8 +6,9 @@ public class Resident extends User{
         super(username, password);
     }
 
-    private void submitForm(){
-
+    private void submitForm(String location, String username, String descritption){
+        FormResident form = new FormResident(location, username, descritption);
+        ProblemRepository.addForm(form);
     }
 
 }
