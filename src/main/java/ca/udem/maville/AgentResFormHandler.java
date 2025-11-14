@@ -2,7 +2,7 @@ package ca.udem.maville;
 
 import java.util.ArrayList;
 
-public class AgentFormHandler {
+public class AgentResFormHandler {
 
     //Accède à un formulaire via son id
 
