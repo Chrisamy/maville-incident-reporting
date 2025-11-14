@@ -255,10 +255,20 @@ textarea{
   background:#fff
 }
 
-label{display:block;margin-bottom:8px;color:var(--text-soft);font-size:14px}
+label,legend {
+  display:block;
+  margin-bottom:8px;
+  color:var(--text-soft);
+  font-size:14px}
 
 .field {
   margin-bottom:16px
+}
+
+.priority-group label {
+  display:block;
+  margin:6px 0;
+  color:var(--text)
 }
 
 .required {
@@ -325,16 +335,6 @@ label{display:block;margin-bottom:8px;color:var(--text-soft);font-size:14px}
   border:none;
   margin:8px 0 14px 0;
   padding:0
-}
-
-.priority-group legend {
-  font-weight:600;
-  margin-bottom:8px}
-
-.priority-group label {
-  display:block;
-  margin:6px 0;
-  color:var(--text)
 }
 
 .modal-actions {
