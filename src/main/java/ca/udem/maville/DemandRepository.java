@@ -8,6 +8,21 @@ public class DemandRepository {
 
     static ArrayList<FormPrestataire> DemandList = new ArrayList<FormPrestataire>();
 
+    private static DemandRepository instance = null;
+    public ArrayList<FormResident> FormList;
+
+    private DemandRepository() {
+        DemandList = new ArrayList<>();
+    }
+
+    public static synchronized DemandRepository getInstance() {
+        if (instance == null) {
+            instance = new DemandRepository();
+        }
+        return instance;
+    }
+
+
     public ArrayList<FormPrestataire> getAllForms() {
         return DemandList;
     }

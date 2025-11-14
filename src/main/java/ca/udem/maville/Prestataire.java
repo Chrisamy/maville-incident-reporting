@@ -4,11 +4,6 @@ public class Prestataire extends User {
 
     int CompanyNumber;
 
-    public Prestataire(String username, String password, int CompanyNumber) {
-        super(username, password);
-        this.CompanyNumber = CompanyNumber;
-    }
-
     public int getCompanyNumber() {
         return CompanyNumber;
     }

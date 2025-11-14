@@ -7,23 +7,21 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 
-
 import java.util.*;
 
 public class Server {
 
     public static Javalin app;
-    static String ErrorMessage = "Il y a eu une erreur (default)";
 
-    static List<String> messageQueue = new ArrayList<>();
+    private static List<String> messageQueue = new ArrayList<>();
 
-    static List<User> userList = new ArrayList<>();
+    public static ProblemRepository problemList = ProblemRepository.getInstance();
+    public static DemandRepository demandeList = DemandRepository.getInstance();
 
-    static User currentUser;
-
-    private static int port = 7000;
+    static Resident currentResident;
 
     public static void main(String[] args) {
+        int port = 7000;
         app = Javalin.create(config -> {
             config.staticFiles.add("/public");
         }).start(port);
@@ -62,9 +60,18 @@ public class Server {
         });
 
         app.post("/api/resident-log-in", ctx -> {
-            currentUser = new Resident(ctx.formParam("username"), ctx.formParam("password"));
-
+            currentResident = ctx.bodyAsClass(Resident.class);
+            ctx.json(currentResident);
+            System.out.println(currentResident.getUsername());
         });
+
+        app.post("/api/resident-form-send", ctx -> {
+            FormResident formResident = new FormResident(ctx.formParam("address"), currentResident.getUsername(),
+                    ctx.formParam("details"));
+            ctx.json(formResident);
+            currentResident.submitForm(formResident);
+        });
+
 
 
     }
@@ -75,6 +82,10 @@ public class Server {
     }
 
     public void showList(){
+
+    }
+
+    private void sendForm(){
 
     }
 
