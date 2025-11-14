@@ -1,10 +1,8 @@
 package ca.udem.maville;
 
 import io.javalin.Javalin;
-import io.javalin.http.Context;
 
 import java.awt.Desktop;
-import java.io.IOException;
 import java.net.URI;
 
 import java.util.*;
@@ -66,17 +64,16 @@ public class Server {
         });
 
         app.post("/api/resident-form-send", ctx -> {
-            FormResident formResident = new FormResident(ctx.formParam("address"), currentResident.getUsername(),
+            ProblemForm problemForm = new ProblemForm(ctx.formParam("address"), currentResident.getUsername(),
                     ctx.formParam("details"));
-            ctx.json(formResident);
-            currentResident.submitForm(formResident);
+            ctx.json(problemForm);
+            currentResident.submitForm(problemForm);
         });
-
 
 
     }
 
-    public static void sendMessage(String msg){
+    public static void sendMessageToUI(String msg){
         // Update our error message variable (if you want to use it elsewhere)
         messageQueue.add(msg);
     }
@@ -85,8 +82,5 @@ public class Server {
 
     }
 
-    private void sendForm(){
-
-    }
 
 }

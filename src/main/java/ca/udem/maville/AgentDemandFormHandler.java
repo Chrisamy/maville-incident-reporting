@@ -1,8 +1,8 @@
 package ca.udem.maville;
 
-public class AgentPresFormHandler {
+public class AgentDemandFormHandler {
 
-    private FormPrestataire getDemand(){
+    private DemandForm getDemand(){
         return null;
     }
 

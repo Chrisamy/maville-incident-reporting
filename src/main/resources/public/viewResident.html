@@ -33,11 +33,11 @@
                 <input id="addressInput" class="form-control" name="address" type="text" placeholder="Ex: 123 Rue Principale, Montréal" required>
             </label>
 
-            <fieldset class="priority-group" id="priorityGroup">
+            <fieldset class="enumPriority-group" id="priorityGroup">
                 <legend>Niveau de priorité estimé <span class="required">*</span></legend>
-                <label><input type="radio" name="priority" value="low"> Basse - Problème mineur, pas urgent</label>
-                <label><input type="radio" name="priority" value="medium" checked> Moyenne - Problème à traiter dans un délai raisonnable</label>
-                <label><input type="radio" name="priority" value="high"> Haute - Problème urgent, danger potentiel</label>
+                <label><input type="radio" name="enumPriority" value="low"> Basse - Problème mineur, pas urgent</label>
+                <label><input type="radio" name="enumPriority" value="medium" checked> Moyenne - Problème à traiter dans un délai raisonnable</label>
+                <label><input type="radio" name="enumPriority" value="high"> Haute - Problème urgent, danger potentiel</label>
             </fieldset>
 
             <label>Description détaillée <span class="required">*</span>
@@ -120,7 +120,7 @@
           <td>${record.id || "N/A"}</td>
           <td>${record.boroughid || "N/A"}</td>
           <td>${record.reason_category || record.permitcategory || "N/A"}</td>
-          <td><span class="status">${record.currentstatus || "N/A"}</span></td>
+          <td><span class="enumStatus">${record.currentstatus || "N/A"}</span></td>
           <td>${record.submittercategory || "N/A"}</td>
           <td>${record.organizationname || "N/A"}</td>
         `;
@@ -136,13 +136,13 @@
 
     function filterTable() {
         const search = document.getElementById("searchInput").value.toLowerCase();
-        const status = document.getElementById("statusFilter").value.toLowerCase();
+        const enumStatus = document.getElementById("statusFilter").value.toLowerCase();
         const rows = document.querySelectorAll("#permitTable tbody tr");
 
         rows.forEach(row => {
             const cells = row.querySelectorAll("td");
             const matchSearch = [...cells].some(cell => cell.textContent.toLowerCase().includes(search));
-            const matchStatus = status ? row.cells[3].textContent.toLowerCase().includes(status) : true;
+            const matchStatus = enumStatus ? row.cells[3].textContent.toLowerCase().includes(enumStatus) : true;
 
             row.style.display = matchSearch && matchStatus ? "" : "none";
         });
@@ -226,5 +226,6 @@
         }
     })();
 </script>
+<script src="script.js"></script>
 </body>
 </html>

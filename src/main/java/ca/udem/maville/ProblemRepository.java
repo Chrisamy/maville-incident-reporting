@@ -1,12 +1,11 @@
 package ca.udem.maville;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ProblemRepository {
 
     private static ProblemRepository instance = null;
-    public ArrayList<FormResident> FormList;
+    public static ArrayList<ProblemForm> FormList;
 
     private ProblemRepository() {
         FormList = new ArrayList<>();
@@ -20,11 +19,11 @@ public class ProblemRepository {
     }
 
 
-    public ArrayList<FormResident> getFormList(){
+    public ArrayList<ProblemForm> getFormList(){
         return FormList;
     }
 
-    public static void addForm(FormResident form){
+    public static void addForm(ProblemForm form){
         FormList.add(form);
     }
 }

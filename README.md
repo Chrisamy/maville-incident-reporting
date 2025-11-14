@@ -6,7 +6,7 @@ MAVILLE was developed for the STPM to make city maintenance faster and more tran
 
 ## Features
 
-- Residents can report or check the status of urban problems.
+- Residents can report or check the enumStatus of urban problems.
 - Service providers can view, propose and select projects to resolve issues.
 - Centralised dashboard for all users.
 - Real-time notifications and updates.

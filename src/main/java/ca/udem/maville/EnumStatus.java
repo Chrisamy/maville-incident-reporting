@@ -1,6 +1,6 @@
 package ca.udem.maville;
 
-public enum Status {
+public enum EnumStatus {
     waitingForApproval,
     approved,
     inPreparation,

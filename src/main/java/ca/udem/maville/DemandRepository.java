@@ -6,10 +6,8 @@ public class DemandRepository {
 
     //Pour les demandes des prestataires
 
-    static ArrayList<FormPrestataire> DemandList = new ArrayList<FormPrestataire>();
-
     private static DemandRepository instance = null;
-    public ArrayList<FormResident> FormList;
+    public static ArrayList<DemandForm> DemandList = new ArrayList<DemandForm>();
 
     private DemandRepository() {
         DemandList = new ArrayList<>();
@@ -23,11 +21,11 @@ public class DemandRepository {
     }
 
 
-    public ArrayList<FormPrestataire> getAllForms() {
+    public ArrayList<DemandForm> getAllForms() {
         return DemandList;
     }
 
-    public static void addForm(FormPrestataire form) {
+    public static void addForm(DemandForm form) {
         DemandList.add(form);
     }
 }

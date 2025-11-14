@@ -1,6 +1,6 @@
 package ca.udem.maville;
 
-public enum Priority {
+public enum EnumPriority {
     notAssigned,
     low,
     medium,

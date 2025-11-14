@@ -6,8 +6,9 @@ public class Resident extends User{
         super();
     }
 
-    public void submitForm(FormResident form){
+    public void submitForm(ProblemForm form){
         Server.problemList.addForm(form);
+        Server.sendMessageToUI("Probleme Soumis!");
     }
 
 }

@@ -1,8 +1,6 @@
 package ca.udem.maville;
 
-import java.util.Date;
-
-public class FormPrestataire {
+public class DemandForm {
     Prestataire prestataire;
     String titreProjet;
     EnumWorkType workType;
@@ -12,8 +10,8 @@ public class FormPrestataire {
     String dateFin;
     String id;
 
-    public FormPrestataire(Prestataire prestataire, String titreProjet, EnumWorkType workType,
-                           String location, String description, String dateDebut, String dateFin, String id) {
+    public DemandForm(Prestataire prestataire, String titreProjet, EnumWorkType workType,
+                      String location, String description, String dateDebut, String dateFin, String id) {
         this.prestataire = prestataire;
         this.titreProjet = titreProjet;
         this.workType = workType;

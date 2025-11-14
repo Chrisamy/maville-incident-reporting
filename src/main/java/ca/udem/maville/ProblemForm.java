@@ -1,24 +1,24 @@
 package ca.udem.maville;
 
-public class FormResident {
+public class ProblemForm {
     EnumWorkType WorkType;
     String location;
     String username;
-    Priority priority;
+    EnumPriority enumPriority;
     String id;
     String descritption;
-    Status status;
+    EnumStatus enumStatus;
 
     //Constructor
 
-    public FormResident(String location, String username, String descritption) {
+    public ProblemForm(String location, String username, String descritption) {
         this.WorkType = EnumWorkType.notDefined;
         this.location = location;
         this.username = username;
-        this.priority = Priority.notAssigned;
+        this.enumPriority = EnumPriority.notAssigned;
         this.id = IdGenerator.generateID();
         this.descritption = descritption;
-        this.status = Status.waitingForApproval;
+        this.enumStatus = EnumStatus.waitingForApproval;
     }
 
     //Getters
@@ -32,8 +32,8 @@ public class FormResident {
     public String getUsername() {
         return username;
     }
-    public Priority getPriority() {
-        return priority;
+    public EnumPriority getPriority() {
+        return enumPriority;
     }
     public String getId() {
         return id;
@@ -41,8 +41,8 @@ public class FormResident {
     public String getDescritption() {
         return descritption;
     }
-    public Status getStatus() {
-        return status;
+    public EnumStatus getStatus() {
+        return enumStatus;
     }
 
     //Setters
@@ -56,8 +56,8 @@ public class FormResident {
     public void setUsername(String username) {
         this.username = username;
     }
-    public void setPriority(Priority priority) {
-        this.priority = priority;
+    public void setPriority(EnumPriority enumPriority) {
+        this.enumPriority = enumPriority;
     }
     public void setId(String id) {
         this.id = id;
@@ -65,7 +65,7 @@ public class FormResident {
     public void setDescritption(String descritption) {
         this.descritption = descritption;
     }
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setStatus(EnumStatus enumStatus) {
+        this.enumStatus = enumStatus;
     }
 }
