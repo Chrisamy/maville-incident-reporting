@@ -1,15 +1,16 @@
 let colorSwap = 1;
 let requestNum = 1;
 
-document.getElementById("hello-world-btn").addEventListener("click", async () => {
-    try {
-        let response = await fetch("/api/hello_world");
-        let data = await response.json();
-        document.getElementById("message").innerText = data.message;
-    } catch (err) {
-        document.getElementById("message").innerText = "Error loading message.";
-    }
-});
+// PLR VERIF: I commented the following lines as it as causing an erro in the browser's console
+// document.getElementById("hello-world-btn").addEventListener("click", async () => {
+//     try {
+//         let response = await fetch("/api/hello_world");
+//         let data = await response.json();
+//         document.getElementById("message").innerText = data.message;
+//     } catch (err) {
+//         document.getElementById("message").innerText = "Error loading message.";
+//     }
+// });
 
 function addRequestButton() {
     var table = document.getElementById("table-request");
@@ -31,9 +32,11 @@ function addRequestButton() {
     cellTypeProb.innerHTML = typeProb;
     cellStatus.innerHTML = Status;
 
-if (!window.eventSource) {
-    window.eventSource = new EventSource("/events");
-    window.eventSource.onmessage = (event) => {
-        alert(event.data);
+    if (!window.eventSource) {
+        window.eventSource = new EventSource("/events");
+        window.eventSource.onmessage = (event) => {
+            alert(event.data);
         };
-}
+
+    }
+}// PLR VERIF: missing } at the end, I added this one
