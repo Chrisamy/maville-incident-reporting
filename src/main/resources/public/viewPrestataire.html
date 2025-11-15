@@ -51,9 +51,170 @@
     <p id="resultCount">Affichage des requêtes</p>
 </section>
 
+<div id="prestataireModalOverlay" class="modal-overlay" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="prestModalTitle">
+    <button class="modal-close" id="prestModalClose" aria-label="Fermer">&times;</button>
+    <h2 id="prestModalTitle" class="modal-title">Soumettre une candidature</h2>
+    <p class="modal-sub">Remplissez le formulaire ci-dessous pour devenir prestataire agréé.</p>
+
+    <form id="prestataireForm" class="modal-form">
+      <label>Nom de l'organisation <span class="required">*</span>
+        <input id="orgInput" name="organization" class="form-control" type="text" placeholder="Ex: Les Entreprises Inc." required>
+      </label>
+
+      <div class="form-inline field">
+
+        <label style="flex:1">Numéro de licence
+          <input id="rbqInput" class="form-control" type="text" placeholder="Ex: 1234-5678-90">
+        </label>
+      </div>
+
+      <label>Adresse complète <span class="required">*</span>
+        <input id="addressInput" name="address" class="form-control" type="text" placeholder="Ex: 123 Rue Principale, Montréal" required>
+      </label>
+
+      <h4 class="small text-muted">Personne contact</h4>
+      <div class="form-inline field">
+        <label style="flex:1">Nom complet
+          <input id="contactName" name="contactName" class="form-control" type="text" placeholder="Jean Pierre" required>
+        </label>
+        <label style="flex:1">Téléphone <span class="required">*</span>
+          <input id="contactPhone" name="phone" class="form-control" type="text" placeholder="(514) 123-4567" required>
+        </label>
+      </div>
+      <div class="form-inline field">
+        <label style="flex:1">Courriel <span class="required">*</span>
+          <input id="contactEmail" name="email" class="form-control" type="email" placeholder="contact@entreprise.com" required>
+        </label>
+      </div>
+
+      <h4 class="small text-muted">Services offerts <span class="required">*</span></h4>
+      <div class="field two-col-checkboxes">
+        <label><input type="checkbox" name="services" value="Travaux routiers"> Travaux routiers</label>
+        <label><input type="checkbox" name="services" value="ConstructionOrRenovation"> Construction/rénovation</label>
+        <label><input type="checkbox" name="services" value="GazOrElectric"> Gaz / Électricité</label>
+        <label><input type="checkbox" name="services" value="TelecommunicationsMaintenance"> Télécommunications</label>
+        <label><input type="checkbox" name="services" value="Landscaping"> Aménagement paysager</label>
+        <label><input type="checkbox" name="services" value="UrbanMaintenance"> Entretien urbain</label>
+        <label><input type="checkbox" name="services" value="UndergroundWork"> Travaux souterrains</label>
+        <label><input type="checkbox" name="services" value="PublicsTransportWork"> Transports en commun</label>
+        <label><input type="checkbox" name="services" value="SignageAndLighting"> Signalisation / éclairage</label>
+        <label><input type="checkbox" name="services" value="ResidentialWork"> Travaux résidentiels</label>
+      </div>
+
+      <label>Description de l'entreprise
+        <textarea id="descriptionInput" name="description" class="form-control" rows="4" placeholder="Décrivez brièvement votre entreprise, votre expérience et vos qualifications..."></textarea>
+      </label>
+
+      <h4 class="small text-muted">Méthodologie et approche</h4>
+      <hr>
+
+      <label>Description de votre approche <span class="required">*</span>
+        <textarea id="approachDescription" name="approachDescription" class="form-control" rows="4" placeholder="Décrivez comment vous comptez réaliser ce projet, les étapes clés, etc..." required></textarea>
+      </label>
+
+      <label>Méthode de travail
+        <textarea id="workingMethod" name="workingMethod" class="form-control" rows="3" placeholder="Ex: Travaux en phases, fermeture partielle de la rue, horaires de nuit..."></textarea>
+      </label>
+
+      <label>Équipement utilisé
+        <textarea id="equipmentUsed" name="equipmentUsed" class="form-control" rows="3" placeholder="Liste de l'équipement et des machines qui seront utilisés..."></textarea>
+      </label>
+
+      <label>Plan de sécurité
+        <textarea id="safetyPlan" name="safetyPlan" class="form-control" rows="3" placeholder="Mesures de sécurité, signalisation, protection du public..."></textarea>
+      </label>
+
+      <h4 class="small text-muted">Documents requis</h4>
+      <hr>
+
+      <div id="prestFileDropRBQ" class="file-drop">
+        <input id="prestFileInputRBQ" type="file" accept="application/pdf" />
+        <div class="file-drop-inner">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v10" stroke="#7b8794" stroke-width="1.5"/><path d="M8 7l4-4 4 4" stroke="#7b8794" stroke-width="1.5"/></svg>
+          <div class="file-drop-text">Licence RBQ<br><small>PDF jusqu'à 5MB</small></div>
+        </div>
+      </div>
+
+      <div id="prestFileDropBudget" class="file-drop" style="margin-top:12px">
+        <input id="prestFileInputBudget" type="file" accept="application/pdf" />
+        <div class="file-drop-inner">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v10" stroke="#7b8794" stroke-width="1.5"/><path d="M8 7l4-4 4 4" stroke="#7b8794" stroke-width="1.5"/></svg>
+          <div class="file-drop-text">Soumission détaillée (budget)<br><small>PDF jusqu'à 10MB</small></div>
+        </div>
+      </div>
+
+      <div id="prestFileDropPlan" class="file-drop" style="margin-top:12px">
+        <input id="prestFileInputPlan" type="file" accept="application/pdf" />
+        <div class="file-drop-inner">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v10" stroke="#7b8794" stroke-width="1.5"/><path d="M8 7l4-4 4 4" stroke="#7b8794" stroke-width="1.5"/></svg>
+          <div class="file-drop-text">Plan d'exécution (optionnel)<br><small>PDF jusqu'à 10MB</small></div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-outline" id="prestCancel">Annuler</button>
+        <button type="submit" class="btn-primary">Soumettre</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <footer>
     <p>© Petit Génie - 2025</p>
 </footer>
+
+<script>
+  (function(){
+    const openBtn = document.querySelector('.topbar .right .btn-primary');
+    const overlay = document.getElementById('prestataireModalOverlay');
+    const closeBtn = document.getElementById('prestModalClose');
+    const cancelBtn = document.getElementById('prestCancel');
+    const form = document.getElementById('prestataireForm');
+
+    const rbqDrop = document.getElementById('prestFileDropRBQ');
+    const budgetDrop = document.getElementById('prestFileDropBudget');
+    const planDrop = document.getElementById('prestFileDropPlan');
+    const rbqInput = document.getElementById('prestFileInputRBQ');
+    const budgetInput = document.getElementById('prestFileInputBudget');
+    const planInput = document.getElementById('prestFileInputPlan');
+
+    function openModal(){ overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+    function closeModal(){ overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); document.body.style.overflow=''; form.reset(); clearPreview(rbqDrop); clearPreview(budgetDrop); clearPreview(planDrop); }
+
+    if(openBtn) openBtn.addEventListener('click', e=> { e.preventDefault(); openModal(); });
+    if(closeBtn) closeBtn.addEventListener('click', closeModal);
+    if(cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', e=> { if(e.target === overlay) closeModal(); });
+    const card = overlay.querySelector('.modal-card'); if(card) card.addEventListener('click', e=> e.stopPropagation());
+
+    form.addEventListener('submit', async function(e){
+      e.preventDefault();
+      if(!form.checkValidity()){ form.reportValidity(); return; }
+      const fd = new FormData(form);
+      if(rbqInput.files[0]) fd.append('rbqFile', rbqInput.files[0]);
+      if(budgetInput.files[0]) fd.append('budgetPdf', budgetInput.files[0]);
+      if(planInput.files[0]) fd.append('planPdf', planInput.files[0]);
+
+      try{ await fetch('/api/prestataire-form-send',{ method:'POST', body:fd }); }catch(err){ console.log('submit error',err); }
+      closeModal();
+    });
+
+    [rbqDrop, budgetDrop, planDrop].forEach((drop, i)=>{
+      const input = [rbqInput, budgetInput, planInput][i];
+      if(!drop || !input) return;
+      drop.addEventListener('click', ()=> input.click());
+      drop.addEventListener('dragover', e=>{ e.preventDefault(); drop.style.borderColor='#a0a9b5'; });
+      drop.addEventListener('dragleave', e=>{ e.preventDefault(); drop.style.borderColor=''; });
+      drop.addEventListener('drop', e=>{ e.preventDefault(); drop.style.borderColor=''; const files = e.dataTransfer.files; if(files && files.length){ input.files = files; showPreview(drop, files[0]); } });
+      input.addEventListener('change', ()=>{ if(input.files[0]) showPreview(drop, input.files[0]); });
+    });
+
+    function showPreview(dropEl, file){ clearPreview(dropEl); const d = document.createElement('div'); d.className='file-name'; d.textContent = file.name + ' (' + Math.round(file.size/1024) + ' KB)'; dropEl.appendChild(d); }
+    function clearPreview(dropEl){ const ex = dropEl.querySelector('.file-name'); if(ex) ex.remove(); }
+
+  })();
+</script>
 
 </body>
 </html>

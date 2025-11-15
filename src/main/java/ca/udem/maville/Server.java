@@ -11,7 +11,7 @@ public class Server {
 
     public static Javalin app;
 
-    private static List<String> messageQueue = new ArrayList<>();
+    private static final List<String> messageQueue = new ArrayList<>();
 
     public static ProblemRepository problemList = ProblemRepository.getInstance();
     public static DemandRepository demandeList = DemandRepository.getInstance();
@@ -20,9 +20,7 @@ public class Server {
 
     public static void main(String[] args) {
         int port = 7000;
-        app = Javalin.create(config -> {
-            config.staticFiles.add("/public");
-        }).start(port);
+        app = Javalin.create(config -> config.staticFiles.add("/public")).start(port);
 
         Desktop desktop = Desktop.getDesktop();
         try {
@@ -64,17 +62,28 @@ public class Server {
         });
 
         app.post("/api/resident-form-send", ctx -> {
-            ProblemForm problemForm = new ProblemForm(ctx.formParam("address"), currentResident.getUsername(),
-                    ctx.formParam("details"));
+            // logs
+            String addr = ctx.formParam("address");
+            String details = ctx.formParam("details");
+            System.out.println("[SERVER] /api/resident-form-send received: address='" + addr + "' details='" + details + "'");
+            System.out.println("[SERVER] currentResident object: " + (currentResident == null ? "null" : currentResident.getUsername()));
+
+            ProblemForm problemForm = new ProblemForm(addr, currentResident == null ? "anonymous" : currentResident.getUsername(), details);
+            System.out.println("[SERVER] created ProblemForm: " + problemForm);
             ctx.json(problemForm);
-            currentResident.submitForm(problemForm);
+
+            if (currentResident != null) {
+                currentResident.submitForm(problemForm);
+            } else {
+                ProblemRepository.addForm(problemForm);
+                System.out.println("[SERVER] No current resident; form saved in repository without association.");
+            }
         });
 
 
     }
 
     public static void sendMessageToUI(String msg){
-        // Update our error message variable (if you want to use it elsewhere)
         messageQueue.add(msg);
     }
 
