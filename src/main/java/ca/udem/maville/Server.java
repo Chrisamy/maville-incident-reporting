@@ -61,7 +61,7 @@ public class Server {
             System.out.println(currentResident.getUsername());
             // PLR VERIF: test added to see if the username gets added
             System.out.println(currentResident.getPassword());
-            System.out.println("");
+            System.out.println("yeye end of log in info");
         });
 
         app.post("/api/resident-form-send", ctx -> {
