@@ -1,7 +1,7 @@
 let colorSwap = 1;
 let requestNum = 1;
 
-// PLR VERIF: I commented the following lines as it as causing an erro in the browser's console
+// PLR VERIF: I commented the following lines as they were causing an error in the browser's console when Logining to resident
 // document.getElementById("hello-world-btn").addEventListener("click", async () => {
 //     try {
 //         let response = await fetch("/api/hello_world");
@@ -39,4 +39,4 @@ function addRequestButton() {
         };
 
     }
-}// PLR VERIF: missing } at the end, I added this one
+}// PLR VERIF: there was a missing } at the end, I added this one

@@ -59,6 +59,9 @@ public class Server {
             currentResident = ctx.bodyAsClass(Resident.class);
             ctx.json(currentResident);
             System.out.println(currentResident.getUsername());
+            // PLR VERIF: test added to see if the username gets added
+            System.out.println(currentResident.getPassword());
+            System.out.println("");
         });
 
         app.post("/api/resident-form-send", ctx -> {
