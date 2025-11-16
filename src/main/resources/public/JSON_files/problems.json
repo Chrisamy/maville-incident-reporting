@@ -1,14 +1,35 @@
-{
-  "name": "public",
-  "version": "1.0.0",
-  "description": "",
-  "main": "login.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+[
+  {
+    "_id": 1,
+    "id": "654277b8021cab001920d32e",
+    "workType": "notDefined",
+    "location": "123 Street",
+    "boroughid": "Ville-Marie",
+    "username" : "Johnny",
+    "priority": "notAssigned",
+    "description": "Trou dans la carlingue",
+    "currentStatus": "waitingForApproval"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/IFT-2255/a25-dm-petit-genie.git"
+  {
+    "_id": 2,
+    "id": "65493314c8687900121fd593",
+    "workType": "notDefined",
+    "location": "456 Papineau",
+    "boroughid": "Outremont",
+    "username" : "Papi",
+    "priority": "notAssigned",
+    "description": "Trou dans la carlingue",
+    "currentStatus": "waitingForApproval"
   },
-  "private": true
-}
+  {"_id": 3,
+    "id": "682dece1d997790012e58b2e",
+    "workType": "notDefined",
+    "location": "678 Klang",
+    "boroughid": "Rosemont",
+    "username" : "Mami",
+    "priority": "notAssigned",
+    "description": "Trou dans la carlingue",
+    "currentStatus": "waitingForApproval"
+  }
+]
+

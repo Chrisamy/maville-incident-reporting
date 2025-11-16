@@ -1,0 +1,269 @@
+{
+  "help": "https://donnees.montreal.ca/api/3/action/help_show?name=datastore_search",
+  "success": true,
+  "result": {
+    "include_total": true,
+    "limit": 100,
+    "records_format": "objects",
+    "resource_id": "cc41b532-f12d-40fb-9f55-eb58c9a2b12b",
+    "total_estimation_threshold": null,
+    "records": [
+      {
+        "_id": 1,
+        "id": "654277b8021cab001920d32e",
+        "permit_permit_id": "OCC-2311NX01306852",
+        "contractnumber": null,
+        "boroughid": "Ville-Marie",
+        "permitcategory": "Travaux",
+        "currentstatus": "Permis émis",
+        "duration_start_date": "2022-04-23T20:00:00Z",
+        "duration_end_date": "2027-07-31T19:59:59Z",
+        "reason_category": "Construction/rénovation sans excavation",
+        "occupancy_name": "Ruelle",
+        "submittercategory": "Organisation publique ou son sous-traitant",
+        "organizationname": "Réfection Ville Marie SEP",
+        "load_date": "2024-10-29T19:06:02Z",
+        "longitude": "-73.55828628138067",
+        "latitude": "45.507781965135976"
+      },
+      {
+        "_id": 2,
+        "id": "6542781b33c2e4001965cfa8",
+        "permit_permit_id": "OCC-2311CN01296163",
+        "contractnumber": null,
+        "boroughid": "Ville-Marie",
+        "permitcategory": "Travaux",
+        "currentstatus": "Permis émis",
+        "duration_start_date": "2022-04-23T20:00:00Z",
+        "duration_end_date": "2027-07-31T19:59:59Z",
+        "reason_category": "Construction/rénovation sans excavation",
+        "occupancy_name": "Ruelle",
+        "submittercategory": "Organisation publique ou son sous-traitant",
+        "organizationname": "Réfection Ville Marie SEP",
+        "load_date": "2024-10-29T19:06:02Z",
+        "longitude": "-73.55895598269238",
+        "latitude": "45.50703373998367"
+      },
+      {
+        "_id": 3,
+        "id": "654931426204cf00122b5f3f",
+        "permit_permit_id": "OCC-2311LB05011755",
+        "contractnumber": null,
+        "boroughid": "Mercier-Hochelaga-Maisonneuve",
+        "permitcategory": "Travaux",
+        "currentstatus": "Permis émis",
+        "duration_start_date": "2023-11-05T19:00:00Z",
+        "duration_end_date": "2025-12-31T18:59:59Z",
+        "reason_category": "Réseaux routier - Réfection et travaux corrélatifs",
+        "occupancy_name": "Honoré-Beaugrand entre Dubuisson et Souligny",
+        "submittercategory": "Organisation publique ou son sous-traitant",
+        "organizationname": "Renouveau Lafontaine",
+        "load_date": "2024-10-29T19:06:02Z",
+        "longitude": "-73.52181328478628",
+        "latitude": "45.59247022639736"
+      },
+      {
+        "_id": 4,
+        "id": "65493314c8687900121fd593",
+        "permit_permit_id": "OCC-2311PT05028598",
+        "contractnumber": null,
+        "boroughid": "Mercier-Hochelaga-Maisonneuve",
+        "permitcategory": "Travaux",
+        "currentstatus": "Permis émis",
+        "duration_start_date": "2023-11-05T19:00:00Z",
+        "duration_end_date": "2025-12-31T18:59:59Z",
+        "reason_category": "Réseaux routier - Réfection et travaux corrélatifs",
+        "occupancy_name": "Honoré-Beaugrand entre Madeleine-Huguenin et Hochelaga",
+        "submittercategory": "Organisation publique ou son sous-traitant",
+        "organizationname": "Renouveau Lafontaine",
+        "load_date": "2024-10-29T19:06:02Z",
+        "longitude": "-73.52428954145576",
+        "latitude": "45.59316871579947"
+      }
+    ],
+    "fields": [
+      {
+        "id": "_id",
+        "type": "int"
+      },
+      {
+        "id": "id",
+        "type": "text"
+      },
+      {
+        "id": "permit_permit_id",
+        "type": "text"
+      },
+      {
+        "id": "contractnumber",
+        "type": "text"
+      },
+      {
+        "id": "boroughid",
+        "type": "text"
+      },
+      {
+        "id": "permitcategory",
+        "type": "text"
+      },
+      {
+        "id": "currentstatus",
+        "type": "text"
+      },
+      {
+        "id": "duration_start_date",
+        "type": "text"
+      },
+      {
+        "id": "duration_end_date",
+        "type": "text"
+      },
+      {
+        "id": "reason_category",
+        "type": "text"
+      },
+      {
+        "id": "occupancy_name",
+        "type": "text"
+      },
+      {
+        "id": "submittercategory",
+        "type": "text"
+      },
+      {
+        "id": "organizationname",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_mon_active",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_mon_all_day_round",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_tue_active",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_tue_all_day_round",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_wed_active",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_wed_all_day_round",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_thu_active",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_thu_all_day_round",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_fri_active",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_fri_all_day_round",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_sat_active",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_sat_all_day_round",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_sun_active",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_sun_all_day_round",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_sat_start_time",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_sat_end_time",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_mon_start_time",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_mon_end_time",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_tue_start_time",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_tue_end_time",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_wed_start_time",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_wed_end_time",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_thu_start_time",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_thu_end_time",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_fri_start_time",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_fri_end_time",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_sun_start_time",
+        "type": "text"
+      },
+      {
+        "id": "duration_days_sun_end_time",
+        "type": "text"
+      },
+      {
+        "id": "load_date",
+        "type": "text"
+      },
+      {
+        "id": "longitude",
+        "type": "text"
+      },
+      {
+        "id": "latitude",
+        "type": "text"
+      }
+    ],
+    "_links": {
+      "start": "/api/3/action/datastore_search?resource_id=cc41b532-f12d-40fb-9f55-eb58c9a2b12b",
+      "next": "/api/3/action/datastore_search?resource_id=cc41b532-f12d-40fb-9f55-eb58c9a2b12b&offset=100"
+    },
+    "total": 1940,
+    "total_was_estimated": false
+  }
+}

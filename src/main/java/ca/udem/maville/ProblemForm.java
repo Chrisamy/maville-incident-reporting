@@ -6,6 +6,7 @@ public class ProblemForm {
     private final String id;
     private EnumWorkType workType;
     private String location;
+    private EnumBoroughID boroughId;
     private String username;
     private EnumPriority priority;
     private String description;
