@@ -38,11 +38,11 @@ public class Server {
 
             //desktop.browse(new URI(String.format("http://localhost:%d", port)));
             // PLR TESTING : to open the page in resident directly
-            desktop.browse(new URI(String.format("http://localhost:7000/viewResident.html", port)));
+            //desktop.browse(new URI(String.format("http://localhost:7000/viewResident.html", port)));
             // PLR TESTING : to open the page in contractor directly
             //desktop.browse(new URI(String.format("http://localhost:7000/viewPrestataire.html", port)));
             // PLR TESTING : to open the page in agent directly
-            //desktop.browse(new URI(String.format("http://localhost:%d/viewAgent.html", port)));
+            desktop.browse(new URI(String.format("http://localhost:%d/viewAgent.html", port)));
 
         } catch (Exception e) {
             e.printStackTrace();
