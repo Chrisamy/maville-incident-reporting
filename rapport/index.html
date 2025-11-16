@@ -73,12 +73,6 @@
 
         <li><b>Utilisateur</b>: Personne qui utilise l'application MaVille, souvent un résident ou un prestataire.</li>
 
-        <li><b>Registre des travaux</b>: Onglet de l'application MaVille ou les travaux à effectuer et ceux en cours sont affichés. On peut y appercevoir des informations comme la date de début et de fin des travaux, le budget, le prestataire en charge, etc. </li>
-
-        <li><b>Formulaire de signalement</b>: Formulaire à remplir par les résidents pour signaler au STPM un problème dans leur quartier. Ces formulaires seront accessibles par l'application MaVille. </li>
-
-        <li><b>Fiche de problème</b>: Fiche décrivant un problème affiché par le STPM. Les prestatires consultent ces fiches pour prendre note des problèmes à résoudre dans la ville de Montréal. </li>
-
         <li><b>Appels de projet</b>: Appel fait par la STPM qui indique qu'un problème est prêt à être résolu et qu'un chantier est prêt à être établi. Cet appel sert à recruter un prestataire pour entamer des travaux. </li>
 
         <li><b>Budget</b>: Somme d'argent investie dans la résolution d'un problème. Ce montant doit être respecté le plus possible. </li>
@@ -91,10 +85,10 @@
     </ul>
 
     <h3>Diagramme d'activités</h3>
-        <img src="images/diagramme_activite_actuelle-2.png" alt="le diagramme d'activité" style="width: 50em">
+        <img src="images/diagram_activite_actuel_corr.png" alt="le diagramme d'activité" style="width: 50em">
 
     <h3>Diagramme de classes</h3>
-        <img src="images/diagramme_de_classes-1.png" alt="le diagram de classe" style=" width: 50em; margin-left: 4em">
+        <img src="images/diagram_de_classes_corr.png" alt="le diagram de classe" style=" width: 50em; margin-left: 4em">
 
     </section>
 
@@ -116,7 +110,7 @@
 
         <h3>Diagramme de cas d'utilisation</h3>
 
-        <img src="images/diagramme_cas_dutilisation-1.png" alt="diagramme de cas d'utilisation" style="width: 50em">
+        <img src="images/diagram_CU_corr.png" alt="diagramme de cas d'utilisation" style="width: 50em">
 
         <h3>Résumé des cas d’utilisation</h3>
         <table>
@@ -139,14 +133,9 @@
                 <td>L’utilisateur consulte la liste des problèmes signalés et leur état (en cours, résolu, etc.).</td>
             </tr>
             <tr>
-                <td><b>Signaler un problème</b></td>
-                <td>Résident</td>
-                <td>Le résident remplit un formulaire pour déclarer un problème urbain (trou, lampadaire, graffiti, etc...).</td>
-            </tr>
-            <tr>
                 <td><b>Remplir formulaire de signalement</b></td>
                 <td>Résident</td>
-                <td>Étape obligatoire pour décrire le problème (adresse, type, description).</td>
+                <td>Le résident remplit un formulaire pour déclarer un problème urbain (trou, lampadaire, graffiti, etc...).</td>
             </tr>
             <tr>
                 <td><b>Valider et publier appels de projet</b></td>
@@ -178,7 +167,13 @@
                 <td>STPM</td>
                 <td>Le registre est automatiquement mis à jour après validation ou changement (travaux complétés, en cours, etc.).</td>
             </tr>
+            <td><b>Choisir paramètres de préférence des travaux</b></td>
+                <td>Prestataire</td>
+                <td>Le prestatiare configure ses préférences de travaux.</td>
             </tbody>
+            <td><b>Envoyer des notifications</b></td>
+                <td>STPM</td>
+                <td>Envoie des notifications aux utilisateurs civils en fonction de leurs paramètres de notifications.</td>
         </table>
 
         <h3>Cas d’utilisation : Signaler un problème</h3>
@@ -237,6 +232,24 @@
     <section>
         <h2>Prototype</h2>
         <p>L’application permet de choisir un profil (résident, prestataire, STPM), puis d’afficher un menu adapté à chaque cas.</p>
+    </section>
+
+    <section>
+
+        <h2>Style d'architecture</h2>
+        <p>Le style d'architecture choisie pour l'application est une architecture client-serveur.</p>
+        <h3>Résumé du fonctionnemment de l'application</h3>
+        <p>L'Utilisateur intéragit avec l'interface utilisateur de l'application web servant de client pour soumettre des requêtes au serveur. Le serveur traite la requête et retourne la réponse correspondante. L'interface utilisateur affiche ensuite la réponse du serveur.</p>
+
+        <h3>Modèle C4 de niveau 1</h3>
+        <img src="images/modC4_1.png" alt="modèle C4 niveau 1" style="width: 40em;">
+
+        <h3>Modèle C4 de niveau 2</h3>
+        <img src="images/modC4_2.png" alt="modèle C4 niveau 2" style="width: 40em;">
+
+        <h3>Modèle C4 de niveau 3</h3>
+        <img src="images/modC4_3.png" alt="modèle C4 de niveau 3" style="width: 60em;">
+
     </section>
 </div>
 
