@@ -1,16 +1,18 @@
 package ca.udem.maville;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Collections;
 
 public class DemandRepository {
 
     //Pour les demandes des prestataires
 
     private static DemandRepository instance = null;
-    public static ArrayList<DemandForm> DemandList = new ArrayList<DemandForm>();
+    private static ArrayList<DemandForm> demandList;
 
     private DemandRepository() {
-        DemandList = new ArrayList<>();
+        demandList = new ArrayList<>();
     }
 
     public static synchronized DemandRepository getInstance() {
@@ -20,12 +22,10 @@ public class DemandRepository {
         return instance;
     }
 
-
-    public ArrayList<DemandForm> getAllForms() {
-        return DemandList;
+    public ArrayList<DemandForm> getDemandList() {
+        return demandList;
     }
-
     public static void addForm(DemandForm form) {
-        DemandList.add(form);
+        demandList.add(form);
     }
 }

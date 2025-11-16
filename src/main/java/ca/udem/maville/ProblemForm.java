@@ -1,71 +1,108 @@
 package ca.udem.maville;
 
+import java.util.Objects;
+
 public class ProblemForm {
-    EnumWorkType WorkType;
-    String location;
-    String username;
-    EnumPriority enumPriority;
-    String id;
-    String descritption;
-    EnumStatus enumStatus;
+    private final String id;
+    private EnumWorkType workType;
+    private String location;
+    private String username;
+    private EnumPriority priority;
+    private String description;
+    private EnumStatus status;
 
-    //Constructor
+    //constructor for JSON deserialization
+    public ProblemForm() {
+        this.id = IdGenerator.generateID();
+        this.workType = EnumWorkType.notDefined;
+        this.priority = EnumPriority.notAssigned;
+        this.status = EnumStatus.waitingForApproval;
+    }
 
-    public ProblemForm(String location, String username, String descritption) {
-        this.WorkType = EnumWorkType.notDefined;
+    public ProblemForm(String location, String username, String description) {
+        this();
         this.location = location;
         this.username = username;
-        this.enumPriority = EnumPriority.notAssigned;
-        this.id = IdGenerator.generateID();
-        this.descritption = descritption;
-        this.enumStatus = EnumStatus.waitingForApproval;
+        this.description = description;
     }
 
-    //Getters
-
-    public EnumWorkType getWorkType() {
-        return WorkType;
-    }
-    public String getLocation() {
-        return location;
-    }
-    public String getUsername() {
-        return username;
-    }
-    public EnumPriority getPriority() {
-        return enumPriority;
-    }
+    // Getters
     public String getId() {
         return id;
     }
-    public String getDescritption() {
-        return descritption;
+
+    public EnumWorkType getWorkType() {
+        return workType;
     }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public EnumPriority getPriority() {
+        return priority;
+    }
+
+
+    public String getDescription() {
+        return description;
+    }
+
     public EnumStatus getStatus() {
-        return enumStatus;
+        return status;
     }
 
-    //Setters
-
-    public void setWorkType(EnumWorkType WorkType) {
-        this.WorkType = WorkType;
+    // Setters (no setter for id)
+    public void setWorkType(EnumWorkType workType) {
+        this.workType = workType;
     }
+
     public void setLocation(String location) {
         this.location = location;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
-    public void setPriority(EnumPriority enumPriority) {
-        this.enumPriority = enumPriority;
+
+    public void setPriority(EnumPriority priority) {
+        this.priority = priority;
     }
-    public void setId(String id) {
-        this.id = id;
+
+    public void setDescription(String description) {
+        this.description = description;
     }
-    public void setDescritption(String descritption) {
-        this.descritption = descritption;
+
+    public void setStatus(EnumStatus status) {
+        this.status = status;
     }
-    public void setStatus(EnumStatus enumStatus) {
-        this.enumStatus = enumStatus;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ProblemForm that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "ProblemForm{" +
+                "id='" + id + '\'' +
+                ", workType=" + workType +
+                ", location='" + location + '\'' +
+                ", username='" + username + '\'' +
+                ", priority=" + priority +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                '}';
     }
 }

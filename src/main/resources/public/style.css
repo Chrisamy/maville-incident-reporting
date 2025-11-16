@@ -331,12 +331,6 @@ label,legend {
   margin-bottom:14px
 }
 
-.priority-group {
-  border:none;
-  margin:8px 0 14px 0;
-  padding:0
-}
-
 .modal-actions {
   display:flex;
   justify-content:flex-end;
@@ -370,6 +364,24 @@ label,legend {
   margin-top:8px;
   font-size:0.9rem;
   color:var(--text-soft)
+}
+
+.two-col-checkboxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 24px;
+  align-items: start;
+}
+.two-col-checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  color: var(--text);
+}
+.two-col-checkboxes input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
 }
 
 

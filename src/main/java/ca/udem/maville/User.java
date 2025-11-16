@@ -1,12 +1,31 @@
 package ca.udem.maville;
 
 public class User {
-    public String username;
+    private String username;
     private String password;
 
+    // PLR verif pourquoi il y a un aure User vide ici?
+    public User() {}
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
 }
