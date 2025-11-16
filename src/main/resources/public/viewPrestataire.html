@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- Topbar: navigation -->
 <header class="topbar">
     <div class="left">
         <button class="menu" onclick="location.href='loginPage.html'"> Menu principal</button>
@@ -25,6 +26,7 @@
     </div>
 </header>
 
+<!-- Search area - simple client-side filters (behaviour in viewPrestataire.js) -->
 <section class="search-section">
     <label for="searchInput"></label><input type="text" id="searchInput" placeholder="Rechercher par numéro, arrondissement ou catégorie...">
     <label for="statusFilter"></label><select id="statusFilter">
@@ -35,6 +37,8 @@
     </select>
 </section>
 
+
+<!-- Table container - data will be injected into #requestTable by JS when implemented -->
 <section class="table-container">
     <table id="requestTable">
         <thead>
@@ -51,6 +55,7 @@
     <p id="resultCount">Affichage des requêtes</p>
 </section>
 
+<!-- Modal: form for suppliers to submit an application. File inputs are handled in viewPrestataire.js -->
 <div id="prestataireModalOverlay" class="modal-overlay" aria-hidden="true">
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="prestModalTitle">
     <button class="modal-close" id="prestModalClose" aria-label="Fermer">&times;</button>
@@ -164,57 +169,7 @@
     <p>© Petit Génie - 2025</p>
 </footer>
 
-<script>
-  (function(){
-    const openBtn = document.querySelector('.topbar .right .btn-primary');
-    const overlay = document.getElementById('prestataireModalOverlay');
-    const closeBtn = document.getElementById('prestModalClose');
-    const cancelBtn = document.getElementById('prestCancel');
-    const form = document.getElementById('prestataireForm');
-
-    const rbqDrop = document.getElementById('prestFileDropRBQ');
-    const budgetDrop = document.getElementById('prestFileDropBudget');
-    const planDrop = document.getElementById('prestFileDropPlan');
-    const rbqInput = document.getElementById('prestFileInputRBQ');
-    const budgetInput = document.getElementById('prestFileInputBudget');
-    const planInput = document.getElementById('prestFileInputPlan');
-
-    function openModal(){ overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
-    function closeModal(){ overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); document.body.style.overflow=''; form.reset(); clearPreview(rbqDrop); clearPreview(budgetDrop); clearPreview(planDrop); }
-
-    if(openBtn) openBtn.addEventListener('click', e=> { e.preventDefault(); openModal(); });
-    if(closeBtn) closeBtn.addEventListener('click', closeModal);
-    if(cancelBtn) cancelBtn.addEventListener('click', closeModal);
-    overlay.addEventListener('click', e=> { if(e.target === overlay) closeModal(); });
-    const card = overlay.querySelector('.modal-card'); if(card) card.addEventListener('click', e=> e.stopPropagation());
-
-    form.addEventListener('submit', async function(e){
-      e.preventDefault();
-      if(!form.checkValidity()){ form.reportValidity(); return; }
-      const fd = new FormData(form);
-      if(rbqInput.files[0]) fd.append('rbqFile', rbqInput.files[0]);
-      if(budgetInput.files[0]) fd.append('budgetPdf', budgetInput.files[0]);
-      if(planInput.files[0]) fd.append('planPdf', planInput.files[0]);
-
-      try{ await fetch('/api/prestataire-form-send',{ method:'POST', body:fd }); }catch(err){ console.log('submit error',err); }
-      closeModal();
-    });
-
-    [rbqDrop, budgetDrop, planDrop].forEach((drop, i)=>{
-      const input = [rbqInput, budgetInput, planInput][i];
-      if(!drop || !input) return;
-      drop.addEventListener('click', ()=> input.click());
-      drop.addEventListener('dragover', e=>{ e.preventDefault(); drop.style.borderColor='#a0a9b5'; });
-      drop.addEventListener('dragleave', e=>{ e.preventDefault(); drop.style.borderColor=''; });
-      drop.addEventListener('drop', e=>{ e.preventDefault(); drop.style.borderColor=''; const files = e.dataTransfer.files; if(files && files.length){ input.files = files; showPreview(drop, files[0]); } });
-      input.addEventListener('change', ()=>{ if(input.files[0]) showPreview(drop, input.files[0]); });
-    });
-
-    function showPreview(dropEl, file){ clearPreview(dropEl); const d = document.createElement('div'); d.className='file-name'; d.textContent = file.name + ' (' + Math.round(file.size/1024) + ' KB)'; dropEl.appendChild(d); }
-    function clearPreview(dropEl){ const ex = dropEl.querySelector('.file-name'); if(ex) ex.remove(); }
-
-  })();
-</script>
+<script src="viewPrestataire.js"></script>
 
 </body>
 </html>

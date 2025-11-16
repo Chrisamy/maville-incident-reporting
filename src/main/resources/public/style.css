@@ -331,12 +331,6 @@ label,legend {
   margin-bottom:14px
 }
 
-.priority-group {
-  border:none;
-  margin:8px 0 14px 0;
-  padding:0
-}
-
 .modal-actions {
   display:flex;
   justify-content:flex-end;

@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- Topbar: agent view with quick actions for assigning and tracking tasks -->
 <header class="topbar">
     <div class="left">
         <button class="menu" onclick="location.href='loginPage.html'"> Menu principal</button>
@@ -22,6 +23,7 @@
     </div>
 </header>
 
+<!-- Filters for the agent table: search, status and priority. Behaviour to be added in JS. -->
 <section class="search-section">
     <label for="searchInput"></label><input type="text" id="searchInput" placeholder="Rechercher par ID, arrondissement ou priorité...">
     <label for="statusFilter"></label><select id="statusFilter">
@@ -38,6 +40,7 @@
     </select>
 </section>
 
+<!-- Table of interventions -->
 <section class="table-container">
     <table id="agentTable">
         <thead>
