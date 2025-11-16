@@ -22,10 +22,9 @@ public class DemandRepository {
         return instance;
     }
 
-    public List<DemandForm> getAllForms() {
-        return Collections.unmodifiableList(demandList);
+    public ArrayList<DemandForm> getDemandList() {
+        return demandList;
     }
-
     public static void addForm(DemandForm form) {
         demandList.add(form);
     }
