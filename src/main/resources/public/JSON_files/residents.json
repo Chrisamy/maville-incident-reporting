@@ -1,0 +1,14 @@
+{
+  "name": "public",
+  "version": "1.0.0",
+  "description": "",
+  "main": "login.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IFT-2255/a25-dm-petit-genie.git"
+  },
+  "private": true
+}
