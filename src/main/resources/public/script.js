@@ -11,7 +11,7 @@ let requestNum = 1;
 //         document.getElementById("message").innerText = "Error loading message.";
 //     }
 // });
-
+// PLR VERIF: is this even used?
 function addRequestButton() {
     var table = document.getElementById("table-request");
     let typeProb = document.getElementById("type-probleme").value;

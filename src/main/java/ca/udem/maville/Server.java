@@ -83,6 +83,12 @@ public class Server {
             }
         });
 
+        // PLR VERIF: to route the form from the Resident to the Agent
+        // TODO PLR doesnt work obv
+        app.get("/api/agent-problems-receive",ctx ->  {
+            ctx.json(problemList.getFormList());
+        });
+
 
     }
 
