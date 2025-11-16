@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- Top bar: navigation and quick actions for the resident user -->
 <header class="topbar">
     <div class="left">
         <button class="menu" onclick="location.href='loginPage.html'"> Menu principal</button>
@@ -22,6 +23,7 @@
     </div>
 </header>
 
+<!-- Modal used to submit a resident problem report. Controlled from viewResident.js -->
 <div id="problemModalOverlay" class="modal-overlay" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <button class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
@@ -32,13 +34,6 @@
             <label>Adresse du problème <span class="required">*</span>
                 <input id="addressInput" class="form-control" name="address" type="text" placeholder="Ex: 123 Rue Principale, Montréal" required>
             </label>
-
-            <fieldset class="enumPriority-group" id="priorityGroup">
-                <legend>Niveau de priorité estimé <span class="required">*</span></legend>
-                <label><input type="radio" name="enumPriority" value="low"> Basse - Problème mineur, pas urgent</label>
-                <label><input type="radio" name="enumPriority" value="medium" checked> Moyenne - Problème à traiter dans un délai raisonnable</label>
-                <label><input type="radio" name="enumPriority" value="high"> Haute - Problème urgent, danger potentiel</label>
-            </fieldset>
 
             <label>Description détaillée <span class="required">*</span>
                 <textarea id="detailsInput" class="form-control" name="details" rows="5" placeholder="Décrivez le problème en détail..." required></textarea>
@@ -62,6 +57,7 @@
 </div>
 
 
+<!-- Search and filter area: contains both free text search and status filter -->
 <section class="search-section">
     <label for="searchInput"></label><input type="text" id="searchInput" placeholder="Rechercher par numéro, arrondissement ou organisation...">
     <label for="statusFilter"></label><select id="statusFilter">
@@ -73,6 +69,7 @@
 </section>
 
 
+<!-- Main table: data is loaded from the Montreal open-data API via viewResident.js -->
 <section class="table-container">
     <table id="permitTable">
         <thead>
@@ -92,142 +89,12 @@
     <p id="resultCount">Affichage des résultats...</p>
 </section>
 
+<!-- Footer is static branding/info -->
 <footer>
     <p>© Petit Génie - 2025</p>
 </footer>
 
-<script>
-    // PLR Verif : I replaced the URL for a JSON for testing purposes
-//    const API_URL = "https://donnees.montreal.ca/api/3/action/datastore_search?resource_id=cc41b532-f12d-40fb-9f55-eb58c9a2b12b&limit=10";
-    const API_URL = "donnees_mtl.json";
-
-    async function fetchData() {
-        try {
-            const response = await fetch(API_URL);
-            const data = await response.json();
-            const records = data.result.records;
-            populateTable(records);
-        } catch (error) {
-            document.getElementById("tableBody").innerHTML = `<tr><td colspan='6'>Erreur de chargement des données</td></tr>`;
-        }
-    }
-
-    function populateTable(records) {
-        const tbody = document.getElementById("tableBody");
-        tbody.innerHTML = "";
-
-        records.forEach(record => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-          <td>${record.id || "N/A"}</td>
-          <td>${record.boroughid || "N/A"}</td>
-          <td>${record.reason_category || record.permitcategory || "N/A"}</td>
-          <td><span class="enumStatus">${record.currentstatus || "N/A"}</span></td>
-          <td>${record.submittercategory || "N/A"}</td>
-          <td>${record.organizationname || "N/A"}</td>
-        `;
-            tbody.appendChild(row);
-        });
-
-        document.getElementById("resultCount").textContent = `Affichage de ${records.length} requêtes`;
-    }
-
-
-    document.getElementById("searchInput").addEventListener("input", filterTable);
-    document.getElementById("statusFilter").addEventListener("change", filterTable);
-
-    function filterTable() {
-        const search = document.getElementById("searchInput").value.toLowerCase();
-        const enumStatus = document.getElementById("statusFilter").value.toLowerCase();
-        const rows = document.querySelectorAll("#permitTable tbody tr");
-
-        rows.forEach(row => {
-            const cells = row.querySelectorAll("td");
-            const matchSearch = [...cells].some(cell => cell.textContent.toLowerCase().includes(search));
-            const matchStatus = enumStatus ? row.cells[3].textContent.toLowerCase().includes(enumStatus) : true;
-
-            row.style.display = matchSearch && matchStatus ? "" : "none";
-        });
-    }
-
-    fetchData();
-
-    (function(){
-        const openBtn = document.querySelector('.btn-primary');
-        const overlay = document.getElementById('problemModalOverlay');
-        const closeBtn = document.getElementById('modalCloseBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const form = document.getElementById('problemForm');
-        const fileDrop = document.getElementById('fileDrop');
-        const fileInput = document.getElementById('fileInput');
-
-        function openModal(){ overlay.classList.add('show'); overlay.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
-        function closeModal(){ overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); document.body.style.overflow=''; form.reset(); clearFilePreview(); }
-
-        if(openBtn) openBtn.addEventListener('click', (e)=>{ e.preventDefault(); openModal(); });
-
-        closeBtn.addEventListener('click', closeModal);
-        cancelBtn.addEventListener('click', closeModal);
-        overlay.addEventListener('click', (e)=> { if(e.target === overlay) closeModal(); });
-
-        document.querySelector('.modal-card').addEventListener('click', e=> e.stopPropagation());
-
-        form.addEventListener('submit', async function (e) {
-            e.preventDefault();
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-            const fd = new FormData(form);
-            console.log(FormData)
-            if (fileInput.files[0]) fd.append('photo', fileInput.files[0]);
-            // TODO: send fd via fetch to server endpoint
-
-
-            try {
-                let response = await fetch("/api/resident-form-send", {
-                    method: 'POST',
-                    body: fd,
-                });
-                let data = await response.json();
-            } catch (err) {
-                console.log(err);
-            }
-
-
-            console.log('Submit form:', Object.fromEntries(fd.entries()));
-            closeModal();
-        });
-
-        fileDrop.addEventListener('click', ()=> fileInput.click());
-        fileDrop.addEventListener('dragover', e=> { e.preventDefault(); fileDrop.style.borderColor='#a0a9b5'; });
-        fileDrop.addEventListener('dragleave', e=> { e.preventDefault(); fileDrop.style.borderColor=''; });
-        fileDrop.addEventListener('drop', e=> {
-            e.preventDefault();
-            fileDrop.style.borderColor='';
-            const files = e.dataTransfer.files;
-            if(files && files.length) {
-                fileInput.files = files;
-                showFileName(files[0]);
-            }
-        });
-        fileInput.addEventListener('change', ()=> { if(fileInput.files[0]) showFileName(fileInput.files[0]); });
-
-        function showFileName(file){
-            const name = document.createElement('div');
-            name.className = 'file-name';
-            name.textContent = file.name + ' (' + Math.round(file.size/1024) + ' KB)';
-            // remove previous small preview text if any
-            const existing = fileDrop.querySelector('.file-name');
-            if(existing) existing.remove();
-            fileDrop.appendChild(name);
-        }
-        function clearFilePreview(){
-            const existing = fileDrop.querySelector('.file-name');
-            if(existing) existing.remove();
-        }
-    })();
-</script>
-<script src="script.js"></script>
+<!-- External script: contains all page behaviour (fetching, modal, form) -->
+<script src="viewResident.js"></script>
 </body>
 </html>

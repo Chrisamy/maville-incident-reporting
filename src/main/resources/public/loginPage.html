@@ -74,18 +74,6 @@
 <footer>
     <p>© Petit Génie - 2025</p>
 </footer>
-<script>
-    document.getElementById("resident-Login").addEventListener("click", async () => {
-        try {
-            const username = document.getElementById("email-resident").value;
-            const password = document.getElementById("password-resident").value;
-            let response = await fetch("/api/resident-log-in", { method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username}),});
-            let data = await response.json();
-        } catch (err) {
-            alert(err);
-        }
-    });
-</script>
+<script src="login.js"></script>
 </body>
 </html>
