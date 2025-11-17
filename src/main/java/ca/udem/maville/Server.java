@@ -92,10 +92,9 @@ public class Server {
         app.post("/api/resident-log-in", ctx -> {
             currentResident = ctx.bodyAsClass(Resident.class);
             ctx.json(currentResident);
-            System.out.println(currentResident.getUsername());
+            System.out.println("Utilisateur " + currentResident.getUsername() + "s'est connecté.");
             // PLR TESTING: test added to see if the username gets added
             System.out.println(currentResident.getPassword());
-            System.out.println("yeye end of log in info");
         });
 
         app.post("/api/resident-form-send", ctx -> {
