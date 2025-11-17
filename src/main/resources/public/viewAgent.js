@@ -2,7 +2,7 @@ const API_URL = "JSON_files/problems.json";
 
 // Fetch data from the API and render it in the table.
 // Wrapped in try/catch so the UI shows a very friendly message on failure.
-async function fetchData() {
+/*async function fetchData() {
   try {
     const response = await fetch(API_URL);
     if (!response.ok) {
@@ -20,34 +20,37 @@ async function fetchData() {
     console.error('fetchData error:', error);
     document.getElementById('tableBody').innerHTML = `<tr><td colspan='6'>Erreur de chargement des données</td></tr>`;
   }
-}
+}*/
 
 // Render the records array into the table body.
-function populateTable(records) {
-  const tbody = document.getElementById('tableBody');
-  tbody.innerHTML = '';
-  if (!Array.isArray(records) || records.length === 0) {
-    tbody.innerHTML = `<tr><td colspan='6'>Aucun résultat trouvé</td></tr>`;
-    document.getElementById('resultCount').textContent = 'Affichage de 0 requêtes';
-    return;
-  }
+document.addEventListener('DOMContentLoaded', async () => {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    const response = await fetch("/api/load-problems")
+    const listofProblem =  await response.json() //so we get the list of problems
 
-  records.forEach(record => {
-    const row = document.createElement('tr');
-    // Simple fallbacks so the table stays readable.
-    row.innerHTML = `
-      <td>${record.id || 'N/A'}</td>
-      <td>${record.location || 'N/A'}</td>
-      <td>${record.boroughid || 'N/A'}</td>
-      <td>${record.priority || record.permitcategory || 'N/A'}</td>
-      <td><span class="enumStatus">${record.currentStatus || 'N/A'}</span></td>
-      <td>${record.description || 'N/A'}</td>
+    if (!Array.isArray(listofProblem) || listofProblem.length === 0) {
+        tbody.innerHTML = `<tr><td colspan='6'>Aucun résultat trouvé</td></tr>`;
+        document.getElementById('resultCount').textContent = 'Affichage de 0 requêtes';
+        return;
+    }
+
+    listofProblem.forEach(listofProblem => {
+        const row = document.createElement('tr');
+        // Simple fallbacks so the table stays readable.
+        row.innerHTML = `
+      <td>${listofProblem.id || 'N/A'}</td>
+      <td>${listofProblem.location || 'N/A'}</td>
+      <td>${listofProblem.boroughId || listofProblem.permitcategory || 'N/A'}</td>
+      <td><span class="enumPriority">${listofProblem.priority || 'N/A'}</span></td>
+      <td>${listofProblem.status || 'N/A'}</td>
+      <td>${listofProblem.description || 'N/A'}</td>
     `;
-    tbody.appendChild(row);
-  });
+        tbody.appendChild(row);
+    });
 
-  document.getElementById('resultCount').textContent = `Affichage de ${records.length} requêtes`;
-}
+    document.getElementById('resultCount').textContent = `Affichage de ${listofProblem.length} requêtes`;
+});
 
 // --- Search & filters ---
 

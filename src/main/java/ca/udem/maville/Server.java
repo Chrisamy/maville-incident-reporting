@@ -3,13 +3,18 @@ package ca.udem.maville;
 import io.javalin.Javalin;
 
 import java.awt.Desktop;
+import java.io.IOException;
 import java.net.URI;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Server {
 
     public static Javalin app;
+
+    protected static String MTLjson = "src/main/resources/public/JSON_files/donnees_mtl_stripped_down.json";
 
     private static final List<String> messageQueue = new ArrayList<>();
 
@@ -67,8 +72,9 @@ public class Server {
             // Send events, for demonstration send a new one every 5 seconds
             while (!Thread.interrupted()) {
                 while (numMessagesSent < messageQueue.size()) {
-                    ctx.res().getWriter().write("data: " + messageQueue.get(numMessagesSent++) + "\n\n");
+                    ctx.res().getWriter().write("data: " + messageQueue.getFirst() + "\n\n");
                     ctx.res().getWriter().flush();
+                    messageQueue.removeFirst();
                 }
                 Thread.sleep(1000); // chaque seconde on check pour un nouveaux message chaque seconde
             }
@@ -141,9 +147,10 @@ public class Server {
             problemFormHandler.AssignProblemPriority(problemList.getFormList(),formId, newPriority);
         });
 
+        app.get("/api/load-problems", ctx -> {
+            ctx.json(problemList.getFormList());
 
-
-
+        });
 
 
     }
