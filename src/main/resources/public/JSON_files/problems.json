@@ -18,7 +18,7 @@
     "boroughid": "Outremont",
     "username" : "Papi",
     "priority": "notAssigned",
-    "description": "Trou dans la carlingue",
+    "description": "Sable dans la rue",
     "currentStatus": "waitingForApproval"
   },
   {"_id": 3,
@@ -28,7 +28,7 @@
     "boroughid": "Rosemont",
     "username" : "Mami",
     "priority": "notAssigned",
-    "description": "Trou dans la carlingue",
+    "description": "Pantouffle qui bloque le chemin",
     "currentStatus": "waitingForApproval"
   }
 ]

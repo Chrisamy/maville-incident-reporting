@@ -37,11 +37,11 @@ function populateTable(records) {
     // Simple fallbacks so the table stays readable.
     row.innerHTML = `
       <td>${record.id || 'N/A'}</td>
+      <td>${record.location || 'N/A'}</td>
       <td>${record.boroughid || 'N/A'}</td>
-      <td>${record.reason_category || record.permitcategory || 'N/A'}</td>
-      <td><span class="enumStatus">${record.currentstatus || 'N/A'}</span></td>
-      <td>${record.submittercategory || 'N/A'}</td>
-      <td>${record.organizationname || 'N/A'}</td>
+      <td>${record.priority || record.permitcategory || 'N/A'}</td>
+      <td><span class="enumStatus">${record.currentStatus || 'N/A'}</span></td>
+      <td>${record.description || 'N/A'}</td>
     `;
     tbody.appendChild(row);
   });
