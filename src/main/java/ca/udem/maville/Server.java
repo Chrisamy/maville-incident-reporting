@@ -1,5 +1,8 @@
 package ca.udem.maville;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
 
 import java.awt.Desktop;
@@ -14,7 +17,7 @@ public class Server {
 
     public static Javalin app;
 
-    protected static String MTLjson = "src/main/resources/public/JSON_files/donnees_mtl_stripped_down.json";
+    //protected static String MTLjson = "src/main/resources/public/JSON_files/donnees_mtl_stripped_down.json";
 
     private static final List<String> messageQueue = new ArrayList<>();
 
@@ -26,7 +29,7 @@ public class Server {
 
     static Resident currentResident;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         /**=============================================================================================================
          PRELOAD SERVER WITH 3 RESIDENTS, 3 CONTRACTORS, 3 PROBLEMS and 3 DEMANDS
          =============================================================================================================*/
@@ -148,9 +151,10 @@ public class Server {
         });
 
         app.get("/api/load-problems", ctx -> {
-            ctx.json(problemList.getFormList());
-
+            ctx.json(problemList.getFormList()); //loads list of problems to the front end (only for agent at this moment in time)
         });
+
+        //loadDemandeFromJson();
 
 
     }
@@ -162,6 +166,52 @@ public class Server {
     public void showList(){
 
     }
+
+    /* private static void loadDemandeFromJson(){
+        String jsonContent = new String(Files.readAllBytes(Paths.get(MTLjson)));
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(jsonContent);
+        JsonNode itemsArray = rootNode.path("records");
+
+        for (int i=0; i < 5; i++){
+            JsonNode item = itemsArray.get(i);
+            String id = item.get("id").asText();
+            String borough = item.get("borough").asText();
+            EnumBoroughID enumBoroughID;
+            switch (borough) {
+                case "Anjou":
+                    enumBoroughID = EnumBoroughID.anjou;
+                case "Côte-des-Neiges—Notre-Dame-de-Grâce":
+                    enumBoroughID = EnumBoroughID.coteDesNeigesNotreDameDeGrace;
+                case "Le Plateau-Mont-Royal":
+                    enumBoroughID = EnumBoroughID.lePlateauMontRoyal;
+                case "Le Sud-Ouest":
+                    enumBoroughID = EnumBoroughID.leSudOuest;
+                case "Mercier–Hochelaga-Maisonneuve":
+                    enumBoroughID = EnumBoroughID.mercierHochelagaMaisonneuve;
+                case "Montréal-Nord":
+                    enumBoroughID = EnumBoroughID.montrealNord;
+                case "Outremont":
+                    enumBoroughID = EnumBoroughID.outremont;
+                case "Rivière-des-Prairies—Pointe-aux-Trembles":
+                    enumBoroughID = EnumBoroughID.riviereDesPrairiesPointeAuxTrembles;
+                case "Rosemont—La Petite-Patrie":
+                    enumBoroughID = EnumBoroughID.rosemontLaPetitePatrie;
+                case "Saint-Léonard":
+                    enumBoroughID = EnumBoroughID.saintLeonard;
+                case "Villeray—Saint-Michel—Parc-Extension":
+                    enumBoroughID = EnumBoroughID.villeraySaintMichelParcExtension;
+                case "Ville-Marie":
+                    enumBoroughID = EnumBoroughID.villeMarie;
+                default:
+                    throw new IllegalArgumentException("Unknown borough: " + borough);
+            }
+
+
+        }
+
+    }*/
 
 
 }
