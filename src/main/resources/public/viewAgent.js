@@ -75,9 +75,9 @@ function filterTable() {
   const overlay = document.getElementById('problemModalOverlay');
   const closeBtn = document.getElementById('modalCloseBtn');
   const cancelBtn = document.getElementById('cancelBtn');
-  const form = document.getElementById('problemForm');
-  const fileDrop = document.getElementById('fileDrop');
-  const fileInput = document.getElementById('fileInput');
+  const form = document.getElementById('priorityAssigner');
+  //const fileDrop = document.getElementById('fileDrop');
+  //const fileInput = document.getElementById('fileInput');
 
   function openModal() {
     overlay.classList.add('show');
@@ -106,19 +106,17 @@ function filterTable() {
       return;
     }
     const fd = new FormData(form);
-    // Logging to help debug submission during development.
-    try {
-      console.log('FormData entries:', Object.fromEntries(fd.entries()));
-    } catch (err) {
+      // Logging to help debug submission during development.
+      try {
+          console.log('FormData entries:', Object.fromEntries(fd.entries()));
+      } catch (err) {
       // Some environments may not support Object.fromEntries on FormData: fallback to manual logging.
       for (const pair of fd.entries()) console.log(pair[0], pair[1]);
     }
 
-    if (fileInput.files[0]) fd.append('photo', fileInput.files[0]);
-
     // Send to backend endpoint
     try {
-      const response = await fetch('/api/resident-form-send', { method: 'POST', body: fd });
+      const response = await fetch('/api/agent-problem-set-priority', { method: 'POST', body: fd });
       if (!response.ok) console.error('Server error while sending form', response.status);
       // We don't strictly need the JSON result here, but we try to parse if the server returns it.
       const json = await response.json().catch(() => null);
@@ -131,22 +129,6 @@ function filterTable() {
   });
 
   // File drop behaviour: click to open file picker, drag/drop to attach.
-
-  if (fileDrop && fileInput) {
-    fileDrop.addEventListener('click', () => fileInput.click());
-    fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.style.borderColor = '#a0a9b5'; });
-    fileDrop.addEventListener('dragleave', e => { e.preventDefault(); fileDrop.style.borderColor = ''; });
-    fileDrop.addEventListener('drop', e => {
-      e.preventDefault();
-      fileDrop.style.borderColor = '';
-      const files = e.dataTransfer.files;
-      if (files && files.length) {
-        fileInput.files = files;
-        showFileName(files[0]);
-      }
-    });
-    fileInput.addEventListener('change', () => { if (fileInput.files[0]) showFileName(fileInput.files[0]); });
-  }
 
   // showFileName / clearFilePreview: small helpers that update the drop zone with the selected file name.
   function showFileName(file) {

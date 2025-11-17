@@ -18,10 +18,10 @@
             Suivi des demandes
         </button>
         <button class="btn-outline">
-            Assigner un travail
+            Changer details d'un probleme
         </button>
         <button class="btn-primary">
-            Traiter un problème
+            Assigner une priorité
         </button>
     </div>
 </header>
@@ -31,25 +31,20 @@
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <button class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
         <h2 id="modalTitle" class="modal-title">Traiter un problème</h2>
-        <p class="modal-sub">Complétez le formulaire ci-dessous refuser ou accepter et classifier un problème rapporté par un résident.</p>
+        <p class="modal-sub">Complétez le formulaire ci-dessous pour assigner une priorité a un probleme.</p>
 
-        <form id="problemForm" class="modal-form">
-            <label>Adresse du problème <span class="required">*</span>
-                <input id="addressInput" class="form-control" name="address" type="text" placeholder="Ex: 123 Rue Principale, Montréal" required>
+        <form id="priorityAssigner" class="modal-form">
+            <label>Id du probleme <span class="required">*</span>
+                <input id="problemid" class="form-control" name="problemid" type="text" placeholder="000000000000aaaaaaaaaaaa" required>
             </label>
 
-            <label>Description détaillée <span class="required">*</span>
-                <textarea id="detailsInput" class="form-control" name="details" rows="5" placeholder="Décrivez le problème en détail..." required></textarea>
+            <label>Quelle priorité Assignée <span class="required">*</span>
+                <select name="newpriority">
+                    <option value="low">low</option>
+                    <option value="medium">medium</option>
+                    <option value="high">high</option>
+                </select>
             </label>
-
-            <label>Photo (optionnel)</label>
-            <div id="fileDrop" class="file-drop">
-                <input id="fileInput" type="file" accept="image/png, image/jpeg" />
-                <div class="file-drop-inner">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v10" stroke="#7b8794" stroke-width="1.5"/><path d="M8 7l4-4 4 4" stroke="#7b8794" stroke-width="1.5"/></svg>
-                    <div class="file-drop-text">Cliquez pour ajouter une photo ou glissez-déposez<br><small>PNG, JPG jusqu'à 10MB</small></div>
-                </div>
-            </div>
 
             <div class="modal-actions">
                 <button type="button" class="btn-outline" id="cancelBtn">Annuler</button>
@@ -58,6 +53,7 @@
         </form>
     </div>
 </div>
+
 
 
 <!-- Filters for the agent table: search, status and priority. Behaviour to be added in JS. -->
@@ -102,6 +98,7 @@
 </footer>
 <!-- External script: contains all page behaviour (fetching, modal, form) -->
 <script src="viewAgent.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>

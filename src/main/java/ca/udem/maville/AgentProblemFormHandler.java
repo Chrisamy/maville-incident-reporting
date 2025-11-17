@@ -39,9 +39,11 @@ public class AgentProblemFormHandler {
     // PLR verif: changed from private to public
     public void AssignProblemPriority(ArrayList<ProblemForm> FormList, String idForm, EnumPriority enumPriority) {
         ProblemForm f = getProblem(FormList, idForm);
+        System.out.println(f);
         if (f != null) {
             f.setPriority(enumPriority);
             Server.sendMessageToUI("Le projet " + idForm + " a eu sa priorité changé pour " + enumPriority);
+            System.out.println(f);
         }
         // PLR verif : do we need to throw an exeption if the form is not found?
     }

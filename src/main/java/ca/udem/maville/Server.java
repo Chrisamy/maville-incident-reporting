@@ -132,8 +132,8 @@ public class Server {
 
         app.post("/api/agent-problem-set-priority", ctx -> {
             // get user input
-            String formId = ctx.formParam("id");
-            String priority = ctx.formParam("priority");
+            String formId = ctx.formParam("problemid");
+            String priority = ctx.formParam("newpriority");
 
             // Get the EnumPriority associated with the string
             EnumPriority newPriority = EnumPriority.valueOf(priority);
