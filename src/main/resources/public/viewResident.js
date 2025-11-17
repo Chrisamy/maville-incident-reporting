@@ -31,17 +31,59 @@ function populateTable(records) {
     return;
   }
 
+  // Define synonyms for each EnumWorkType so we can map API values to a stable key
+  const workTypeSynonyms = {
+    RoadWork: ['route','routier','travaux routiers','asphalte','nid de poule','pavage','réfection','réasphaltage','pavage'],
+    GazOrElectric: ['gaz','gaz naturel','électricité','ligne électrique','câble électrique','branchement gaz','gaz ou électricité'],
+    ConstructionOrRenovation: ['construction','rénovation','chantier','bâtiment','travaux de construction','rénovation'],
+    Landscaping: ['paysage','aménagement paysager','végétation','pelouse','arbres','plantation','élagage'],
+    PublicsTransportWork: ['transport','transports en commun','métro','bus','tram','autobus','ligne de bus'],
+    SignageAndLighting: ['signalisation','éclairage','lampadaire','feu de circulation','éclairage public','panneau de signalisation'],
+    UndergroundWork: ['souterrain','excavation','tranchée','fouille','fossé','drain','canalisation','conduite','tranchee','excavation profonde'],
+    ResidentialWork: ['résidentiel','résidence','logement','entrée privée','rue résidentielle'],
+    UrbanMaintenance: ['entretien','maintenance','balayage','ramassage','collecte','entretien routier','voirie','réhabilitation'],
+    TelecommunicationsMaintenance: ['télécom','réseau','fibre','fibre optique','câble','réseau télécom','installation fibre']
+  };
+
+  // Detect work type key from a raw string provided by the API
+  function detectWorkType(raw) {
+    if (!raw) return 'notDefined';
+    const normalize = s => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9àâäéèêëîïôöùûüç-]/g, '');
+    const s = normalize(raw);
+
+    // check synonyms for each key
+    for (const [key, synonyms] of Object.entries(workTypeSynonyms)) {
+      for (const syn of synonyms) {
+        if (s.includes(normalize(syn))) return key;
+      }
+    }
+
+    // Fallback : if contains words like 'excav' or 'trench' map to UndergroundWork
+    if (s.includes('excav') || s.includes('trench') || s.includes('fouille') || s.includes('tranchee')) return 'UndergroundWork';
+
+    // no match -> 'notDefined' (Autre)
+    console.debug('[detectWorkType] unmatched raw type:', raw);
+    return 'notDefined';
+  }
+
   records.forEach(record => {
     const row = document.createElement('tr');
-    // Simple fallbacks so the table stays readable.
+
+    // Determine the raw type text the API provides
+    const rawTypeText = (record.reason_category || record.permitcategory || record.permit_category || '') + '';
+    // store normalized English key as a stable data attribute so filtering is reliable
+    row.dataset.type = detectWorkType(rawTypeText);
+
+    // Keep the displayed text as-is (so users see the API label)
     row.innerHTML = `
       <td>${record.id || 'N/A'}</td>
       <td>${record.boroughid || 'N/A'}</td>
-      <td>${record.reason_category || record.permitcategory || 'N/A'}</td>
+      <td>${rawTypeText || 'N/A'}</td>
       <td><span class="enumStatus">${record.currentstatus || 'N/A'}</span></td>
       <td>${record.submittercategory || 'N/A'}</td>
       <td>${record.organizationname || 'N/A'}</td>
     `;
+
     tbody.appendChild(row);
   });
 
@@ -50,22 +92,44 @@ function populateTable(records) {
 
 // --- Search & filters ---
 
-// Simple client-side filters that hide rows based on text and status.
-document.getElementById('searchInput').addEventListener('input', filterTable);
-document.getElementById('statusFilter').addEventListener('change', filterTable);
+(function(){
+  const searchInput = document.getElementById('searchInput');
+  const statusFilter = document.getElementById('statusFilter');
+  const typeFilter = document.getElementById('typeFilter');
 
-function filterTable() {
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const enumStatus = document.getElementById('statusFilter').value.toLowerCase();
-  const rows = document.querySelectorAll('#permitTable tbody tr');
+  if (searchInput) searchInput.addEventListener('input', filterTableResident);
+  if (statusFilter) statusFilter.addEventListener('change', filterTableResident);
+  if (typeFilter) typeFilter.addEventListener('change', filterTableResident);
 
-  rows.forEach(row => {
-    const cells = row.querySelectorAll('td');
-    const matchSearch = [...cells].some(cell => cell.textContent.toLowerCase().includes(search));
-    const matchStatus = enumStatus ? row.cells[3].textContent.toLowerCase().includes(enumStatus) : true;
-    row.style.display = matchSearch && matchStatus ? '' : 'none';
-  });
-}
+  function filterTableResident(){
+    const search = (searchInput && searchInput.value || '').toLowerCase();
+    const status = (statusFilter && statusFilter.value || '').toLowerCase();
+    const type = (typeFilter && typeFilter.value || ''); // English key from select
+
+    let rows = document.querySelectorAll('#permitTable tbody tr');
+    if (!rows || rows.length === 0) {
+      rows = Array.from(document.querySelectorAll('#permitTable tr')).filter(r => r.querySelectorAll('th').length === 0);
+    }
+
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if (!cells || cells.length === 0) { row.style.display = ''; return; }
+
+      const matchSearch = [...cells].some(cell => cell.textContent.toLowerCase().includes(search));
+      const matchStatus = status ? (row.cells[3] && row.cells[3].textContent.toLowerCase().includes(status)) : true;
+
+      // Compare the key stored in data-type with the select's value
+      let matchType = true;
+      if (type) {
+        const rowType = (row.dataset && row.dataset.type) || 'notDefined';
+        matchType = rowType === type;
+      }
+
+      row.style.display = (matchSearch && matchStatus && matchType) ? '' : 'none';
+    });
+  }
+})();
+
 
 // --- Modal and form handling ---
 
