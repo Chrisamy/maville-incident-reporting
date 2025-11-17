@@ -1,7 +1,14 @@
 package ca.udem.maville;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true) //to ignore the _id property
 public class DemandForm {
+    @JsonIgnore
     Prestataire prestataire;
+
     int companyNumber;
     String projectTitle;
     EnumWorkType workType;
@@ -9,11 +16,13 @@ public class DemandForm {
     String description;
     String startDate;
     String endDate;
-    String id;
+    String problemId;
     float costEstimate;
 
+    public DemandForm() {}
+
     public DemandForm(Prestataire prestataire, int companyNumber, String projectTitle, EnumWorkType workType,
-                      String location, String description, String startDate, String endDate, String id, float costEstimate) {
+                      String location, String description, String startDate, String endDate, String problemId, float costEstimate) {
         this.prestataire = prestataire;
         this.companyNumber = companyNumber;
         this.projectTitle = projectTitle;
@@ -22,7 +31,7 @@ public class DemandForm {
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.id = id;
+        this.problemId = problemId;
         this.costEstimate = costEstimate;
 
     }
@@ -32,7 +41,13 @@ public class DemandForm {
     public Prestataire getPrestataire() {
         return prestataire;
     }
-    public int getCompanyNumber() { return prestataire.getCompanyNumber(); } // PLR VERIF not sure pour cela
+    public int getCompanyNumber() {
+        if(prestataire == null){
+            return 0;
+        }
+        return prestataire.getCompanyNumber();
+
+    } // PLR VERIF not sure pour cela
     public String getProjectTitle() {
         return projectTitle;
     }
@@ -50,7 +65,7 @@ public class DemandForm {
         return endDate;
     }
     public String getId() {
-        return id;
+        return problemId;
     }
     public float getCostEstimate() {return costEstimate;}
 
@@ -78,8 +93,8 @@ public class DemandForm {
     public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
-    public void setId(String id) {
-        this.id = id;
+    public void setId(String problemId) {
+        this.problemId = problemId;
     }
     public void setCostEstimate(float costEstimate) {this.costEstimate = costEstimate;}
 }

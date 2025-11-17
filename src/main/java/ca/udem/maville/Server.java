@@ -46,13 +46,13 @@ public class Server {
         Desktop desktop = Desktop.getDesktop();
         try {
 
-            //desktop.browse(new URI(String.format("http://localhost:%d", port)));
+            desktop.browse(new URI(String.format("http://localhost:%d", port)));
             // PLR TESTING : to open the page in resident directly
             //desktop.browse(new URI(String.format("http://localhost:7000/viewResident.html", port)));
             // PLR TESTING : to open the page in contractor directly
             //desktop.browse(new URI(String.format("http://localhost:7000/viewPrestataire.html", port)));
             // PLR TESTING : to open the page in agent directly
-            desktop.browse(new URI(String.format("http://localhost:%d/viewAgent.html", port)));
+            //desktop.browse(new URI(String.format("http://localhost:%d/viewAgent.html", port)));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,8 +155,14 @@ public class Server {
             ctx.json(problemList.getFormList()); //loads list of problems to the front end (only for agent at this moment in time)
         });
 
+        app.get("/api/load-demands", ctx -> {
+            ctx.json(demandeList.getDemandList()); //loads list of problems to the front end (only for agent at this moment in time)
+        });
+
         ObjectMapper mapper = new ObjectMapper();
+        // a seemingly complicated way to create the placeholders of problems from our json using jackson
         problemList.getFormList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/problems.json"), new TypeReference<ArrayList<ProblemForm>>() {}));
+        demandeList.getDemandList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/demands.json"), new TypeReference<ArrayList<DemandForm>>() {}));
 
 
     }

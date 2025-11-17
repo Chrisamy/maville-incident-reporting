@@ -12,7 +12,7 @@
     "startDate" : "2025-01-05T19:00:00Z",
     "endDate" : "2026-07-12T19:59:59Z",
     "costEstimate" : "2000.00",
-    "problemID": "654277b8021cab001920d32e"
+    "problemId": "654277b8021cab001920d32e"
   },
   {
     "_id": 2,
@@ -27,7 +27,7 @@
     "startDate": "2025-03-12T14:00:00Z",
     "endDate": "2026-11-20T22:00:00Z",
     "costEstimate": "850000.00",
-    "problemID": "654277b8021cab001920d330"
+    "problemId": "654277b8021cab001920d330"
   },
   {
     "_id": 3,
@@ -42,7 +42,7 @@
     "startDate": "2024-09-01T08:00:00Z",
     "endDate": "2025-12-15T18:30:00Z",
     "costEstimate": "1250000.00",
-    "problemID": "654277b8021cab001920d331"
+    "problemId": "654277b8021cab001920d331"
   }
 ]
 
