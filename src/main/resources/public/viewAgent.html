@@ -17,11 +17,44 @@
         <button class="btn-outline">
             Suivi des demandes
         </button>
+        <button class="btn-outline">
+            Changer details d'un probleme
+        </button>
         <button class="btn-primary">
-            Assigner un travail
+            Assigner une priorité
         </button>
     </div>
 </header>
+
+<!-- Modal used to classify a problem. Controlled from viewAgent.js -->
+<div id="problemModalOverlay" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
+        <h2 id="modalTitle" class="modal-title">Traiter un problème</h2>
+        <p class="modal-sub">Complétez le formulaire ci-dessous pour assigner une priorité a un probleme.</p>
+
+        <form id="priorityAssigner" class="modal-form">
+            <label>Id du probleme <span class="required">*</span>
+                <input id="problemid" class="form-control" name="problemid" type="text" placeholder="000000000000aaaaaaaaaaaa" required>
+            </label>
+
+            <label>Quelle priorité Assignée <span class="required">*</span>
+                <select name="newpriority">
+                    <option value="low">low</option>
+                    <option value="medium">medium</option>
+                    <option value="high">high</option>
+                </select>
+            </label>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-outline" id="cancelBtn">Annuler</button>
+                <button type="submit" class="btn-primary">Soumettre</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 
 <!-- Filters for the agent table: search, status and priority. Behaviour to be added in JS. -->
 <section class="search-section">
@@ -40,26 +73,32 @@
     </select>
 </section>
 
-<!-- Table of interventions -->
+<!-- Table of problems -->
 <section class="table-container">
     <table id="agentTable">
         <thead>
         <tr>
             <th>ID</th>
+            <th>Adresse</th>
             <th>Arrondissement</th>
-            <th>Type d’intervention</th>
             <th>Priorité</th>
             <th>Statut</th>
-            <th>Assigné à</th>
+            <th>Description</th>
         </tr>
         </thead>
+        <tbody id="tableBody">
+        <tr><td colspan="6" class="loading">Chargement des données...</td></tr>
+        </tbody>
     </table>
-    <p id="resultCount">Affichage des interventions</p>
+    <p id="resultCount">Affichage des problèmes déclarés par les résidents</p>
 </section>
 
 <footer>
     <p>© Petit Génie - 2025</p>
 </footer>
+<!-- External script: contains all page behaviour (fetching, modal, form) -->
+<script src="viewAgent.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>

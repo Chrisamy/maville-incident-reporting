@@ -4,7 +4,7 @@ public class User {
     private String username;
     private String password;
 
-    // PLR verif pourquoi il y a un aure User vide ici?
+
     public User() {}
 
     public User(String username, String password) {

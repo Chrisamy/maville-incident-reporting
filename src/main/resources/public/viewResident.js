@@ -1,4 +1,6 @@
-const API_URL = "https://donnees.montreal.ca/api/3/action/datastore_search?resource_id=cc41b532-f12d-40fb-9f55-eb58c9a2b12b";
+//const API_URL = "https://donnees.montreal.ca/api/3/action/datastore_search?resource_id=cc41b532-f12d-40fb-9f55-eb58c9a2b12b";
+const API_URL = "JSON_files/donnees_mtl.json"
+
 
 // Fetch data from the API and render it in the table.
 // Wrapped in try/catch so the UI shows a very friendly message on failure.

@@ -40,7 +40,15 @@ public class Server {
 
         Desktop desktop = Desktop.getDesktop();
         try {
-            desktop.browse(new URI(String.format("http://localhost:%d", port)));
+
+            //desktop.browse(new URI(String.format("http://localhost:%d", port)));
+            // PLR TESTING : to open the page in resident directly
+            //desktop.browse(new URI(String.format("http://localhost:7000/viewResident.html", port)));
+            // PLR TESTING : to open the page in contractor directly
+            //desktop.browse(new URI(String.format("http://localhost:7000/viewPrestataire.html", port)));
+            // PLR TESTING : to open the page in agent directly
+            desktop.browse(new URI(String.format("http://localhost:%d/viewAgent.html", port)));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -130,8 +138,8 @@ public class Server {
 
         app.post("/api/agent-problem-set-priority", ctx -> {
             // get user input
-            String formId = ctx.formParam("id");
-            String priority = ctx.formParam("priority");
+            String formId = ctx.formParam("problemid");
+            String priority = ctx.formParam("newpriority");
 
             // Get the EnumPriority associated with the string
             EnumPriority newPriority = EnumPriority.valueOf(priority);
