@@ -27,6 +27,17 @@ public class ProblemForm {
         this.description = description;
     }
 
+    public ProblemForm(String id, EnumWorkType workType, EnumBoroughID boroughId, EnumPriority priority, String description , EnumStatus status){
+        this.id = id;
+        this.workType = workType;
+        this.boroughId = boroughId;
+        this.priority = priority;
+        this.description = description;
+        this.status = status;
+        this.username = "api";
+
+    }
+
     // Getters
     public String getId() {
         return id;
