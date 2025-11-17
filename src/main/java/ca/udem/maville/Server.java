@@ -17,7 +17,7 @@ public class Server {
 
     public static Javalin app;
 
-    protected static String MTLjson = "src/main/resources/public/JSON_files/donnees_mtl_stripped_down.json";
+    //protected static String MTLjson = "src/main/resources/public/JSON_files/donnees_mtl_stripped_down.json";
 
     private static final List<String> messageQueue = new ArrayList<>();
 
