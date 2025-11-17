@@ -1,7 +1,10 @@
 package ca.udem.maville;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Objects;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProblemForm {
     private final String id;
     private EnumWorkType workType;
@@ -27,14 +30,14 @@ public class ProblemForm {
         this.description = description;
     }
 
-    public ProblemForm(String id, EnumWorkType workType, EnumBoroughID boroughId, EnumPriority priority, String description , EnumStatus status){
+    public ProblemForm(String id, EnumWorkType workType, EnumBoroughID boroughId, EnumPriority priority, String description , EnumStatus status, String username) {
         this.id = id;
         this.workType = workType;
         this.boroughId = boroughId;
         this.priority = priority;
         this.description = description;
         this.status = status;
-        this.username = "api";
+        this.username = username;
 
     }
 

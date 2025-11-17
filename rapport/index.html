@@ -231,13 +231,25 @@
 
     <section>
         <h2>Prototype</h2>
-        <p>L’application permet de choisir un profil (résident, prestataire, STPM), puis d’afficher un menu adapté à chaque cas.</p>
+        <p>L’application permet de choisir un profil (résident, prestataire, Agent), puis d’afficher un menu adapté à chaque cas.</p>
+        <p>Dans la vue resident le resident est capable de voir la liste des problems de l'api. Et est capable de signaler des problemes</p>
+        <p>Le prestataire est capable de soumettre une demande de travail sur un projet.</p>
+        <p>L'agent est capable de voir les demandes soumis par le resident et est capable d'assigner une priorité</p>
     </section>
 
     <section>
 
-        <h2>Style d'architecture</h2>
-        <p>Le style d'architecture choisie pour l'application est une architecture client-serveur.</p>
+        <h2>Style d'architecture: Client Serveur</h2>
+        <p>Le style d'architecture choisie pour l'application est une architecture client-serveur. Nous avons choisi
+        cette architecture puisque ceci permet un niveau d'abstraction entre le client et le fonctionnement de  l'application. De plus on a commencer avec cette architecture puisque elle va etre plus facile et rapide a
+        implementer a ce stade. De plus on pourras ensuite. De plus la gestions des données est plus simple puisque
+        elles sont tous stoquée dans le serveur.</p>
+        <p>Lorsqu'on a conceptualiser le serveur on voulais que l'utilisateur de l'application communique seulement
+        avec le serveur et que le serveur s'occupe a offload les interactions a d'autre modules de code. Les modules de
+        codes sont regrouper par le role qu'ils jouent, c'est a dire si c'est liée a un prestataire, agent,
+        resident. Une chose notable est l'implementation du design pattern de singleton pour nos deux repertoires. on a
+        utiliser ceci afin de s'assurer qu'il existe un seule repertoire et que les problemes ne sont pas desorganiser
+        dans de divers instance des repertoires</p>
         <h3>Résumé du fonctionnemment de l'application</h3>
         <p>L'Utilisateur intéragit avec l'interface utilisateur de l'application web servant de client pour soumettre des requêtes au serveur. Le serveur traite la requête et retourne la réponse correspondante. L'interface utilisateur affiche ensuite la réponse du serveur.</p>
 
@@ -250,6 +262,15 @@
         <h3>Modèle C4 de niveau 3</h3>
         <img src="images/modC4_3.png" alt="modèle C4 de niveau 3" style="width: 60em;">
 
+    </section>
+
+    <section>
+        <h3>Diagramme de Sequence</h3>
+        <img src="images/sequence.png" alt="Diagramme de Sequence">
+
+        <h3>Diagramme de Classes Object orientée</h3>
+        <img src="images/classes.png" alt="Diagramme de Classes Object">
+        <p>Le code couleur est: les classes en Rose sont associee au Resident, ceux en jaune au prestataire, et ceux en bleu pale(cyan) au agents</p>
     </section>
 </div>
 
