@@ -1,11 +1,13 @@
 package ca.udem.maville;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
@@ -154,7 +156,8 @@ public class Server {
             ctx.json(problemList.getFormList()); //loads list of problems to the front end (only for agent at this moment in time)
         });
 
-        //loadDemandeFromJson();
+        ObjectMapper mapper = new ObjectMapper();
+        problemList.getFormList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/problems.json"), new TypeReference<ArrayList<ProblemForm>>() {}));
 
 
     }
