@@ -26,7 +26,6 @@ public class AgentProblemFormHandler {
     }
 
     //Méthode pour accepter un projet
-    // PLR verif: changed from private to public
     public void AcceptProblem(ArrayList<ProblemForm> formList, String id, EnumWorkType newWorkType, EnumPriority newEnumPriority) {
         ProblemForm form = getProblem(formList, id);
         form.setWorkType(newWorkType);
@@ -36,7 +35,6 @@ public class AgentProblemFormHandler {
     }
 
     //Au cas où la priorité d'un problème change
-    // PLR verif: changed from private to public
     public void AssignProblemPriority(ArrayList<ProblemForm> FormList, String idForm, EnumPriority enumPriority) {
         ProblemForm f = getProblem(FormList, idForm);
         System.out.println(f);
@@ -50,7 +48,6 @@ public class AgentProblemFormHandler {
 
 
     // Method to update the project from example "inProgress" to "finished"
-    // PLR verif: changed from private to public
     public void UpdateProjectStatus(ArrayList<ProblemForm> formList, String id, EnumStatus newStatus) {
         ProblemForm form = getProblem(formList, id);
         form.setStatus(newStatus);
