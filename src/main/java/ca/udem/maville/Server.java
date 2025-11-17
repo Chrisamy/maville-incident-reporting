@@ -156,8 +156,14 @@ public class Server {
             ctx.json(problemList.getFormList()); //loads list of problems to the front end (only for agent at this moment in time)
         });
 
+        app.get("/api/load-demands", ctx -> {
+            ctx.json(demandeList.getDemandList()); //loads list of problems to the front end (only for agent at this moment in time)
+        });
+
         ObjectMapper mapper = new ObjectMapper();
+        // a seemingly complicated way to create the placeholders of problems from our json using jackson
         problemList.getFormList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/problems.json"), new TypeReference<ArrayList<ProblemForm>>() {}));
+        demandeList.getDemandList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/demands.json"), new TypeReference<ArrayList<DemandForm>>() {}));
 
 
     }

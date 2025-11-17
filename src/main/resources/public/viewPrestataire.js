@@ -1,3 +1,33 @@
+document.addEventListener('DOMContentLoaded', async () => {
+    const tbody = document.getElementById('requestTableBody');
+    tbody.innerHTML = '';
+    const response = await fetch("/api/load-demands")
+    const listofDemands =  await response.json() //so we get the list of problems
+
+    if (!Array.isArray(listofDemands) || listofDemands.length === 0) {
+        tbody.innerHTML = `<tr><td colspan='6'>Aucun résultat trouvé</td></tr>`;
+        document.getElementById('resultCount').textContent = 'Affichage de 0 requêtes';
+        return;
+    }
+
+    listofDemands.forEach(listofDemands => {
+        const row = document.createElement('tr');
+        // Simple fallbacks so the table stays readable.
+        row.innerHTML = `
+      <td>${listofDemands.problemId || 'N/A'}</td>
+      <td>${listofDemands.location || 'N/A'}</td>
+      <td>${listofDemands.workType || 'N/A'}</td>
+      <td><span class="titleproject">${listofDemands.projectTitle || 'N/A'}</span></td>
+      <td>${listofDemands.startDate || 'N/A'}</td>
+      <td>${listofDemands.endDate || 'N/A'}</td>
+    `;
+        tbody.appendChild(row);
+    });
+
+    document.getElementById('resultCount').textContent = `Affichage de ${listofDemands.length} requêtes`;
+});
+
+
 (function(){
   // Nodes used by the prestataire form/modal
   const openBtn = document.querySelector('.topbar .right .btn-primary');
