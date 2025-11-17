@@ -14,7 +14,7 @@ public class PrestataireUpdateProject {
     }
 
     public void UpdateProjectDescription(){
-       // ApprovedProject project = getProject();
+     
 
     }
     public void UpdateProjectEndDate(){
