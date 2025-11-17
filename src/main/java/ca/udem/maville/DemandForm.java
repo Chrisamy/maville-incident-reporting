@@ -2,24 +2,28 @@ package ca.udem.maville;
 
 public class DemandForm {
     Prestataire prestataire;
-    String titreProjet;
+    int companyNumber;
+    String projectTitle;
     EnumWorkType workType;
     String location;
     String description;
-    String dateDebut;
-    String dateFin;
+    String startDate;
+    String endDate;
     String id;
+    float costEstimate;
 
-    public DemandForm(Prestataire prestataire, String titreProjet, EnumWorkType workType,
-                      String location, String description, String dateDebut, String dateFin, String id) {
+    public DemandForm(Prestataire prestataire, int companyNumber, String projectTitle, EnumWorkType workType,
+                      String location, String description, String startDate, String endDate, String id, float costEstimate) {
         this.prestataire = prestataire;
-        this.titreProjet = titreProjet;
+        this.companyNumber = companyNumber;
+        this.projectTitle = projectTitle;
         this.workType = workType;
         this.location = location;
         this.description = description;
-        this.dateDebut = dateDebut;
-        this.dateFin = dateFin;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.id = id;
+        this.costEstimate = costEstimate;
 
     }
 
@@ -28,35 +32,36 @@ public class DemandForm {
     public Prestataire getPrestataire() {
         return prestataire;
     }
-    public String getTitreProjet() {
-        return titreProjet;
+    public int getCompanyNumber() { return prestataire.getCompanyNumber(); } // PLR VERIF not sure pour cela
+    public String getProjectTitle() {
+        return projectTitle;
     }
-    public EnumWorkType getWorkType() {
-        return workType;
-    }
+    public EnumWorkType getWorkType() { return workType; }
     public String getLocation() {
         return location;
     }
     public String getDescription() {
         return description;
     }
-    public String getDateDebut() {
-        return dateDebut;
+    public String getStartDate() {
+        return startDate;
     }
-    public String getDateFin() {
-        return dateFin;
+    public String getEndDate() {
+        return endDate;
     }
     public String getId() {
         return id;
     }
+    public float getCostEstimate() {return costEstimate;}
 
     //Setters
 
     public void setPrestataire(Prestataire prestataire) {
         this.prestataire = prestataire;
     }
-    public void setTitreProjet(String titreProjet) {
-        this.titreProjet = titreProjet;
+    public void setCompanyNumber(int companyNumber) {   this.companyNumber = companyNumber; }
+    public void setProjectTitle(String projectTitle) {
+        this.projectTitle = projectTitle;
     }
     public void setWorkType(EnumWorkType workType) {
         this.workType = workType;
@@ -67,13 +72,14 @@ public class DemandForm {
     public void setDescription(String description) {
         this.description = description;
     }
-    public void setDateDebut(String dateDebut) {
-        this.dateDebut = dateDebut;
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
-    public void setDateFin(String dateFin) {
-        this.dateFin = dateFin;
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
     public void setId(String id) {
         this.id = id;
     }
+    public void setCostEstimate(float costEstimate) {this.costEstimate = costEstimate;}
 }
