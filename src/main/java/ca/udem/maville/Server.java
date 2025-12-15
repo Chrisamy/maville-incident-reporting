@@ -19,6 +19,9 @@ public class Server {
 
     public static Javalin app;
 
+    // in-memory notifications list
+    public static java.util.List<Notification> notifications = new java.util.ArrayList<>();
+
     //protected static String MTLjson = "src/main/resources/public/JSON_files/donnees_mtl_stripped_down.json";
 
     private static final List<String> messageQueue = new ArrayList<>();
@@ -66,7 +69,9 @@ public class Server {
             context.json(response);
         });
 
-        app.get("/events", ctx -> {
+        // events doesn't let the server start manually
+
+        /*app.get("/events", ctx -> {
             // Set necessary headers for SSE
             ctx.header("Content-Type", "text/event-stream");
             ctx.header("Cache-Control", "no-cache");
@@ -83,7 +88,7 @@ public class Server {
                 }
                 Thread.sleep(1000); // chaque seconde on check pour un nouveaux message chaque seconde
             }
-        });
+        }); *
 
         /**=============================================================================================================
          API MANIPULATION FOR THE RESIDENT
@@ -114,10 +119,18 @@ public class Server {
                 ProblemRepository.addForm(problemForm);
                 System.out.println("[SERVER] No current resident; form saved in repository without association.");
             }
+
+            // Notify agent when resident submits a request
+            try {
+                Notification notif = new Notification("agent", "Nouvelle demande", "Une nouvelle demande a été soumise par un résident");
+                notifications.add(notif);
+            } catch (Exception e) {
+                // ignore notification errors
+            }
         });
 
         /**=============================================================================================================
-        API MANIPULATION FOR THE AGENT
+         API MANIPULATION FOR THE AGENT
          =============================================================================================================*/
 
         app.post("/api/agent-refuse-problem", ctx -> {
@@ -159,6 +172,67 @@ public class Server {
             ctx.json(demandeList.getDemandList()); //loads list of problems to the front end (only for agent at this moment in time)
         });
 
+        // Notifications endpoint (session or ?role= fallback)
+        app.get("/notifications", ctx -> {
+            String role = ctx.sessionAttribute("role");
+            if (role == null) role = ctx.queryParam("role");
+            if (role == null) role = (currentResident != null) ? "resident" : "agent";
+
+            java.util.List<java.util.Map<String,Object>> out = new java.util.ArrayList<>();
+            for (Notification n : notifications) {
+                if (role.equals(n.getRole())) {
+                    java.util.Map<String,Object> m = new java.util.HashMap<>();
+                    m.put("id", n.getId());
+                    m.put("title", n.getTitle());
+                    m.put("message", n.getText());
+                    m.put("timestamp", n.getTime());
+                    m.put("read", n.isRead());
+                    out.add(m);
+                }
+            }
+            ctx.json(out);
+        });
+
+        // compatibility route under /api
+        app.get("/api/notifications", ctx -> {
+            ctx.req().setAttribute("org.eclipse.jetty.server.Request.baseURI", ctx.req().getRequestURI());
+            // delegate to same logic by repeating minimal code
+            String role = ctx.sessionAttribute("role");
+            if (role == null) role = ctx.queryParam("role");
+            if (role == null) role = (currentResident != null) ? "resident" : "agent";
+
+            java.util.List<java.util.Map<String,Object>> out = new java.util.ArrayList<>();
+            for (Notification n : notifications) {
+                if (role.equals(n.getRole())) {
+                    java.util.Map<String,Object> m = new java.util.HashMap<>();
+                    m.put("id", n.getId());
+                    m.put("title", n.getTitle());
+                    m.put("message", n.getText());
+                    m.put("timestamp", n.getTime());
+                    m.put("read", n.isRead());
+                    out.add(m);
+                }
+            }
+            ctx.json(out);
+        });
+
+        // mark as read endpoints
+        app.post("/notifications/mark-read/:id", ctx -> {
+            String id = ctx.pathParam("id");
+            for (Notification n : notifications) {
+                if (n.getId().equals(id)) { n.setRead(true); break; }
+            }
+            ctx.status(200);
+        });
+
+        app.post("/api/notifications/mark-read/:id", ctx -> {
+            String id = ctx.pathParam("id");
+            for (Notification n : notifications) {
+                if (n.getId().equals(id)) { n.setRead(true); break; }
+            }
+            ctx.status(200);
+        });
+
         ObjectMapper mapper = new ObjectMapper();
         // a seemingly complicated way to create the placeholders of problems from our json using jackson
         problemList.getFormList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/problems.json"), new TypeReference<ArrayList<ProblemForm>>() {}));
@@ -175,7 +249,9 @@ public class Server {
 
     }
 
-    /* private static void loadDemandeFromJson(){
+}
+
+/* private static void loadDemandeFromJson(){
         String jsonContent = new String(Files.readAllBytes(Paths.get(MTLjson)));
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -220,6 +296,3 @@ public class Server {
         }
 
     }*/
-
-
-}

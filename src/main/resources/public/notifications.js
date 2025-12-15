@@ -2,7 +2,9 @@
    Small client-side notification UI for demo.
    - Renders notifications per wrapper
    - Toggles dropdown and positions it
-   - Simple local storage persistence
+   - Syncs with backend /api/notifications when available
+
+   - Keeps localStorage as a fallback for offline/demo
 */
 
 function _timeAgo(ts) {
@@ -10,17 +12,46 @@ function _timeAgo(ts) {
   if (s < 60) return `${s}s`;
   if (s < 3600) return `${Math.floor(s / 60)}m`;
   if (s < 86400) return `${Math.floor(s / 3600)}h`;
-  return `${Math.floor(s / 86400)}j`;
+  return `${Math.floor(s / 864000)}j`;
 }
 
 const NotificationStore = (function () {
   const KEY = 'maville_notifications_v1';
+  // simple in-memory cache to avoid repeated fetches
+  const cache = {};
+
   function _load() {
     try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
   }
   function _save(items) { localStorage.setItem(KEY, JSON.stringify(items)); }
-  function list(role) { return _load().filter(i => i.role === role).sort((a,b)=>b.time-a.time); }
+
+  // map server notification shape to client shape
+  function _mapServer(n) {
+    let time = Date.now();
+    if (typeof n.time === 'number') time = n.time;
+    else if (typeof n.timestamp === 'string') {
+      const parsed = Date.parse(n.timestamp);
+      if (!isNaN(parsed)) time = parsed;
+    }
+    return {
+      id: n.id,
+      role: n.role,
+      title: n.title,
+      text: n.message || n.text || '',
+      time: time,
+      read: !!n.read,
+      type: n.type || 'info'
+    };
+  }
+
+  function list(role) {
+    // return cached/local list synchronously for compatibility with existing UI code
+    const items = _load().filter(i => i.role === role).sort((a,b)=>b.time-a.time);
+    return items;
+  }
+
   function add(role, item) {
+    //keep existing local behaviour for demos this does NOT push to server
     const items = _load();
     item.id = item.id || ('n_' + Date.now() + '_' + Math.floor(Math.random()*1000));
     item.role = role;
@@ -30,15 +61,27 @@ const NotificationStore = (function () {
     _save(items);
     return item;
   }
+
   function markAllRead(role) {
     const items = _load().map(i => i.role === role ? ({...i, read: true}) : i);
     _save(items);
+    // try to mark on server too
+    const toMark = items.filter(i => i.role===role).map(i=>i.id);
+    toMark.forEach(id => {
+      // best-effort, ignore failures
+      fetch(`/api/notifications/mark-read/${id}`, {method: 'POST'}).catch(()=>{});
+    });
   }
+
   function markRead(role, id) {
     const items = _load().map(i => (i.role===role && i.id===id) ? ({...i, read:true}) : i);
     _save(items);
+    // mark on server (best-effort)
+    fetch(`/api/notifications/mark-read/${id}`, {method: 'POST'}).catch(()=>{});
   }
+
   function unreadCount(role) { return _load().filter(i => i.role === role && !i.read).length; }
+
   function ensureSeed(role) {
     const items = _load();
     if (items.some(i => i.role === role)) return;
@@ -46,7 +89,27 @@ const NotificationStore = (function () {
     add(role, { title: 'Nouvelle mise à jour', text: 'Des travaux sont prévus dans votre arrondissement.', time: Date.now()-7200000, read:false, type:'info' });
     add(role, { title: 'Action requise', text: 'Veuillez compléter les informations manquantes.', time: Date.now()-86400000, read:false, type:'warn' });
   }
-  return { list, add, markAllRead, markRead, unreadCount, ensureSeed };
+
+  // fetch notifications from backend and store in localStorage; cb(optional) called after update
+  function syncFromServer(role, cb) {
+    fetch(`/api/notifications?role=${encodeURIComponent(role)}`)
+      .then(r => { if (!r.ok) throw new Error('network'); return r.json(); })
+      .then(data => {
+        // data expected to be an array of server Notification objects
+        const existing = _load().filter(i => i.role !== role);
+        const mapped = (Array.isArray(data) ? data : []).map(_mapServer);
+        const merged = existing.concat(mapped);
+        _save(merged);
+        cache[role] = mapped;
+        if (typeof cb === 'function') cb();
+      })
+      .catch(() => {
+        // ignore failures; leave local storage intact
+        if (typeof cb === 'function') cb();
+      });
+  }
+
+  return { list, add, markAllRead, markRead, unreadCount, ensureSeed, syncFromServer };
 })();
 
 function _renderItem(item, role, onClickMarkRead) {
@@ -66,6 +129,7 @@ function _renderItem(item, role, onClickMarkRead) {
   li.appendChild(icon); li.appendChild(meta);
 
   li.addEventListener('click', () => {
+    // mark locally and ask server to mark read
     NotificationStore.markRead(role, item.id);
     li.classList.remove('unread');
     if (typeof onClickMarkRead === 'function') onClickMarkRead();
@@ -124,6 +188,8 @@ function initNotificationsPerWrapper(wrapper) {
   document.addEventListener('pointerdown', (e) => { if (!wrapper.contains(e.target) && dd.classList.contains('show')) hideDropdown(); });
   window.addEventListener('resize', () => { if (dd.classList.contains('show')) _positionDropdown(btn, dd); });
 
+  // sync from server once on init (best-effort) then render
+  NotificationStore.syncFromServer(role, refreshList);
   refreshList();
 }
 
@@ -133,4 +199,3 @@ function initAllNotifications() {
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAllNotifications); else initAllNotifications();
-
