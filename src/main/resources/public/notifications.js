@@ -46,8 +46,7 @@ const NotificationStore = (function () {
 
   function list(role) {
     // return cached/local list synchronously for compatibility with existing UI code
-    const items = _load().filter(i => i.role === role).sort((a,b)=>b.time-a.time);
-    return items;
+    return _load().filter(i => i.role === role).sort((a, b) => b.time - a.time);
   }
 
   function add(role, item) {
