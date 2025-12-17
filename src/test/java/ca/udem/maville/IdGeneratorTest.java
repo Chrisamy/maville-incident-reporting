@@ -8,17 +8,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class IdGeneratorTest {
 
+    //Test qui vérifie qu'un ID généré n'est pas null
+
     @Test
     void testGenerateID_notNull() {
         String id = IdGenerator.generateID();
         assertNotNull(id, "ID should not be null");
     }
 
+    //Test qui vérifie qu'un ID généré n'est pas vide
+
     @Test
     void testGenerateID_notEmpty() {
         String id = IdGenerator.generateID();
         assertFalse(id.isEmpty(), "ID should not be empty");
     }
+
+    //Test qui vérifie qu'un ID généré correspond au format valide
 
     @Test
     void testGenerateID_validUUIDFormat() {
@@ -27,6 +33,8 @@ class IdGeneratorTest {
             UUID.fromString(id);
         }, "ID should be valid UUID format");
     }
+
+    //Test qui vérifie que 2 ID générés n'ont pas la même valeur
 
     @Test
     void generateIdProducesNonEmptyUniqueValues() {
