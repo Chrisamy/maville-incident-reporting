@@ -25,7 +25,7 @@ public class DemandRepository {
     public ArrayList<DemandForm> getDemandList() {
         return demandList;
     }
-    public static void addForm(DemandForm form) {
+    public static void addDemand(DemandForm form) {
         demandList.add(form);
     }
 }

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class AgentDemandFormHandler {
 
-    protected static DemandForm getDemand(ArrayList<DemandForm> FormList, String idForm) {
-        for (DemandForm d : FormList) {
+    protected static DemandForm getDemand(ArrayList<DemandForm> demandList, String idForm) {
+        for (DemandForm d : demandList) {
             if (d.getId().equals(idForm)) {
                 return d;
             }
@@ -13,13 +13,15 @@ public class AgentDemandFormHandler {
         return null;
     }
 
-
-    public void AcceptDemand(boolean isAccepted){
-
+    public void RejectDemand(ArrayList<DemandForm> demandList, String id) {
+        DemandForm demand = getDemand(demandList, id);
+        demand.setStatus(EnumStatus.rejected);
+        Server.sendMessageToUI("La demande " + id + "est refusée.");
     }
 
-    public void RefuseDemand(ArrayList<DemandForm> formList, String id) {
-
-
+    public void AcceptDemand(ArrayList<DemandForm> demandList, String id) {
+        DemandForm demand = getDemand(demandList, id);
+        demand.setStatus(EnumStatus.approved);
+        Server.sendMessageToUI("La demande " + id + "est acceptée.");
     }
 }
