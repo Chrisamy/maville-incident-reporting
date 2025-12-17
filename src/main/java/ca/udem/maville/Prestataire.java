@@ -11,4 +11,9 @@ public class Prestataire extends User {
     public void setCompanyNumber(int CompanyNumber) {
         this.CompanyNumber = CompanyNumber;
     }
+
+    public void submitDemand(DemandForm demandForm) {
+        DemandRepository.addDemand(demandForm);
+        Server.sendMessageToUI("Demande Soumise!");
+    }
 }
