@@ -77,7 +77,7 @@ public class DemandForm {
     public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
-    public void setCostEstimate(float costEstimate) {this.costEstimate = costEstimate;}
+    public void setCostEstimate(double costEstimate) {this.costEstimate = costEstimate;}
     public void setStatus(EnumStatus status) {
         this.status = status;
     }
