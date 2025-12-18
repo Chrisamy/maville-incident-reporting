@@ -43,7 +43,6 @@ public class AgentProblemFormHandler {
             Server.sendMessageToUI("Le projet " + idForm + " a eu sa priorité changé pour " + enumPriority);
             System.out.println(f);
         }
-        // PLR verif : do we need to throw an exeption if the form is not found?
     }
 
 
