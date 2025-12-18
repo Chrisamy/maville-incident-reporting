@@ -688,86 +688,6 @@ label,legend {
   outline: none; box-shadow: 0 8px 20px rgba(26,115,232,0.06);
 }
 
-/* =====================================================
-   TABLE
-   ===================================================== */
-
-#agentTable {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  background: var(--surface);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
-/* Cells */
-#agentTable th,
-#agentTable td {
-  padding: 12px 16px;
-  vertical-align: middle;
-  font-size: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Header */
-#agentTable thead th {
-  background: #f7f9fb;
-  font-weight: 600;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-
-/* Rows */
-#agentTable tbody tr {
-  border-bottom: 1px solid var(--border);
-}
-
-#agentTable tbody tr:last-child {
-  border-bottom: none;
-}
-
-#agentTable tbody tr:hover {
-  background: #fbfcff;
-}
-
-/* =====================================================
-   COLUMN WIDTHS
-   ===================================================== */
-
-#agentTable th:nth-child(1),
-#agentTable td:nth-child(1) {
-  width: 6%;
-}
-
-#agentTable th:nth-child(2),
-#agentTable td:nth-child(2) {
-  width: 18%;
-}
-
-#agentTable th:nth-child(3),
-#agentTable td:nth-child(3) {
-  width: 22%;
-}
-
-#agentTable th:nth-child(4),
-#agentTable td:nth-child(4) {
-  width: 16%;
-}
-
-#agentTable th:nth-child(5),
-#agentTable td:nth-child(5) {
-  width: 10%;
-  text-align: center;
-}
-
-#agentTable th:nth-child(6),
-#agentTable td:nth-child(6) {
-  width: 14%;
-  text-align: center;
-}
 
 /* action column */
 #agentTable th:nth-child(7),
@@ -775,10 +695,6 @@ label,legend {
   width: 8%;
   text-align: center;
 }
-
-/* =====================================================
-   ACTION BUTTON
-   ===================================================== */
 
 .btn-treat {
   padding: 8px 14px;
