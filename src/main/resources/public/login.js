@@ -9,6 +9,7 @@ if (residentLoginBtn) {
       // The server expects JSON
       const response = await fetch('/api/resident-log-in', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username }),
       });
@@ -24,4 +25,3 @@ if (residentLoginBtn) {
     }
   });
 }
-

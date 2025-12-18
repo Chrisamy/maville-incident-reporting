@@ -14,6 +14,7 @@ public class ProblemForm {
     private EnumPriority priority;
     private String description;
     private EnumStatus status;
+    private long date; // submission timestamp (server-side)
 
     //constructor for JSON deserialization
     public ProblemForm() {
@@ -71,6 +72,9 @@ public class ProblemForm {
         return status;
     }
 
+    public EnumBoroughID getBoroughId() { return boroughId; }
+    public long getDate() { return date; }
+
     // Setters (no setter for id)
     public void setWorkType(EnumWorkType workType) {
         this.workType = workType;
@@ -95,6 +99,9 @@ public class ProblemForm {
     public void setStatus(EnumStatus status) {
         this.status = status;
     }
+
+    public void setBoroughId(EnumBoroughID boroughId) { this.boroughId = boroughId; }
+    public void setDate(long date) { this.date = date; }
 
     @Override
     public boolean equals(Object o) {

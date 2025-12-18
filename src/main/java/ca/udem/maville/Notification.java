@@ -10,6 +10,7 @@ public class Notification {
     private long time; // frontend expects 'time'
     private boolean read;
     private String type; // optional: info, success, warn
+    private String userId; // optional target username
 
     public Notification() {
         this.id = UUID.randomUUID().toString();
@@ -46,4 +47,7 @@ public class Notification {
 
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
+
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 }

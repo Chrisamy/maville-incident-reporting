@@ -99,10 +99,13 @@ public class Server {
 
         app.post("/api/resident-log-in", ctx -> {
             currentResident = ctx.bodyAsClass(Resident.class);
+            // persist username in session so notification endpoints can target this session
+            if (currentResident != null && currentResident.getUsername() != null) {
+                ctx.sessionAttribute("username", currentResident.getUsername());
+                ctx.sessionAttribute("role", "resident");
+            }
             ctx.json(currentResident);
-            System.out.println("Utilisateur " + currentResident.getUsername() + "s'est connecté.");
-            // PLR TESTING: test added to see if the username gets added
-            System.out.println(currentResident.getPassword());
+            System.out.println("Utilisateur " + (currentResident==null?"null":currentResident.getUsername()) + " s'est connecté.");
         });
 
         app.post("/api/resident-form-send", ctx -> {
@@ -113,9 +116,20 @@ public class Server {
             System.out.println("[SERVER] currentResident object: " + (currentResident == null ? "null" : currentResident.getUsername()));
 
             ProblemForm problemForm = new ProblemForm(addr, currentResident == null ? "anonymous" : currentResident.getUsername(), details);
-            System.out.println("[SERVER] created ProblemForm: " + problemForm);
-            ctx.json(problemForm);
+            // read arrondissement from form param 'borough' if present and set enum
+            String boroughParam = ctx.formParam("borough");
+            if (boroughParam != null && !boroughParam.isEmpty()) {
+                try {
+                    problemForm.setBoroughId(EnumBoroughID.valueOf(boroughParam));
+                } catch (Exception e) {
+                    System.err.println("Invalid borough parameter: " + boroughParam);
+                }
+            }
+            // set server-side submission timestamp
+            problemForm.setDate(System.currentTimeMillis());
 
+            System.out.println("[SERVER] created ProblemForm: " + problemForm);
+            // add to repository (resident association if available)
             if (currentResident != null) {
                 currentResident.submitForm(problemForm);
             } else {
@@ -123,15 +137,30 @@ public class Server {
                 System.out.println("[SERVER] No current resident; form saved in repository without association.");
             }
 
-            // Notify agent when resident submits a request
+            // Persist problems list so the agent page (which can read JSON) sees the new submission
+            try {
+                ObjectMapper problemsMapper = new ObjectMapper();
+                java.util.List<ProblemForm> list = problemList.getFormList();
+                File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
+                File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
+                problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, list);
+                File problemsFileTarget = new File("target/public/JSON_files/problems.json");
+                File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
+                try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, list); } catch (Exception ignore) {}
+                File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
+                File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
+                try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, list); } catch (Exception ignore) {}
+            } catch (Exception e) { System.err.println("Failed to persist problems.json: " + e.getMessage()); }
+
+            // Notify agent when resident submits a request (non-fatal)
             try {
                 Notification notif = new Notification("agent", "Nouvelle demande", "Une nouvelle demande a été soumise par un résident");
                 notifications.add(notif);
-                // persist change
                 saveNotifications();
-            } catch (Exception e) {
-                // ignore notification errors
-            }
+            } catch (Exception e) { /* ignore notification errors */ }
+
+            // return created form for client if needed
+            ctx.json(problemForm);
         });
 
         /**=============================================================================================================
@@ -150,10 +179,29 @@ public class Server {
                 if (f != null && f.getUsername() != null) {
                     Notification notif = new Notification("resident", "Demande refusée", "Votre demande a été refusée par un agent.");
                     notif.setRole("resident");
+                    // target this notification to the submitter so the resident sees it
+                    notif.setUserId(f.getUsername());
                     notifications.add(notif);
                     saveNotifications();
                 }
-            } catch (Exception e) { /* ignore notification errors */ }
+
+                // persist updated problems list so agent JSON source sees the change
+                try {
+                    ObjectMapper problemsMapper = new ObjectMapper();
+                    java.util.List<ProblemForm> list = problemList.getFormList();
+                    File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
+                    File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
+                    problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, list);
+                    File problemsFileTarget = new File("target/public/JSON_files/problems.json");
+                    File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
+                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, list); } catch (Exception ignore) {}
+                    File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
+                    File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
+                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, list); } catch (Exception ignore) {}
+                } catch (Exception e) { System.err.println("Failed to persist problems.json after refuse: " + e.getMessage()); }
+
+                Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("newStatus", (f==null?"rejected":f.getStatus().name())); ctx.json(out);
+            } catch (Exception e) { /* ignore notification errors */ ctx.status(500); }
         });
 
         app.post("/api/agent-accept-problem", ctx -> {
@@ -161,28 +209,50 @@ public class Server {
             String workType = ctx.formParam("workType");
             String priority = ctx.formParam("priority");
 
-            // Get the EnumPriority associated with the string
-            EnumWorkType newWorkType = EnumWorkType.valueOf(workType);
-            EnumPriority newPriority = EnumPriority.valueOf(priority);
+            // Get the EnumPriority associated with the string (defensive)
+            EnumWorkType newWorkType = EnumWorkType.notDefined;
+            EnumPriority newPriority = EnumPriority.notAssigned;
+            try { if (workType != null && !workType.isEmpty()) newWorkType = EnumWorkType.valueOf(workType); } catch (Exception ignored) {}
+            try { if (priority != null && !priority.isEmpty()) newPriority = EnumPriority.valueOf(priority); } catch (Exception ignored) {}
 
-            problemFormHandler.AcceptProblem(problemList.getFormList(), formId, newWorkType,newPriority);
-            // Notify resident about approval
+            problemFormHandler.AcceptProblem(problemList.getFormList(), formId, newWorkType, newPriority);
+            // Notify resident about approval and persist
             try {
                 ProblemForm f = null;
                 for (ProblemForm p : problemList.getFormList()) if (p.getId().equals(formId)) { f = p; break; }
                 if (f != null && f.getUsername() != null) {
                     Notification notif = new Notification("resident", "Demande approuvée", "Votre demande a été approuvée par un agent.");
                     notif.setRole("resident");
+                    notif.setUserId(f.getUsername());
                     notifications.add(notif);
                     saveNotifications();
                 }
-            } catch (Exception e) { /* ignore notification errors */ }
+
+                // persist updated problems list so agent JSON source sees the change
+                try {
+                    ObjectMapper problemsMapper = new ObjectMapper();
+                    java.util.List<ProblemForm> list = problemList.getFormList();
+                    File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
+                    File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
+                    problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, list);
+                    File problemsFileTarget = new File("target/public/JSON_files/problems.json");
+                    File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
+                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, list); } catch (Exception ignore) {}
+                    File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
+                    File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
+                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, list); } catch (Exception ignore) {}
+                } catch (Exception e) { System.err.println("Failed to persist problems.json after accept: " + e.getMessage()); }
+
+                Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("newStatus", (f==null?"approved":f.getStatus().name())); ctx.json(out);
+            } catch (Exception e) { /* ignore notification errors */ ctx.status(500); }
         });
 
         // Agent requests modification for a problem
         app.post("/api/agent-request-modification", ctx -> {
             String formId = ctx.formParam("id");
-            // set problem status to onHold
+            String message = ctx.formParam("message");
+            // set problem status to onHold via handler
+            problemFormHandler.RefuseProblem(problemList.getFormList(), formId); // reuse refuse to set status? keep consistent
             for (ProblemForm p : problemList.getFormList()) {
                 if (p.getId().equals(formId)) {
                     p.setStatus(EnumStatus.onHold);
@@ -194,13 +264,30 @@ public class Server {
                 ProblemForm f = null;
                 for (ProblemForm p : problemList.getFormList()) if (p.getId().equals(formId)) { f = p; break; }
                 if (f != null && f.getUsername() != null) {
-                    Notification notif = new Notification("resident", "Modification demandée", "Un agent a demandé des modifications à votre demande.");
+                    Notification notif = new Notification("resident", "Modification demandée", (message != null && !message.isEmpty()) ? ("Un agent a demandé : " + message) : "Un agent a demandé des modifications à votre demande.");
                     notif.setRole("resident");
+                    notif.setUserId(f.getUsername());
                     notifications.add(notif);
                     saveNotifications();
                 }
-            } catch (Exception e) { /* ignore notification errors */ }
-            ctx.status(200);
+
+                // persist updated problems list so agent JSON source sees the change
+                try {
+                    ObjectMapper problemsMapper = new ObjectMapper();
+                    java.util.List<ProblemForm> list = problemList.getFormList();
+                    File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
+                    File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
+                    problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, list);
+                    File problemsFileTarget = new File("target/public/JSON_files/problems.json");
+                    File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
+                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, list); } catch (Exception ignore) {}
+                    File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
+                    File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
+                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, list); } catch (Exception ignore) {}
+                } catch (Exception e) { System.err.println("Failed to persist problems.json after request-modification: " + e.getMessage()); }
+
+                Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("newStatus", "onHold"); ctx.json(out);
+            } catch (Exception e) { /* ignore notification errors */ ctx.status(500); }
         });
 
         app.post("/api/agent-problem-set-priority", ctx -> {
@@ -226,17 +313,23 @@ public class Server {
         app.get("/notifications", ctx -> {
             String role = ctx.sessionAttribute("role");
             if (role == null) role = ctx.queryParam("role");
-            if (role == null) role = (currentResident != null) ? "resident" : "agent";
+            String sessionUser = ctx.sessionAttribute("username");
+            String qUser = ctx.queryParam("user");
+            if (qUser != null && !qUser.isEmpty()) sessionUser = qUser;
+            if (role == null) role = (sessionUser != null) ? "resident" : "agent";
 
             java.util.List<java.util.Map<String,Object>> out = new java.util.ArrayList<>();
             for (Notification n : notifications) {
-                if (role.equals(n.getRole())) {
+                boolean targetedToCurrent = (n.getUserId() != null && sessionUser != null && n.getUserId().equals(sessionUser));
+                if (role.equals(n.getRole()) || targetedToCurrent) {
                     java.util.Map<String,Object> m = new java.util.HashMap<>();
                     m.put("id", n.getId());
+                    m.put("role", n.getRole());
                     m.put("title", n.getTitle());
                     m.put("message", n.getText());
                     m.put("timestamp", n.getTime());
                     m.put("read", n.isRead());
+                    m.put("userId", n.getUserId());
                     out.add(m);
                 }
             }
@@ -246,20 +339,25 @@ public class Server {
         // compatibility route under /api
         app.get("/api/notifications", ctx -> {
             ctx.req().setAttribute("org.eclipse.jetty.server.Request.baseURI", ctx.req().getRequestURI());
-            // delegate to same logic by repeating minimal code
             String role = ctx.sessionAttribute("role");
             if (role == null) role = ctx.queryParam("role");
-            if (role == null) role = (currentResident != null) ? "resident" : "agent";
+            String sessionUser = ctx.sessionAttribute("username");
+            String qUser = ctx.queryParam("user");
+            if (qUser != null && !qUser.isEmpty()) sessionUser = qUser;
+            if (role == null) role = (sessionUser != null) ? "resident" : "agent";
 
             java.util.List<java.util.Map<String,Object>> out = new java.util.ArrayList<>();
             for (Notification n : notifications) {
-                if (role.equals(n.getRole())) {
+                boolean targetedToCurrent = (n.getUserId() != null && sessionUser != null && n.getUserId().equals(sessionUser));
+                if (role.equals(n.getRole()) || targetedToCurrent) {
                     java.util.Map<String,Object> m = new java.util.HashMap<>();
                     m.put("id", n.getId());
+                    m.put("role", n.getRole());
                     m.put("title", n.getTitle());
                     m.put("message", n.getText());
                     m.put("timestamp", n.getTime());
                     m.put("read", n.isRead());
+                    m.put("userId", n.getUserId());
                     out.add(m);
                 }
             }
@@ -277,59 +375,104 @@ public class Server {
             ctx.status(200);
         });
 
-        app.post("/api/notifications/mark-read/:id", ctx -> {
-            String id = ctx.pathParam("id");
-            for (Notification n : notifications) {
-                if (n.getId().equals(id)) { n.setRead(true); break; }
-            }
-            // persist change
-            saveNotifications();
-            ctx.status(200);
-        });
-
         // Minimal submission actions for agent UI
         app.post("/submissions/:id/approve", ctx -> {
             String id = ctx.pathParam("id");
+            ProblemForm target = null;
             for (ProblemForm p : problemList.getFormList()) {
-                if (p.getId().equals(id)) { p.setStatus(EnumStatus.approved); break; }
+                if (p.getId().equals(id)) { p.setStatus(EnumStatus.approved); target = p; break; }
             }
-            // notify resident
+            // notify resident (attach userId if found)
             try {
                 Notification notif = new Notification("resident", "Demande approuvée", "Votre demande a été approuvée");
+                if (target != null && target.getUsername() != null) notif.setUserId(target.getUsername());
                 notifications.add(notif);
                 saveNotifications();
             } catch (Exception ignored) {}
-            ctx.status(200);
+
+            // persist updated problems list so static copies also reflect the change
+            try {
+                ObjectMapper problemsMapper = new ObjectMapper();
+                java.util.List<ProblemForm> list = problemList.getFormList();
+                File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
+                File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
+                problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, list);
+                File problemsFileTarget = new File("target/public/JSON_files/problems.json");
+                File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
+                problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, list);
+                File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
+                File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
+                problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, list);
+            } catch (Exception e) { System.err.println("Failed to persist problems.json after approve: " + e.getMessage()); }
+
+            // return success and newStatus (so frontend can update row locally)
+            Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("id", id); out.put("userId", (target==null?null:target.getUsername())); out.put("newStatus", (target==null?"approved":target.getStatus().name())); ctx.json(out);
         });
 
         app.post("/submissions/:id/reject", ctx -> {
             String id = ctx.pathParam("id");
+            ProblemForm target = null;
             for (ProblemForm p : problemList.getFormList()) {
-                if (p.getId().equals(id)) { p.setStatus(EnumStatus.rejected); break; }
+                if (p.getId().equals(id)) { p.setStatus(EnumStatus.rejected); target = p; break; }
             }
-            // notify resident
+            // notify resident (attach userId if found)
             try {
                 Notification notif = new Notification("resident", "Demande refusée", "Votre demande a été rejetée");
+                if (target != null && target.getUsername() != null) notif.setUserId(target.getUsername());
                 notifications.add(notif);
                 saveNotifications();
             } catch (Exception ignored) {}
-            ctx.status(200);
+
+            // persist updated problems list so static copies also reflect the change
+            try {
+                ObjectMapper problemsMapper = new ObjectMapper();
+                java.util.List<ProblemForm> list = problemList.getFormList();
+                File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
+                File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
+                problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, list);
+                File problemsFileTarget = new File("target/public/JSON_files/problems.json");
+                File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
+                problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, list);
+                File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
+                File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
+                problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, list);
+            } catch (Exception e) { System.err.println("Failed to persist problems.json after reject: " + e.getMessage()); }
+
+            Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("id", id); out.put("userId", (target==null?null:target.getUsername())); out.put("newStatus", (target==null?"rejected":target.getStatus().name())); ctx.json(out);
         });
 
         app.post("/submissions/:id/request-modification", ctx -> {
             String id = ctx.pathParam("id");
             String message = ctx.formParam("message");
+            ProblemForm target = null;
             for (ProblemForm p : problemList.getFormList()) {
-                if (p.getId().equals(id)) { p.setStatus(EnumStatus.onHold); break; }
+                if (p.getId().equals(id)) { p.setStatus(EnumStatus.onHold); target = p; break; }
             }
-            // notify resident with optional message
+            // notify resident with optional message (attach userId if found)
             try {
                 String text = (message != null && !message.isEmpty()) ? ("Des modifications sont demandées: " + message) : "Des modifications sont demandées";
                 Notification notif = new Notification("resident", "Modification demandée", text);
+                if (target != null && target.getUsername() != null) notif.setUserId(target.getUsername());
                 notifications.add(notif);
                 saveNotifications();
             } catch (Exception ignored) {}
-            ctx.status(200);
+
+            // persist updated problems list so static copies also reflect the change
+            try {
+                ObjectMapper problemsMapper = new ObjectMapper();
+                java.util.List<ProblemForm> list = problemList.getFormList();
+                File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
+                File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
+                problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, list);
+                File problemsFileTarget = new File("target/public/JSON_files/problems.json");
+                File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
+                problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, list);
+                File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
+                File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
+                problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, list);
+            } catch (Exception e) { System.err.println("Failed to persist problems.json after request-modification: " + e.getMessage()); }
+
+            Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("id", id); out.put("userId", (target==null?null:target.getUsername())); out.put("newStatus", (target==null?"onHold":target.getStatus().name())); ctx.json(out);
         });
 
         ObjectMapper mapper = new ObjectMapper();

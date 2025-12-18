@@ -1,35 +1,11 @@
-[
-  {
-    "_id": 1,
-    "id": "654277b8021cab001920d32e",
-    "workType": "notDefined",
-    "location": "123 Street",
-    "boroughId": "Ville-Marie",
-    "username" : "Johnny",
-    "priority": "notAssigned",
-    "description": "Trou dans la carlingue",
-    "currentStatus": "waitingForApproval"
-  },
-  {
-    "_id": 2,
-    "id": "65493314c8687900121fd593",
-    "workType": "notDefined",
-    "location": "456 Papineau",
-    "boroughId": "Outremont",
-    "username" : "Papi",
-    "priority": "notAssigned",
-    "description": "Sable dans la rue",
-    "currentStatus": "waitingForApproval"
-  },
-  {"_id": 3,
-    "id": "682dece1d997790012e58b2e",
-    "workType": "notDefined",
-    "location": "678 Klang",
-    "boroughId": "Rosemont",
-    "username" : "Mami",
-    "priority": "notAssigned",
-    "description": "Pantouffle qui bloque le chemin",
-    "currentStatus": "waitingForApproval"
-  }
-]
-
+[ {
+  "id" : "74fadd2f-8551-44be-a671-1d04754a5240",
+  "workType" : "notDefined",
+  "location" : "aa",
+  "boroughId" : "saintLaurent",
+  "username" : "Claudette",
+  "priority" : "notAssigned",
+  "description" : "aa",
+  "status" : "onHold",
+  "date" : 1766082822051
+} ]

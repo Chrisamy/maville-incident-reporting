@@ -115,14 +115,31 @@ const NotificationStore = (function () {
 
   // fetch notifications from backend and store in Storage
   function syncFromServer(role, cb) {
-    fetch(`/notifications?role=${encodeURIComponent(role)}`)
+    fetch(`/notifications?role=${encodeURIComponent(role)}`, { credentials: 'same-origin' })
       .then(r => { if (!r.ok) throw new Error('network'); return r.json(); })
       .then(data => {
         // data expected to be an array of server Notification objects
-        const existing = _load().filter(i => i.role !== role);
+        const existingAll = _load();
+        // build map of existing items by id to preserve local read states and keep local-only items
+        const existingMap = {};
+        existingAll.forEach(i => { if (i && i.id) existingMap[i.id] = i; });
+
         const mapped = (Array.isArray(data) ? data : []).map(_mapServer).map(m => ({...m, role: role}));
-        const merged = existing.concat(mapped);
-        _save(merged);
+
+        // overlay server items onto existing map, preserving local read flag when present
+        mapped.forEach(m => {
+          const local = existingMap[m.id];
+          if (local) {
+            existingMap[m.id] = { ...m, role: role, read: !!local.read, time: local.time || m.time };
+          } else {
+            existingMap[m.id] = m;
+          }
+        });
+
+        // final list contains all existing (others + local-only) plus server items (merged)
+        const finalList = Object.keys(existingMap).map(k => existingMap[k]);
+
+        _save(finalList);
         cache[role] = mapped;
         if (typeof cb === 'function') cb();
       })

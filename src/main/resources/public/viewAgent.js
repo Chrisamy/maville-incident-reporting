@@ -18,11 +18,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         listofProblem.forEach(item => {
             const row = document.createElement('tr');
+            // attach id as data attribute to make row lookup reliable
+            if (item.id) row.dataset.id = String(item.id).trim();
             // Format date to YYYY-MM-DD if available
             let dateStr = 'N/A';
             if (item.date) {
               try {
-                const d = new Date(item.date);
+                const d = new Date(Number(item.date));
                 if (!isNaN(d)) {
                   const yy = d.getFullYear();
                   const mm = String(d.getMonth()+1).padStart(2,'0');
@@ -63,6 +65,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     // initial load
     await loadAndRender();
 
+    // helper to update a single row's status in-place without refetching
+    function updateRowStatus(id, newStatus) {
+        if (!id) return;
+        const row = tbody.querySelector(`tr[data-id="${id}"]`);
+        if (row) {
+            const statusCell = row.querySelector('.col-status');
+            if (statusCell) statusCell.textContent = newStatus || '';
+        } else {
+            // fallback: try to find by id cell text
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            for (const r of rows) {
+                const idCell = r.querySelector('.col-id');
+                if (idCell && idCell.textContent.trim() === id) {
+                    const statusCell = r.querySelector('.col-status');
+                    if (statusCell) statusCell.textContent = newStatus || '';
+                    break;
+                }
+            }
+        }
+    }
+
     // Treatment modal helpers
     const treatmentOverlay = document.getElementById('treatmentModalOverlay');
     const treatmentClose = document.getElementById('treatmentCloseBtn');
@@ -88,8 +111,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       treatPriorityEl.textContent = item.priority || '';
       treatStatusEl.textContent = item.currentStatus || item.status || '';
       treatDescEl.textContent = item.description || '';
-      // problems.json does not include a date field; display placeholder
-      treatDateEl.textContent = item.date || 'N/A';
+      // problems.json may include a date field; display it if present
+      treatDateEl.textContent = item.date ? new Date(Number(item.date)).toLocaleString() : 'N/A';
       treatMessage.value = '';
       treatmentOverlay.classList.add('show');
       treatmentOverlay.setAttribute('aria-hidden','false');
@@ -98,33 +121,64 @@ document.addEventListener('DOMContentLoaded', async () => {
       btnApprove.onclick = async () => {
         btnApprove.disabled = true;
         try {
-          const res = await fetch(`/submissions/${encodeURIComponent(item.id)}/approve`, { method: 'POST' });
-          if (!res.ok) console.error('Approve failed', res.status);
+          const fd = new FormData();
+          fd.append('id', item.id);
+          // send the internal values (not the displayed text) so backend can map enums reliably
+          fd.append('workType', item.workType || 'notDefined');
+          fd.append('priority', item.priority || 'notAssigned');
+
+          const res = await fetch('/api/agent-accept-problem', { method: 'POST', body: fd });
+          const json = await res.json().catch(() => null);
+          if (res.ok && json && json.success) {
+            const newStatus = json.newStatus || 'approved';
+            updateRowStatus(item.id, newStatus);
+            item.status = newStatus;
+            item.currentStatus = newStatus;
+          } else {
+            console.error('Approve failed', res.status, json);
+          }
         } catch (err) { console.error(err); }
         closeTreatmentModal();
-        await loadAndRender();
       };
 
       btnReject.onclick = async () => {
         btnReject.disabled = true;
         try {
-          const res = await fetch(`/submissions/${encodeURIComponent(item.id)}/reject`, { method: 'POST' });
-          if (!res.ok) console.error('Reject failed', res.status);
+          const fd = new FormData();
+          fd.append('id', item.id);
+
+          const res = await fetch('/api/agent-refuse-problem', { method: 'POST', body: fd });
+          const json = await res.json().catch(() => null);
+          if (res.ok && json && json.success) {
+            const newStatus = json.newStatus || 'rejected';
+            updateRowStatus(item.id, newStatus);
+            item.status = newStatus;
+            item.currentStatus = newStatus;
+          } else {
+            console.error('Reject failed', res.status, json);
+          }
         } catch (err) { console.error(err); }
         closeTreatmentModal();
-        await loadAndRender();
       };
 
       btnModify.onclick = async () => {
         btnModify.disabled = true;
         try {
           const fd = new FormData();
+          fd.append('id', item.id);
           fd.append('message', treatMessage.value || '');
-          const res = await fetch(`/submissions/${encodeURIComponent(item.id)}/request-modification`, { method: 'POST', body: fd });
-          if (!res.ok) console.error('Modify request failed', res.status);
+          const res = await fetch('/api/agent-request-modification', { method: 'POST', body: fd });
+          const json = await res.json().catch(() => null);
+          if (res.ok && json && json.success) {
+            const newStatus = json.newStatus || 'onHold';
+            updateRowStatus(item.id, newStatus);
+            item.status = newStatus;
+            item.currentStatus = newStatus;
+          } else {
+            console.error('Modify request failed', res.status, json);
+          }
         } catch (err) { console.error(err); }
         closeTreatmentModal();
-        await loadAndRender();
       };
     }
 

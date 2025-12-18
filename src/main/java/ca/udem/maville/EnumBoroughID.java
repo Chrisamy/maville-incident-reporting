@@ -1,16 +1,22 @@
 package ca.udem.maville;
 
 public enum EnumBoroughID {
+    ahuntsicCartierville,
     anjou,
     coteDesNeigesNotreDameDeGrace,
+    lachine,
+    laSalle,
     lePlateauMontRoyal,
     leSudOuest,
     mercierHochelagaMaisonneuve,
     montrealNord,
     outremont,
+    pierrefondsRoxboro,
     riviereDesPrairiesPointeAuxTrembles,
     rosemontLaPetitePatrie,
     saintLeonard,
-    villeraySaintMichelParcExtension,
-    villeMarie
+    saintLaurent,
+    verdun,
+    villeMarie,
+    villeraySaintMichelParcExtension
 }
