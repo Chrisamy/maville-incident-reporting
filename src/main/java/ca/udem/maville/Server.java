@@ -1,8 +1,6 @@
 package ca.udem.maville;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
 
@@ -11,8 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class Server {
@@ -21,6 +17,10 @@ public class Server {
 
     // in-memory notifications list
     public static java.util.List<Notification> notifications = new java.util.ArrayList<>();
+
+    // JSON persistence for notifications
+    private static final ObjectMapper NOTIF_MAPPER = new ObjectMapper();
+    private static final String NOTIF_FILE = "src/main/resources/public/JSON_files/notifications.json";
 
     //protected static String MTLjson = "src/main/resources/public/JSON_files/donnees_mtl_stripped_down.json";
 
@@ -45,6 +45,9 @@ public class Server {
          =============================================================================================================*/
         int port = 7000;
         app = Javalin.create(config -> config.staticFiles.add("/public")).start(port);
+
+        // load persisted notifications
+        loadNotifications();
 
         Desktop desktop = Desktop.getDesktop();
         try {
@@ -124,6 +127,8 @@ public class Server {
             try {
                 Notification notif = new Notification("agent", "Nouvelle demande", "Une nouvelle demande a été soumise par un résident");
                 notifications.add(notif);
+                // persist change
+                saveNotifications();
             } catch (Exception e) {
                 // ignore notification errors
             }
@@ -138,6 +143,17 @@ public class Server {
             String formId = ctx.formParam("id");
             // N.B.: the status change is implicit in the methode RefuseProblem
             problemFormHandler.RefuseProblem(problemList.getFormList(), formId);
+            // Notify resident about refusal
+            try {
+                ProblemForm f = null;
+                for (ProblemForm p : problemList.getFormList()) if (p.getId().equals(formId)) { f = p; break; }
+                if (f != null && f.getUsername() != null) {
+                    Notification notif = new Notification("resident", "Demande refusée", "Votre demande a été refusée par un agent.");
+                    notif.setRole("resident");
+                    notifications.add(notif);
+                    saveNotifications();
+                }
+            } catch (Exception e) { /* ignore notification errors */ }
         });
 
         app.post("/api/agent-accept-problem", ctx -> {
@@ -150,8 +166,42 @@ public class Server {
             EnumPriority newPriority = EnumPriority.valueOf(priority);
 
             problemFormHandler.AcceptProblem(problemList.getFormList(), formId, newWorkType,newPriority);
+            // Notify resident about approval
+            try {
+                ProblemForm f = null;
+                for (ProblemForm p : problemList.getFormList()) if (p.getId().equals(formId)) { f = p; break; }
+                if (f != null && f.getUsername() != null) {
+                    Notification notif = new Notification("resident", "Demande approuvée", "Votre demande a été approuvée par un agent.");
+                    notif.setRole("resident");
+                    notifications.add(notif);
+                    saveNotifications();
+                }
+            } catch (Exception e) { /* ignore notification errors */ }
         });
 
+        // Agent requests modification for a problem
+        app.post("/api/agent-request-modification", ctx -> {
+            String formId = ctx.formParam("id");
+            // set problem status to onHold
+            for (ProblemForm p : problemList.getFormList()) {
+                if (p.getId().equals(formId)) {
+                    p.setStatus(EnumStatus.onHold);
+                    break;
+                }
+            }
+            // Notify resident about requested modification
+            try {
+                ProblemForm f = null;
+                for (ProblemForm p : problemList.getFormList()) if (p.getId().equals(formId)) { f = p; break; }
+                if (f != null && f.getUsername() != null) {
+                    Notification notif = new Notification("resident", "Modification demandée", "Un agent a demandé des modifications à votre demande.");
+                    notif.setRole("resident");
+                    notifications.add(notif);
+                    saveNotifications();
+                }
+            } catch (Exception e) { /* ignore notification errors */ }
+            ctx.status(200);
+        });
 
         app.post("/api/agent-problem-set-priority", ctx -> {
             // get user input
@@ -222,6 +272,8 @@ public class Server {
             for (Notification n : notifications) {
                 if (n.getId().equals(id)) { n.setRead(true); break; }
             }
+            // persist change
+            saveNotifications();
             ctx.status(200);
         });
 
@@ -230,6 +282,53 @@ public class Server {
             for (Notification n : notifications) {
                 if (n.getId().equals(id)) { n.setRead(true); break; }
             }
+            // persist change
+            saveNotifications();
+            ctx.status(200);
+        });
+
+        // Minimal submission actions for agent UI
+        app.post("/submissions/:id/approve", ctx -> {
+            String id = ctx.pathParam("id");
+            for (ProblemForm p : problemList.getFormList()) {
+                if (p.getId().equals(id)) { p.setStatus(EnumStatus.approved); break; }
+            }
+            // notify resident
+            try {
+                Notification notif = new Notification("resident", "Demande approuvée", "Votre demande a été approuvée");
+                notifications.add(notif);
+                saveNotifications();
+            } catch (Exception ignored) {}
+            ctx.status(200);
+        });
+
+        app.post("/submissions/:id/reject", ctx -> {
+            String id = ctx.pathParam("id");
+            for (ProblemForm p : problemList.getFormList()) {
+                if (p.getId().equals(id)) { p.setStatus(EnumStatus.rejected); break; }
+            }
+            // notify resident
+            try {
+                Notification notif = new Notification("resident", "Demande refusée", "Votre demande a été rejetée");
+                notifications.add(notif);
+                saveNotifications();
+            } catch (Exception ignored) {}
+            ctx.status(200);
+        });
+
+        app.post("/submissions/:id/request-modification", ctx -> {
+            String id = ctx.pathParam("id");
+            String message = ctx.formParam("message");
+            for (ProblemForm p : problemList.getFormList()) {
+                if (p.getId().equals(id)) { p.setStatus(EnumStatus.onHold); break; }
+            }
+            // notify resident with optional message
+            try {
+                String text = (message != null && !message.isEmpty()) ? ("Des modifications sont demandées: " + message) : "Des modifications sont demandées";
+                Notification notif = new Notification("resident", "Modification demandée", text);
+                notifications.add(notif);
+                saveNotifications();
+            } catch (Exception ignored) {}
             ctx.status(200);
         });
 
@@ -239,6 +338,33 @@ public class Server {
         demandeList.getDemandList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/demands.json"), new TypeReference<ArrayList<DemandForm>>() {}));
 
 
+    }
+
+    // Load notifications from JSON file if present
+    private static void loadNotifications() {
+        try {
+            File f = new File(NOTIF_FILE);
+            if (!f.exists()) return;
+            List<Notification> loaded = NOTIF_MAPPER.readValue(f, new TypeReference<List<Notification>>() {});
+            if (loaded != null) {
+                notifications.clear();
+                notifications.addAll(loaded);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to load notifications: " + e.getMessage());
+        }
+    }
+
+    // Save notifications to JSON file
+    private static void saveNotifications() {
+        try {
+            File f = new File(NOTIF_FILE);
+            File dir = f.getParentFile();
+            if (dir != null && !dir.exists()) dir.mkdirs();
+            NOTIF_MAPPER.writerWithDefaultPrettyPrinter().writeValue(f, notifications);
+        } catch (Exception e) {
+            System.err.println("Failed to save notifications: " + e.getMessage());
+        }
     }
 
     public static void sendMessageToUI(String msg){

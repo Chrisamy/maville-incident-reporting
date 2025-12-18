@@ -1,18 +1,42 @@
-/* notifications.js
-   Small client-side notification UI for demo.
-   - Renders notifications per wrapper
-   - Toggles dropdown and positions it
-   - Syncs with backend /api/notifications when available
-
-   - Keeps localStorage as a fallback for offline/demo
-*/
-
 function _timeAgo(ts) {
   const s = Math.floor((Date.now() - ts) / 1000);
   if (s < 60) return `${s}s`;
   if (s < 3600) return `${Math.floor(s / 60)}m`;
   if (s < 86400) return `${Math.floor(s / 3600)}h`;
   return `${Math.floor(s / 864000)}j`;
+}
+
+// Format timestamp for display according to locale
+function formatTimestamp(ts) {
+  let d;
+  if (typeof ts === 'number') d = new Date(ts);
+  else if (typeof ts === 'string') {
+    const parsed = Date.parse(ts);
+    d = isNaN(parsed) ? new Date(ts) : new Date(parsed);
+  } else {
+    d = new Date(ts);
+  }
+  if (!(d instanceof Date) || isNaN(d.getTime())) return '';
+
+  const pad = (n) => String(n).padStart(2, '0');
+  const today = new Date();
+  const cmp = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
+  const hours = pad(d.getHours());
+  const minutes = pad(d.getMinutes());
+  if (cmp(d, today)) {
+    return `Aujourd\u2019hui à ${hours}:${minutes}`; // Aujourd'hui
+  }
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+  if (cmp(d, yesterday)) {
+    return `Hier à ${hours}:${minutes}`;
+  }
+  // fallback full date dd/mm/yyyy hh:mm
+  const day = pad(d.getDate());
+  const month = pad(d.getMonth() + 1);
+  const year = d.getFullYear();
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
 const NotificationStore = (function () {
@@ -50,7 +74,7 @@ const NotificationStore = (function () {
   }
 
   function add(role, item) {
-    //keep existing local behaviour for demos this does NOT push to server
+    //keep existing local behaviour for demos. This doesn't push to server
     const items = _load();
     item.id = item.id || ('n_' + Date.now() + '_' + Math.floor(Math.random()*1000));
     item.role = role;
@@ -68,7 +92,7 @@ const NotificationStore = (function () {
     const toMark = items.filter(i => i.role===role).map(i=>i.id);
     toMark.forEach(id => {
       // best-effort, ignore failures
-      fetch(`/api/notifications/mark-read/${id}`, {method: 'POST'}).catch(()=>{});
+      fetch(`/notifications/mark-read/${id}`, {method: 'POST'}).catch(()=>{});
     });
   }
 
@@ -76,7 +100,7 @@ const NotificationStore = (function () {
     const items = _load().map(i => (i.role===role && i.id===id) ? ({...i, read:true}) : i);
     _save(items);
     // mark on server (best-effort)
-    fetch(`/api/notifications/mark-read/${id}`, {method: 'POST'}).catch(()=>{});
+    fetch(`/notifications/mark-read/${id}`, {method: 'POST'}).catch(()=>{});
   }
 
   function unreadCount(role) { return _load().filter(i => i.role === role && !i.read).length; }
@@ -89,14 +113,14 @@ const NotificationStore = (function () {
     add(role, { title: 'Action requise', text: 'Veuillez compléter les informations manquantes.', time: Date.now()-86400000, read:false, type:'warn' });
   }
 
-  // fetch notifications from backend and store in localStorage; cb(optional) called after update
+  // fetch notifications from backend and store in Storage
   function syncFromServer(role, cb) {
-    fetch(`/api/notifications?role=${encodeURIComponent(role)}`)
+    fetch(`/notifications?role=${encodeURIComponent(role)}`)
       .then(r => { if (!r.ok) throw new Error('network'); return r.json(); })
       .then(data => {
         // data expected to be an array of server Notification objects
         const existing = _load().filter(i => i.role !== role);
-        const mapped = (Array.isArray(data) ? data : []).map(_mapServer);
+        const mapped = (Array.isArray(data) ? data : []).map(_mapServer).map(m => ({...m, role: role}));
         const merged = existing.concat(mapped);
         _save(merged);
         cache[role] = mapped;
@@ -122,7 +146,7 @@ function _renderItem(item, role, onClickMarkRead) {
   const meta = document.createElement('div'); meta.className = 'notif-meta';
   const title = document.createElement('div'); title.className = 'notif-title'; title.textContent = item.title;
   const desc = document.createElement('div'); desc.className = 'notif-desc'; desc.textContent = item.text;
-  const time = document.createElement('div'); time.className = 'notif-time'; time.textContent = 'Il y a ' + _timeAgo(item.time);
+  const time = document.createElement('div'); time.className = 'notif-time'; time.textContent = formatTimestamp(item.time);
 
   meta.appendChild(title); meta.appendChild(desc); meta.appendChild(time);
   li.appendChild(icon); li.appendChild(meta);
@@ -176,7 +200,7 @@ function initNotificationsPerWrapper(wrapper) {
     badge.style.display = count ? 'inline-flex' : '';
   }
 
-  function showDropdown() { dd.classList.add('show'); dd.setAttribute('aria-hidden','false'); btn.setAttribute('aria-expanded','true'); _positionDropdown(btn, dd); refreshList(); }
+  function showDropdown() { dd.classList.add('show'); dd.setAttribute('aria-hidden','false'); btn.setAttribute('aria-expanded','true'); _positionDropdown(btn, dd); NotificationStore.syncFromServer(role, refreshList); }
   function hideDropdown() { dd.classList.remove('show'); dd.setAttribute('aria-hidden','true'); btn.setAttribute('aria-expanded','false'); }
 
   btn.addEventListener('click', (e) => { e.stopPropagation(); if (dd.classList.contains('show')) hideDropdown(); else showDropdown(); });

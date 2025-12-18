@@ -79,7 +79,37 @@
     </div>
 </div>
 
+<div id="treatmentModalOverlay" class="modal-overlay" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="treatmentTitle">
+    <button class="modal-close" id="treatmentCloseBtn" aria-label="Close">&times;</button>
+    <h2 id="treatmentTitle" class="modal-title">Traiter la soumission</h2>
+    <p class="modal-sub">Détails de la soumission</p>
 
+    <div class="modal-form" id="treatmentContent">
+      <div class="field"><strong>ID:</strong> <span id="treat-id"></span></div>
+      <div class="field"><strong>Adresse:</strong> <span id="treat-location"></span></div>
+      <div class="field"><strong>Arrondissement:</strong> <span id="treat-borough"></span></div>
+      <div class="field"><strong>Type:</strong> <span id="treat-worktype"></span></div>
+      <div class="field"><strong>Priorité:</strong> <span id="treat-priority"></span></div>
+      <div class="field"><strong>Statut:</strong> <span id="treat-status"></span></div>
+      <div class="field"><strong>Description:</strong>
+        <div id="treat-description" style="white-space:pre-wrap; margin-top:6px; color:var(--text-soft)"></div>
+      </div>
+      <div class="field"><strong>Date:</strong> <span id="treat-date"></span></div>
+
+      <div class="field">
+        <label for="treat-message">Message (optionnel pour modifications)</label>
+        <textarea id="treat-message" class="form-control" rows="3" placeholder="Message pour le résident"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button id="treat-approve" class="btn-primary">Approuver</button>
+        <button id="treat-reject" class="btn-outline">Rejeter</button>
+        <button id="treat-modify" class="btn-outline">Demander modifications</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Filters for the agent table: search, status and priority. Behaviour to be added in JS. -->
 <section class="search-section">
@@ -108,11 +138,12 @@
             <th>Arrondissement</th>
             <th>Priorité</th>
             <th>Statut</th>
-            <th>Description</th>
+            <th>Date</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody id="tableBody">
-        <tr><td colspan="6" class="loading">Chargement des données...</td></tr>
+        <tr><td colspan="7" class="loading">Chargement des données...</td></tr>
         </tbody>
     </table>
     <p id="resultCount">Affichage des problèmes déclarés par les résidents</p>
