@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 public class ProblemRepository {
 
+    //Repository pour stocker les formulaires envoyés par les résidents
+    //On utilise une instance globale
+
     private static ProblemRepository instance = null;
     public static ArrayList<ProblemForm> FormList;
 

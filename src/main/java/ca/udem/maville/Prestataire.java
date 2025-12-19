@@ -12,8 +12,11 @@ public class Prestataire extends User {
         this.CompanyNumber = CompanyNumber;
     }
 
+    //Méthode pour envoyer une demande de projet
+
     public void submitDemand(DemandForm demandForm) {
         DemandRepository.addDemand(demandForm);
         Server.sendMessageToUI("Demande Soumise!");
     }
+
 }

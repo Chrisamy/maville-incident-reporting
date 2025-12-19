@@ -6,7 +6,8 @@ import java.util.Collections;
 
 public class DemandRepository {
 
-    //Pour les demandes des prestataires
+    //Repository pour stocker les demandes envoyées par les prestataires
+    //On utilise une instance globale
 
     private static DemandRepository instance = null;
     private static ArrayList<DemandForm> demandList;
