@@ -1,5 +1,16 @@
 const API_URL = "JSON_files/problems.json";
 
+// helper to display priority tokens as French labels
+function displayPriority(token) {
+  if (!token || token === 'notAssigned' || token === 'N/A') return '—';
+  switch (token) {
+    case 'low': return 'FAIBLE';
+    case 'medium': return 'MOYENNE';
+    case 'high': return 'ÉLEVÉE';
+    default: return token;
+  }
+}
+
 // Render the records array into the table body.
 document.addEventListener('DOMContentLoaded', async () => {
     const tbody = document.getElementById('tableBody');
@@ -35,11 +46,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             // Render cells (no description column)
+            const priorityLabel = displayPriority(item.priority);
             row.innerHTML = `
       <td class="col-id">${item.id || 'N/A'}</td>
       <td class="col-location">${item.location || 'N/A'}</td>
       <td class="col-borough">${item.boroughId || item.permitcategory || 'N/A'}</td>
-      <td class="col-priority"><span class="enumPriority">${item.priority || 'N/A'}</span></td>
+      <td class="col-priority"><span class="enumPriority">${priorityLabel}</span></td>
       <td class="col-status">${item.currentStatus || item.status || 'N/A'}</td>
       <td class="col-date">${dateStr}</td>
       <td class="col-actions"></td>
@@ -86,6 +98,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // helper to update a single row's priority cell
+    function updateRowPriority(id, newPriorityToken) {
+        if (!id) return;
+        const row = tbody.querySelector(`tr[data-id="${id}"]`);
+        if (row) {
+            const priCell = row.querySelector('.col-priority .enumPriority');
+            if (priCell) priCell.textContent = displayPriority(newPriorityToken);
+        } else {
+            // fallback: try to find by id cell text
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            for (const r of rows) {
+                const idCell = r.querySelector('.col-id');
+                if (idCell && idCell.textContent.trim() === id) {
+                    const priCell = r.querySelector('.col-priority .enumPriority');
+                    if (priCell) priCell.textContent = displayPriority(newPriorityToken);
+                    break;
+                }
+            }
+        }
+    }
+
     // Treatment modal helpers
     const treatmentOverlay = document.getElementById('treatmentModalOverlay');
     const treatmentClose = document.getElementById('treatmentCloseBtn');
@@ -107,9 +140,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       treatIdEl.textContent = item.id || '';
       treatLocationEl.textContent = item.location || '';
       treatBoroughEl.textContent = item.boroughId || item.permitcategory || '';
-      treatWorktypeEl.textContent = item.workType || '';
-      treatPriorityEl.textContent = item.priority || '';
-      treatStatusEl.textContent = item.currentStatus || item.status || '';
+      // set select values if elements are selects (fallback to text if not)
+      try { if (treatWorktypeEl && 'value' in treatWorktypeEl) treatWorktypeEl.value = item.workType || 'notDefined'; else treatWorktypeEl.textContent = item.workType || ''; } catch(e) {}
+      try { if (treatPriorityEl && 'value' in treatPriorityEl) treatPriorityEl.value = item.priority || 'notAssigned'; else treatPriorityEl.textContent = item.priority || ''; } catch(e) {}
+      try { if (treatStatusEl && 'value' in treatStatusEl) treatStatusEl.value = item.currentStatus || item.status || 'waitingForApproval'; else treatStatusEl.textContent = item.currentStatus || item.status || ''; } catch(e) {}
       treatDescEl.textContent = item.description || '';
       // problems.json may include a date field; display it if present
       treatDateEl.textContent = item.date ? new Date(Number(item.date)).toLocaleString() : 'N/A';
@@ -124,17 +158,23 @@ document.addEventListener('DOMContentLoaded', async () => {
           const fd = new FormData();
           fd.append('id', item.id);
           // send the internal values (not the displayed text) so backend can map enums reliably
-          fd.append('workType', item.workType || 'notDefined');
-          fd.append('priority', item.priority || 'notAssigned');
+          const selectedWorkType = (treatWorktypeEl && 'value' in treatWorktypeEl) ? treatWorktypeEl.value : (item.workType || 'notDefined');
+          const selectedPriority = (treatPriorityEl && 'value' in treatPriorityEl) ? treatPriorityEl.value : (item.priority || 'notAssigned');
+          fd.append('workType', selectedWorkType);
+          fd.append('priority', selectedPriority);
 
           const res = await fetch('/api/agent-accept-problem', { method: 'POST', body: fd });
           const json = await res.json().catch(() => null);
           if (res.ok && json && json.success) {
-            const newStatus = json.newStatus || 'approved';
+             const newStatus = json.newStatus || 'approved';
             updateRowStatus(item.id, newStatus);
+            // update priority cell if server returned it
+            const newPri = (json && json.newPriority) ? json.newPriority : selectedPriority;
+            updateRowPriority(item.id, newPri);
+            item.priority = newPri;
             item.status = newStatus;
             item.currentStatus = newStatus;
-          } else {
+           } else {
             console.error('Approve failed', res.status, json);
           }
         } catch (err) { console.error(err); }
@@ -146,15 +186,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
           const fd = new FormData();
           fd.append('id', item.id);
-
+          // include selected workType/priority on reject as well
+          try { const selectedWorkType = (treatWorktypeEl && 'value' in treatWorktypeEl) ? treatWorktypeEl.value : (item.workType || 'notDefined'); fd.append('workType', selectedWorkType); } catch(e) {}
+          try { const selectedPriority = (treatPriorityEl && 'value' in treatPriorityEl) ? treatPriorityEl.value : (item.priority || 'notAssigned'); fd.append('priority', selectedPriority); } catch(e) {}
           const res = await fetch('/api/agent-refuse-problem', { method: 'POST', body: fd });
           const json = await res.json().catch(() => null);
           if (res.ok && json && json.success) {
-            const newStatus = json.newStatus || 'rejected';
+             const newStatus = json.newStatus || 'rejected';
             updateRowStatus(item.id, newStatus);
+            const newPri = (json && json.newPriority) ? json.newPriority : (selectedPriority || item.priority);
+            updateRowPriority(item.id, newPri);
+            item.priority = newPri;
             item.status = newStatus;
             item.currentStatus = newStatus;
-          } else {
+           } else {
             console.error('Reject failed', res.status, json);
           }
         } catch (err) { console.error(err); }
@@ -164,17 +209,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       btnModify.onclick = async () => {
         btnModify.disabled = true;
         try {
-          const fd = new FormData();
-          fd.append('id', item.id);
-          fd.append('message', treatMessage.value || '');
+          const fd = new FormData(); fd.append('id', item.id); fd.append('message', treatMessage.value || '');
+          try { const selectedWorkType = (treatWorktypeEl && 'value' in treatWorktypeEl) ? treatWorktypeEl.value : (item.workType || 'notDefined'); fd.append('workType', selectedWorkType); } catch(e) {}
+          try { const selectedPriority = (treatPriorityEl && 'value' in treatPriorityEl) ? treatPriorityEl.value : (item.priority || 'notAssigned'); fd.append('priority', selectedPriority); } catch(e) {}
           const res = await fetch('/api/agent-request-modification', { method: 'POST', body: fd });
           const json = await res.json().catch(() => null);
           if (res.ok && json && json.success) {
-            const newStatus = json.newStatus || 'onHold';
+             const newStatus = json.newStatus || 'onHold';
             updateRowStatus(item.id, newStatus);
+            const newPri = (json && json.newPriority) ? json.newPriority : (selectedPriority || item.priority);
+            updateRowPriority(item.id, newPri);
+            item.priority = newPri;
             item.status = newStatus;
             item.currentStatus = newStatus;
-          } else {
+           } else {
             console.error('Modify request failed', res.status, json);
           }
         } catch (err) { console.error(err); }
@@ -212,78 +260,4 @@ function filterTable() {
 
 // --- Modal and form handling ---
 
-(function () {
-  const openBtn = document.querySelector('.btn-primary');
-  const overlay = document.getElementById('problemModalOverlay');
-  const closeBtn = document.getElementById('modalCloseBtn');
-  const cancelBtn = document.getElementById('cancelBtn');
-  const form = document.getElementById('priorityAssigner');
-  //const fileDrop = document.getElementById('fileDrop');
-  //const fileInput = document.getElementById('fileInput');
-
-  function openModal() {
-    overlay.classList.add('show');
-    overlay.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeModal() {
-    overlay.classList.remove('show');
-    overlay.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-    form.reset();
-    clearFilePreview();
-  }
-
-  if (openBtn) openBtn.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
-  const card = document.querySelector('.modal-card'); if (card) card.addEventListener('click', e => e.stopPropagation());
-
-  // Submit the resident problem form. We use FormData since the form can include files.
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
-    const fd = new FormData(form);
-      // Logging to help debug submission during development.
-      try {
-          console.log('FormData entries:', Object.fromEntries(fd.entries()));
-      } catch (err) {
-      // Some environments may not support Object.fromEntries on FormData: fallback to manual logging.
-      for (const pair of fd.entries()) console.log(pair[0], pair[1]);
-    }
-
-    // Send to backend endpoint
-    try {
-      const response = await fetch('/api/agent-problem-set-priority', { method: 'POST', body: fd });
-      if (!response.ok) console.error('Server error while sending form', response.status);
-      // We don't strictly need the JSON result here, but we try to parse if the server returns it.
-      const json = await response.json().catch(() => null);
-      if (json) console.log('Server response:', json);
-    } catch (err) {
-      console.error('Submit error', err);
-    }
-
-    closeModal();
-  });
-
-  // File drop behaviour: click to open file picker, drag/drop to attach.
-
-  // showFileName / clearFilePreview: small helpers that update the drop zone with the selected file name.
-  function showFileName(file) {
-    const name = document.createElement('div');
-    name.className = 'file-name';
-    name.textContent = file.name + ' (' + Math.round(file.size / 1024) + ' KB)';
-    // remove previous small preview text if any
-    const existing = fileDrop.querySelector('.file-name');
-    if (existing) existing.remove();
-    fileDrop.appendChild(name);
-  }
-  function clearFilePreview() {
-    const existing = fileDrop.querySelector('.file-name');
-    if (existing) existing.remove();
-  }
-})();
+// Note: priority assigner modal removed — priority is now set from the Traiter modal.

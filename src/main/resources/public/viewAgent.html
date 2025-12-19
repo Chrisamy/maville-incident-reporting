@@ -45,39 +45,9 @@
         <button class="btn-outline">
             Changer details d'un probleme
         </button>
-        <button class="btn-primary">
-            Assigner une priorité
-        </button>
     </div>
 </header>
 
-<!-- Modal used to classify a problem. Controlled from viewAgent.js -->
-<div id="problemModalOverlay" class="modal-overlay" aria-hidden="true">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <button class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
-        <h2 id="modalTitle" class="modal-title">Traiter un problème</h2>
-        <p class="modal-sub">Complétez le formulaire ci-dessous pour assigner une priorité a un probleme.</p>
-
-        <form id="priorityAssigner" class="modal-form">
-            <label>Id du probleme <span class="required">*</span>
-                <input id="problemid" class="form-control" name="problemid" type="text" placeholder="000000000000aaaaaaaaaaaa" required>
-            </label>
-
-            <label>Quelle priorité Assignée <span class="required">*</span>
-                <select name="newpriority">
-                    <option value="low">low</option>
-                    <option value="medium">medium</option>
-                    <option value="high">high</option>
-                </select>
-            </label>
-
-            <div class="modal-actions">
-                <button type="button" class="btn-outline" id="cancelBtn">Annuler</button>
-                <button type="submit" class="btn-primary">Soumettre</button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <div id="treatmentModalOverlay" class="modal-overlay" aria-hidden="true">
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="treatmentTitle">
@@ -89,8 +59,33 @@
       <div class="field"><strong>ID:</strong> <span id="treat-id"></span></div>
       <div class="field"><strong>Adresse:</strong> <span id="treat-location"></span></div>
       <div class="field"><strong>Arrondissement:</strong> <span id="treat-borough"></span></div>
-      <div class="field"><strong>Type:</strong> <span id="treat-worktype"></span></div>
-      <div class="field"><strong>Priorité:</strong> <span id="treat-priority"></span></div>
+      <div class="field">
+        <label><strong>Type de travaux:</strong>
+          <select id="treat-worktype" class="form-control">
+            <option value="notDefined">-- Aucun --</option>
+            <option value="RoadWork">VOIRIE</option>
+            <option value="GazOrElectric">ÉLECTRICITÉ</option>
+            <option value="ConstructionOrRenovation">CONSTRUCTION / RÉNOVATION</option>
+            <option value="Landscaping">AMÉNAGEMENT</option>
+            <option value="PublicsTransportWork">TRANSPORTS</option>
+            <option value="SignageAndLighting">ÉCLAIRAGE / SIGNALISATION</option>
+            <option value="UndergroundWork">TRAVAUX SOUTERRAINS</option>
+            <option value="ResidentialWork">TRAVAUX RÉSIDENTIELS</option>
+            <option value="UrbanMaintenance">ENTRETIEN URBAIN</option>
+            <option value="TelecommunicationsMaintenance">TÉLÉCOMMUNICATIONS</option>
+          </select>
+        </label>
+      </div>
+      <div class="field">
+        <label><strong>Priorité:</strong>
+          <select id="treat-priority" class="form-control">
+            <option value="notAssigned">-- Aucun --</option>
+            <option value="low">FAIBLE</option>
+            <option value="medium">MOYENNE</option>
+            <option value="high">ÉLEVÉE</option>
+          </select>
+        </label>
+      </div>
       <div class="field"><strong>Statut:</strong> <span id="treat-status"></span></div>
       <div class="field"><strong>Description:</strong>
         <div id="treat-description" style="white-space:pre-wrap; margin-top:6px; color:var(--text-soft)"></div>
