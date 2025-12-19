@@ -1,5 +1,7 @@
 package ca.udem.maville;
 
+//Énumération des quartiers de Montréal ou peuvent avoir lieu les travaux
+
 public enum EnumBoroughID {
     ahuntsicCartierville,
     anjou,

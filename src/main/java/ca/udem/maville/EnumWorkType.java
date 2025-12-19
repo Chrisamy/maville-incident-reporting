@@ -1,5 +1,7 @@
 package ca.udem.maville;
 
+//Énumération des types de travaux possibles
+
 public enum EnumWorkType {
     notDefined,
     RoadWork,

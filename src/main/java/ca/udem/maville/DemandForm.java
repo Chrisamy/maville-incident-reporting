@@ -7,47 +7,35 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true) //to ignore the _id property
 public class DemandForm {
     @JsonIgnore
-    Prestataire prestataire;
 
-    int companyNumber;
-    String projectTitle;
-    EnumWorkType workType;
-    String location;
-    String description;
-    String startDate;
-    String endDate;
-    String problemId;
-    float costEstimate;
+    private String id;
+    private String projectTitle;
+    private EnumWorkType workType;
+    private String location;
+    private String description;
+    private String startDate;
+    private String endDate;
+    private double costEstimate;
+    private EnumStatus status;
 
-    public DemandForm() {}
-
-    public DemandForm(Prestataire prestataire, int companyNumber, String projectTitle, EnumWorkType workType,
-                      String location, String description, String startDate, String endDate, String problemId, float costEstimate) {
-        this.prestataire = prestataire;
-        this.companyNumber = companyNumber;
+    public DemandForm(String projectTitle, EnumWorkType workType, String location, String description, String startDate,
+                      String endDate, double costEstimate) {
+        this.id = IdGenerator.generateID();
         this.projectTitle = projectTitle;
         this.workType = workType;
         this.location = location;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.problemId = problemId;
         this.costEstimate = costEstimate;
-
+        this.status = EnumStatus.waitingForApproval;
     }
 
     //Getters
 
-    public Prestataire getPrestataire() {
-        return prestataire;
+    public String getId() {
+        return id;
     }
-    public int getCompanyNumber() {
-        if(prestataire == null){
-            return 0;
-        }
-        return prestataire.getCompanyNumber();
-
-    } // PLR VERIF not sure pour cela
     public String getProjectTitle() {
         return projectTitle;
     }
@@ -64,17 +52,13 @@ public class DemandForm {
     public String getEndDate() {
         return endDate;
     }
-    public String getId() {
-        return problemId;
+    public double getCostEstimate() {return costEstimate;}
+    public EnumStatus getStatus() {
+        return status;
     }
-    public float getCostEstimate() {return costEstimate;}
 
     //Setters
 
-    public void setPrestataire(Prestataire prestataire) {
-        this.prestataire = prestataire;
-    }
-    public void setCompanyNumber(int companyNumber) {   this.companyNumber = companyNumber; }
     public void setProjectTitle(String projectTitle) {
         this.projectTitle = projectTitle;
     }
@@ -93,8 +77,8 @@ public class DemandForm {
     public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
-    public void setId(String problemId) {
-        this.problemId = problemId;
+    public void setCostEstimate(double costEstimate) {this.costEstimate = costEstimate;}
+    public void setStatus(EnumStatus status) {
+        this.status = status;
     }
-    public void setCostEstimate(float costEstimate) {this.costEstimate = costEstimate;}
 }
