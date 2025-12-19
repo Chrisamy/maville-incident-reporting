@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 public class AgentProblemFormHandler {
 
+    //Classe qui regroupe les méthodes de traitement de l'agent pour les formulaires soumis par les résidents
+
     //Accède à un formulaire via son id
 
     protected static ProblemForm getProblem(ArrayList<ProblemForm> FormList, String idForm) {
@@ -19,13 +21,16 @@ public class AgentProblemFormHandler {
      PROBLEM FORM MANIPULATION
      =============================================================================================================*/
 
+    //Méthode pour refuser un formulaire (refuser le problème)
+
     public void RefuseProblem(ArrayList<ProblemForm> formList, String id) {
         ProblemForm form = getProblem(formList, id);
         form.setStatus(EnumStatus.rejected);
         Server.sendMessageToUI("Le projet " + id + "est refusé.");
     }
 
-    //Méthode pour accepter un projet
+    //Méthode pour accepter un formulaire (accepter le problème)
+
     public void AcceptProblem(ArrayList<ProblemForm> formList, String id, EnumWorkType newWorkType, EnumPriority newEnumPriority) {
         ProblemForm form = getProblem(formList, id);
         form.setWorkType(newWorkType);
@@ -34,7 +39,8 @@ public class AgentProblemFormHandler {
         Server.sendMessageToUI("Le projet " + id + "est accepté.");
     }
 
-    //Au cas où la priorité d'un problème change
+    //Méthode pour changer la priorité d'un problème
+
     public void AssignProblemPriority(ArrayList<ProblemForm> FormList, String idForm, EnumPriority enumPriority) {
         ProblemForm f = getProblem(FormList, idForm);
         System.out.println(f);
@@ -45,11 +51,4 @@ public class AgentProblemFormHandler {
         }
     }
 
-
-    // Method to update the project from example "inProgress" to "finished"
-    public void UpdateProjectStatus(ArrayList<ProblemForm> formList, String id, EnumStatus newStatus) {
-        ProblemForm form = getProblem(formList, id);
-        form.setStatus(newStatus);
-        Server.sendMessageToUI("Le status du projet " + id + " a eu sa priorité changé pour " + newStatus);
-    }
 }
