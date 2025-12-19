@@ -231,25 +231,23 @@
 
     <section>
         <h2>Prototype</h2>
-        <p>L’application permet de choisir un profil (résident, prestataire, Agent), puis d’afficher un menu adapté à chaque cas.</p>
-        <p>Dans la vue resident le resident est capable de voir la liste des problems de l'api. Et est capable de signaler des problemes</p>
-        <p>Le prestataire est capable de soumettre une demande de travail sur un projet.</p>
-        <p>L'agent est capable de voir les demandes soumis par le resident et est capable d'assigner une priorité</p>
+        <p>L’application permet de choisir un profil (résident, prestataire, Agent), puis d’afficher un menu adapté à chaque profil.</p>
+        <p>Dans la vue résident, le resident est capable de voir la liste des problèmes de l'api et peut signaler des problemes.</p>
+        <p>Le prestataire est capable de soumettre une demande de travail pour un projet.</p>
+        <p>L'agent est capable de voir les demandes soumises par le résident et est capable d'assigner une priorité à un problème.</p>
     </section>
 
     <section>
 
         <h2>Style d'architecture: Client Serveur</h2>
-        <p>Le style d'architecture choisie pour l'application est une architecture client-serveur. Nous avons choisi
-        cette architecture puisque ceci permet un niveau d'abstraction entre le client et le fonctionnement de  l'application. De plus on a commencer avec cette architecture puisque elle va etre plus facile et rapide a
-        implementer a ce stade. De plus on pourras ensuite. De plus la gestions des données est plus simple puisque
-        elles sont tous stoquée dans le serveur.</p>
-        <p>Lorsqu'on a conceptualiser le serveur on voulais que l'utilisateur de l'application communique seulement
-        avec le serveur et que le serveur s'occupe a offload les interactions a d'autre modules de code. Les modules de
-        codes sont regrouper par le role qu'ils jouent, c'est a dire si c'est liée a un prestataire, agent,
-        resident. Une chose notable est l'implementation du design pattern de singleton pour nos deux repertoires. on a
-        utiliser ceci afin de s'assurer qu'il existe un seule repertoire et que les problemes ne sont pas desorganiser
-        dans de divers instance des repertoires</p>
+        <p>Le style d’architecture choisi pour l’application est une architecture client-serveur. Nous avons opté pour cette architecture car elle permet d’introduire
+             un niveau d’abstraction entre le client et le fonctionnement interne de l’application. De plus, nous avons commencé avec cette architecture parce qu’elle est plus
+             simple et plus rapide à implémenter à ce stade du projet. Elle pourra ensuite être adaptée ou étendue si nécessaire. Enfin, la gestion des données est facilitée
+             puisqu’elles sont toutes stockées sur le serveur.</p>
+        <p>Lors de la conceptualisation du serveur, nous voulions que l’utilisateur de l’application communique uniquement avec le serveur, et que celui-ci se charge de déléguer
+             les interactions aux autres modules du code. Les modules sont regroupés selon le rôle qu’ils jouent, c’est-à-dire selon qu’ils sont liés à un prestataire, un agent ou un résident.
+             Un point notable est l’implémentation du patron de conception Singleton pour nos deux répertoires. Nous avons utilisé ce patron afin de garantir qu’il n’existe qu’un seul répertoire et
+             d’éviter que les problèmes ne soient répartis de manière désorganisée entre plusieurs instances de répertoires.</p>
         <h3>Résumé du fonctionnemment de l'application</h3>
         <p>L'Utilisateur intéragit avec l'interface utilisateur de l'application web servant de client pour soumettre des requêtes au serveur. Le serveur traite la requête et retourne la réponse correspondante. L'interface utilisateur affiche ensuite la réponse du serveur.</p>
 
@@ -265,12 +263,32 @@
     </section>
 
     <section>
-        <h3>Diagramme de Sequence</h3>
-        <img src="images/diagram_sequence.png" alt="Diagramme de Sequence">
+        <h3>Diagramme de Séquence</h3>
+        <img src="images/diagram_sequence.png" alt="Diagramme de Sequence" style="width: 70em;" >
 
         <h3>Diagramme de Classes Object orientée</h3>
-        <img src="images/classes_OO.png" alt="Diagramme de Classes Object">
-        <p>Le code couleur est: les classes en Rose sont associee au Resident, ceux en jaune au prestataire, et ceux en bleu pale(cyan) au agents</p>
+        <img src="images/classes_OO.png" alt="Diagramme de Classes Object" style="width: 70em;">
+        <p>Code couleur: les classes en Rose sont associées au Resident, celles en jaune au prestataire, et celles en bleu pale(cyan) sont associées à l'agent</p>
+    </section>
+
+    <section>
+        <h2>Implémentation finale</h2>
+        <p>En lançant l'application, l'utilisateur peut choisir un profil lui correspondant: résident, agent ou prestataire, chacun ayant des fonctionnalités différentes</p>
+        <p>Le résident peut réaliser les actions suivantes: consulter le registe des travaux, consulter ses notifications et signaler un problème en remplissant un formulaire.</p>
+        <p>Lors du signalement d'un problème, le formulaire est envoyé à un agent afin que la requête soit acceptée et qu'un soit planifié.</p>
+        <p>L'agent peut réaliser les actions suivantes: accepter ou refuser un formulaire qui rapporte un problème, assigner une priorité à un problème, accepter ou refuser une demande de projet et consulter ses notifications.</p>
+        <p>Lorsqu'un agent accepte un formulaire, les prestataires peuvent envoyer une demande de travail pour le problème en question.</p>
+        <p>Le prestataire peut réaliser les actions suivantes: consulter le registe des travaux, faire une demande de projet, modifier sa demande et les informations du projet sur lequel il travaille.</p>
+    </section>
+
+    <section>
+        <h3>Rapport de test</h3>
+        <img src="images/rapportTest.png" alt="Rapport de test JaCoco" style="width: 60em;">
+    </section>
+
+    <section>
+        <h3>Documentation</h3>
+        <p>Chaque classe du projet contient les commentatires nécessaires pour décrire son fonctionnement. Les commentatires sont écris dans le code source.</p>
     </section>
 </div>
 
