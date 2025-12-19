@@ -124,23 +124,25 @@ const NotificationStore = (function () {
         const existingMap = {};
         existingAll.forEach(i => { if (i && i.id) existingMap[i.id] = i; });
 
-        const mapped = (Array.isArray(data) ? data : []).map(_mapServer).map(m => ({...m, role: role}));
+        // map server items but keep their server-declared role
+        const mapped = (Array.isArray(data) ? data : []).map(_mapServer);
 
-        // overlay server items onto existing map, preserving local read flag when present
-        mapped.forEach(m => {
+        // select only server items that are for the requested role
+        const serverRoleItems = mapped.filter(m => m.role === role);
+
+        // Preserve items of other roles in local storage
+        const others = existingAll.filter(i => i.role !== role);
+
+        // Preserve local read flag when ids match between existing and server items
+        const finalMapped = serverRoleItems.map(m => {
           const local = existingMap[m.id];
-          if (local) {
-            existingMap[m.id] = { ...m, role: role, read: !!local.read, time: local.time || m.time };
-          } else {
-            existingMap[m.id] = m;
-          }
+          if (local) return { ...m, role: m.role, read: !!local.read, time: local.time || m.time };
+          return { ...m, role: m.role };
         });
 
-        // final list contains all existing (others + local-only) plus server items (merged)
-        const finalList = Object.keys(existingMap).map(k => existingMap[k]);
-
+        const finalList = others.concat(finalMapped);
         _save(finalList);
-        cache[role] = mapped;
+        cache[role] = finalMapped;
         if (typeof cb === 'function') cb();
       })
       .catch(() => {

@@ -137,20 +137,40 @@ public class Server {
                 System.out.println("[SERVER] No current resident; form saved in repository without association.");
             }
 
-            // Persist problems list so the agent page (which can read JSON) sees the new submission
+            // Persist problems list so the agent page (which can read JSON) sees the new submission.
+            // FIX: load existing problems.json, append the new form, then write merged list.
             try {
                 ObjectMapper problemsMapper = new ObjectMapper();
-                java.util.List<ProblemForm> list = problemList.getFormList();
+                java.util.List<ProblemForm> merged = new java.util.ArrayList<>();
                 File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
-                File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
-                problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, list);
+                try {
+                    if (problemsFileSrc.exists()) {
+                        java.util.List<ProblemForm> loaded = problemsMapper.readValue(problemsFileSrc, new com.fasterxml.jackson.core.type.TypeReference<java.util.ArrayList<ProblemForm>>(){});
+                        if (loaded != null) merged.addAll(loaded);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Warning: failed to read existing problems.json (will append anyway): " + e.getMessage());
+                }
+
+                // append the new submission
+                merged.add(problemForm);
+
+                // write merged list back to src file (and target copies)
+                File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc != null && !dirSrc.exists()) dirSrc.mkdirs();
+                problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, merged);
+
                 File problemsFileTarget = new File("target/public/JSON_files/problems.json");
                 File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
-                try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, list); } catch (Exception ignore) {}
+                try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, merged); } catch (Exception ignore) {}
+
                 File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
                 File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
-                try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, list); } catch (Exception ignore) {}
-            } catch (Exception e) { System.err.println("Failed to persist problems.json: " + e.getMessage()); }
+                try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, merged); } catch (Exception ignore) {}
+
+            } catch (Exception e) {
+                // Log but don't fail the request — submission stays in-memory.
+                System.err.println("Failed to persist problems.json: " + e.getMessage());
+            }
 
             // Notify agent when resident submits a request (non-fatal)
             try {
@@ -187,17 +207,67 @@ public class Server {
 
                 // persist updated problems list so agent JSON source sees the change
                 try {
+                    // Robust update: load on-disk problems.json, update the matching item status, and write full list back
                     ObjectMapper problemsMapper = new ObjectMapper();
-                    java.util.List<ProblemForm> list = problemList.getFormList();
                     File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
+                    java.util.List<java.util.Map<String,Object>> diskList = new java.util.ArrayList<>();
+                    if (problemsFileSrc.exists()) {
+                        try {
+                            diskList = problemsMapper.readValue(problemsFileSrc, new TypeReference<java.util.ArrayList<java.util.Map<String,Object>>>(){});
+                        } catch (Exception readEx) {
+                            System.err.println("Warning: failed to read problems.json for refuse update: " + readEx.getMessage());
+                            // fallback: continue and write in-memory list
+                        }
+                    }
+                    boolean updatedOnDisk = false;
+                    for (java.util.Map<String,Object> m : diskList) {
+                        Object idObj = m.get("id");
+                        if (idObj != null && formId.equals(String.valueOf(idObj))) {
+                            m.put("status", EnumStatus.rejected.name());
+                            m.put("decisionDate", System.currentTimeMillis());
+                            updatedOnDisk = true;
+                            break;
+                        }
+                    }
+                    if (!updatedOnDisk) {
+                        // if not found on disk, ensure in-memory list is written (append if needed)
+                        // but do not remove existing entries
+                        java.util.List<ProblemForm> mem = problemList.getFormList();
+                        // ensure diskList contains mem items by id to avoid duplicates
+                        for (ProblemForm pf : mem) {
+                            boolean found = false;
+                            for (java.util.Map<String,Object> m : diskList) {
+                                if (pf.getId().equals(String.valueOf(m.get("id")))) { found = true; break; }
+                            }
+                            if (!found) {
+                                // convert pf to Map via mapper
+                                java.util.Map<String,Object> conv = problemsMapper.convertValue(pf, new TypeReference<java.util.Map<String,Object>>(){});
+                                diskList.add(conv);
+                            }
+                        }
+                        // update the matching mem entry if present
+                        for (java.util.Map<String,Object> m : diskList) {
+                            if (formId.equals(String.valueOf(m.get("id")))) {
+                                m.put("status", EnumStatus.rejected.name());
+                                m.put("decisionDate", System.currentTimeMillis());
+                                break;
+                            }
+                        }
+                    }
+                    // write back full diskList
                     File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
-                    problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, list);
+                    problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, diskList);
                     File problemsFileTarget = new File("target/public/JSON_files/problems.json");
                     File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
-                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, list); } catch (Exception ignore) {}
+                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, diskList); } catch (Exception ignore) {}
                     File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
                     File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
-                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, list); } catch (Exception ignore) {}
+                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, diskList); } catch (Exception ignore) {}
+
+                    // also update in-memory copy if present
+                    for (ProblemForm p : problemList.getFormList()) {
+                        if (p.getId().equals(formId)) { p.setStatus(EnumStatus.rejected); break; }
+                    }
                 } catch (Exception e) { System.err.println("Failed to persist problems.json after refuse: " + e.getMessage()); }
 
                 Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("newStatus", (f==null?"rejected":f.getStatus().name())); ctx.json(out);
@@ -231,16 +301,57 @@ public class Server {
                 // persist updated problems list so agent JSON source sees the change
                 try {
                     ObjectMapper problemsMapper = new ObjectMapper();
-                    java.util.List<ProblemForm> list = problemList.getFormList();
                     File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
+                    java.util.List<java.util.Map<String,Object>> diskList = new java.util.ArrayList<>();
+                    if (problemsFileSrc.exists()) {
+                        try {
+                            diskList = problemsMapper.readValue(problemsFileSrc, new TypeReference<java.util.ArrayList<java.util.Map<String,Object>>>(){});
+                        } catch (Exception readEx) {
+                            System.err.println("Warning: failed to read problems.json for accept update: " + readEx.getMessage());
+                        }
+                    }
+                    boolean updatedOnDisk = false;
+                    for (java.util.Map<String,Object> m : diskList) {
+                        Object idObj = m.get("id");
+                        if (idObj != null && formId.equals(String.valueOf(idObj))) {
+                            m.put("status", EnumStatus.approved.name());
+                            m.put("decisionDate", System.currentTimeMillis());
+                            updatedOnDisk = true;
+                            break;
+                        }
+                    }
+                    if (!updatedOnDisk) {
+                        java.util.List<ProblemForm> mem = problemList.getFormList();
+                        for (ProblemForm pf : mem) {
+                            boolean found = false;
+                            for (java.util.Map<String,Object> m : diskList) {
+                                if (pf.getId().equals(String.valueOf(m.get("id")))) { found = true; break; }
+                            }
+                            if (!found) {
+                                java.util.Map<String,Object> conv = problemsMapper.convertValue(pf, new TypeReference<java.util.Map<String,Object>>(){});
+                                diskList.add(conv);
+                            }
+                        }
+                        for (java.util.Map<String,Object> m : diskList) {
+                            if (formId.equals(String.valueOf(m.get("id")))) {
+                                m.put("status", EnumStatus.approved.name());
+                                m.put("decisionDate", System.currentTimeMillis());
+                                break;
+                            }
+                        }
+                    }
                     File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
-                    problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, list);
+                    problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, diskList);
                     File problemsFileTarget = new File("target/public/JSON_files/problems.json");
                     File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
-                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, list); } catch (Exception ignore) {}
+                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, diskList); } catch (Exception ignore) {}
                     File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
                     File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
-                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, list); } catch (Exception ignore) {}
+                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, diskList); } catch (Exception ignore) {}
+
+                    for (ProblemForm p : problemList.getFormList()) {
+                        if (p.getId().equals(formId)) { p.setStatus(EnumStatus.approved); break; }
+                    }
                 } catch (Exception e) { System.err.println("Failed to persist problems.json after accept: " + e.getMessage()); }
 
                 Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("newStatus", (f==null?"approved":f.getStatus().name())); ctx.json(out);
@@ -274,16 +385,57 @@ public class Server {
                 // persist updated problems list so agent JSON source sees the change
                 try {
                     ObjectMapper problemsMapper = new ObjectMapper();
-                    java.util.List<ProblemForm> list = problemList.getFormList();
                     File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
+                    java.util.List<java.util.Map<String,Object>> diskList = new java.util.ArrayList<>();
+                    if (problemsFileSrc.exists()) {
+                        try {
+                            diskList = problemsMapper.readValue(problemsFileSrc, new TypeReference<java.util.ArrayList<java.util.Map<String,Object>>>(){});
+                        } catch (Exception readEx) {
+                            System.err.println("Warning: failed to read problems.json for modify update: " + readEx.getMessage());
+                        }
+                    }
+                    boolean updatedOnDisk = false;
+                    for (java.util.Map<String,Object> m : diskList) {
+                        Object idObj = m.get("id");
+                        if (idObj != null && formId.equals(String.valueOf(idObj))) {
+                            m.put("status", "onHold");
+                            m.put("decisionDate", System.currentTimeMillis());
+                            updatedOnDisk = true;
+                            break;
+                        }
+                    }
+                    if (!updatedOnDisk) {
+                        java.util.List<ProblemForm> mem = problemList.getFormList();
+                        for (ProblemForm pf : mem) {
+                            boolean found = false;
+                            for (java.util.Map<String,Object> m : diskList) {
+                                if (pf.getId().equals(String.valueOf(m.get("id")))) { found = true; break; }
+                            }
+                            if (!found) {
+                                java.util.Map<String,Object> conv = problemsMapper.convertValue(pf, new TypeReference<java.util.Map<String,Object>>(){});
+                                diskList.add(conv);
+                            }
+                        }
+                        for (java.util.Map<String,Object> m : diskList) {
+                            if (formId.equals(String.valueOf(m.get("id")))) {
+                                m.put("status", "onHold");
+                                m.put("decisionDate", System.currentTimeMillis());
+                                break;
+                            }
+                        }
+                    }
                     File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
-                    problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, list);
+                    problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, diskList);
                     File problemsFileTarget = new File("target/public/JSON_files/problems.json");
                     File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
-                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, list); } catch (Exception ignore) {}
+                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, diskList); } catch (Exception ignore) {}
                     File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
                     File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
-                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, list); } catch (Exception ignore) {}
+                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, diskList); } catch (Exception ignore) {}
+
+                    for (ProblemForm p : problemList.getFormList()) {
+                        if (p.getId().equals(formId)) { p.setStatus(EnumStatus.onHold); break; }
+                    }
                 } catch (Exception e) { System.err.println("Failed to persist problems.json after request-modification: " + e.getMessage()); }
 
                 Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("newStatus", "onHold"); ctx.json(out);
@@ -302,35 +454,70 @@ public class Server {
         });
 
         app.get("/api/load-problems", ctx -> {
-            ctx.json(problemList.getFormList()); //loads list of problems to the front end (only for agent at this moment in time)
+            ctx.json(problemList.getFormList()); //loads list of problems to the front end (only for agent)
         });
 
         app.get("/api/load-demands", ctx -> {
-            ctx.json(demandeList.getDemandList()); //loads list of problems to the front end (only for agent at this moment in time)
+            ctx.json(demandeList.getDemandList()); //loads list of problems to the front end (//)
         });
 
-        // Notifications endpoint (session or ?role= fallback)
+        // Notifications endpoint
         app.get("/notifications", ctx -> {
-            String role = ctx.sessionAttribute("role");
-            if (role == null) role = ctx.queryParam("role");
+            String roleParam = ctx.queryParam("role");
+            String sessionRole = ctx.sessionAttribute("role");
             String sessionUser = ctx.sessionAttribute("username");
-            String qUser = ctx.queryParam("user");
-            if (qUser != null && !qUser.isEmpty()) sessionUser = qUser;
-            if (role == null) role = (sessionUser != null) ? "resident" : "agent";
+
+            String role;
+            if (roleParam != null) {
+                if ("resident".equals(roleParam)) {
+                    role = "resident".equals(sessionRole) ? "resident" : (sessionRole != null ? sessionRole : (sessionUser != null ? "resident" : "agent"));
+                } else if ("agent".equals(roleParam) || "prestataire".equals(roleParam)) {
+                    role = roleParam; // allow override for agent & prestataire pages
+                } else {
+                    role = sessionRole != null ? sessionRole : (sessionUser != null ? "resident" : "agent");
+                }
+            } else {
+                role = sessionRole != null ? sessionRole : (sessionUser != null ? "resident" : "agent");
+            }
 
             java.util.List<java.util.Map<String,Object>> out = new java.util.ArrayList<>();
             for (Notification n : notifications) {
-                boolean targetedToCurrent = (n.getUserId() != null && sessionUser != null && n.getUserId().equals(sessionUser));
-                if (role.equals(n.getRole()) || targetedToCurrent) {
-                    java.util.Map<String,Object> m = new java.util.HashMap<>();
-                    m.put("id", n.getId());
-                    m.put("role", n.getRole());
-                    m.put("title", n.getTitle());
-                    m.put("message", n.getText());
-                    m.put("timestamp", n.getTime());
-                    m.put("read", n.isRead());
-                    m.put("userId", n.getUserId());
-                    out.add(m);
+                if ("agent".equals(role)) {
+                    if ("agent".equals(n.getRole())) {
+                        java.util.Map<String,Object> m = new java.util.HashMap<>();
+                        m.put("id", n.getId());
+                        m.put("role", n.getRole());
+                        m.put("title", n.getTitle());
+                        m.put("message", n.getText());
+                        m.put("timestamp", n.getTime());
+                        m.put("read", n.isRead());
+                        m.put("userId", n.getUserId());
+                        out.add(m);
+                    }
+                } else if ("resident".equals(role)) {
+                    if ("resident".equals(n.getRole()) && n.getUserId() != null && sessionUser != null && sessionUser.equals(n.getUserId())) {
+                        java.util.Map<String,Object> m = new java.util.HashMap<>();
+                        m.put("id", n.getId());
+                        m.put("role", n.getRole());
+                        m.put("title", n.getTitle());
+                        m.put("message", n.getText());
+                        m.put("timestamp", n.getTime());
+                        m.put("read", n.isRead());
+                        m.put("userId", n.getUserId());
+                        out.add(m);
+                    }
+                } else if ("prestataire".equals(role)) {
+                    if (n.getRole() != null && "prestataire".equals(n.getRole())) {
+                        java.util.Map<String,Object> m = new java.util.HashMap<>();
+                        m.put("id", n.getId());
+                        m.put("role", n.getRole());
+                        m.put("title", n.getTitle());
+                        m.put("message", n.getText());
+                        m.put("timestamp", n.getTime());
+                        m.put("read", n.isRead());
+                        m.put("userId", n.getUserId());
+                        out.add(m);
+                    }
                 }
             }
             ctx.json(out);
@@ -339,26 +526,62 @@ public class Server {
         // compatibility route under /api
         app.get("/api/notifications", ctx -> {
             ctx.req().setAttribute("org.eclipse.jetty.server.Request.baseURI", ctx.req().getRequestURI());
-            String role = ctx.sessionAttribute("role");
-            if (role == null) role = ctx.queryParam("role");
+            // Same canonical role resolution for /api/notifications
+            String roleParam = ctx.queryParam("role");
+            String sessionRole = ctx.sessionAttribute("role");
             String sessionUser = ctx.sessionAttribute("username");
-            String qUser = ctx.queryParam("user");
-            if (qUser != null && !qUser.isEmpty()) sessionUser = qUser;
-            if (role == null) role = (sessionUser != null) ? "resident" : "agent";
+
+            String role;
+            if (roleParam != null) {
+                if ("resident".equals(roleParam)) {
+                    role = "resident".equals(sessionRole) ? "resident" : (sessionRole != null ? sessionRole : (sessionUser != null ? "resident" : "agent"));
+                } else if ("agent".equals(roleParam) || "prestataire".equals(roleParam)) {
+                    role = roleParam;
+                } else {
+                    role = sessionRole != null ? sessionRole : (sessionUser != null ? "resident" : "agent");
+                }
+            } else {
+                role = sessionRole != null ? sessionRole : (sessionUser != null ? "resident" : "agent");
+            }
 
             java.util.List<java.util.Map<String,Object>> out = new java.util.ArrayList<>();
             for (Notification n : notifications) {
-                boolean targetedToCurrent = (n.getUserId() != null && sessionUser != null && n.getUserId().equals(sessionUser));
-                if (role.equals(n.getRole()) || targetedToCurrent) {
-                    java.util.Map<String,Object> m = new java.util.HashMap<>();
-                    m.put("id", n.getId());
-                    m.put("role", n.getRole());
-                    m.put("title", n.getTitle());
-                    m.put("message", n.getText());
-                    m.put("timestamp", n.getTime());
-                    m.put("read", n.isRead());
-                    m.put("userId", n.getUserId());
-                    out.add(m);
+                if ("agent".equals(role)) {
+                    if ("agent".equals(n.getRole())) {
+                        java.util.Map<String,Object> m = new java.util.HashMap<>();
+                        m.put("id", n.getId());
+                        m.put("role", n.getRole());
+                        m.put("title", n.getTitle());
+                        m.put("message", n.getText());
+                        m.put("timestamp", n.getTime());
+                        m.put("read", n.isRead());
+                        m.put("userId", n.getUserId());
+                        out.add(m);
+                    }
+                } else if ("resident".equals(role)) {
+                    if ("resident".equals(n.getRole()) && n.getUserId() != null && sessionUser != null && sessionUser.equals(n.getUserId())) {
+                        java.util.Map<String,Object> m = new java.util.HashMap<>();
+                        m.put("id", n.getId());
+                        m.put("role", n.getRole());
+                        m.put("title", n.getTitle());
+                        m.put("message", n.getText());
+                        m.put("timestamp", n.getTime());
+                        m.put("read", n.isRead());
+                        m.put("userId", n.getUserId());
+                        out.add(m);
+                    }
+                } else if ("prestataire".equals(role)) {
+                    if (n.getRole() != null && "prestataire".equals(n.getRole())) {
+                        java.util.Map<String,Object> m = new java.util.HashMap<>();
+                        m.put("id", n.getId());
+                        m.put("role", n.getRole());
+                        m.put("title", n.getTitle());
+                        m.put("message", n.getText());
+                        m.put("timestamp", n.getTime());
+                        m.put("read", n.isRead());
+                        m.put("userId", n.getUserId());
+                        out.add(m);
+                    }
                 }
             }
             ctx.json(out);
