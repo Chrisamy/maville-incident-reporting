@@ -5,15 +5,15 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AgentDemandFormHandlerTest {
+public class AgentPrestataireInteractionsTest {
 
     //Test qui vérifie que le statut de la demande est bien mis à approved après la validation de celle-ci
 
     @Test
     public void acceptDemandSetsStatusToApproved() {
-        AgentDemandFormHandler handler = new AgentDemandFormHandler();
-        ArrayList<DemandForm> demandList = new ArrayList<>();
-        DemandForm demand = new DemandForm("titre", EnumWorkType.RoadWork, "chez moi", "demande de projet pour problème x", "12 novembre 2025",
+        AgentPrestataireInteractions handler = new AgentPrestataireInteractions();
+        ArrayList<PrestataireForm> demandList = new ArrayList<>();
+        PrestataireForm demand = new PrestataireForm("titre", EnumWorkType.RoadWork, "chez moi", "demande de projet pour problème x", "12 novembre 2025",
                 "7 février 2026", 56789.67);
         demandList.add(demand);
         handler.AcceptDemand(demandList, demand.getId());
@@ -25,9 +25,9 @@ public class AgentDemandFormHandlerTest {
 
     @Test
     public void rejectDemandSetsStatusToRejected() {
-        AgentDemandFormHandler handler = new AgentDemandFormHandler();
-        ArrayList<DemandForm> demandList = new ArrayList<>();
-        DemandForm demand = new DemandForm("titre", EnumWorkType.RoadWork, "quelque part", "demande de projet pour problème x", "14 septembre 2025",
+        AgentPrestataireInteractions handler = new AgentPrestataireInteractions();
+        ArrayList<PrestataireForm> demandList = new ArrayList<>();
+        PrestataireForm demand = new PrestataireForm("titre", EnumWorkType.RoadWork, "quelque part", "demande de projet pour problème x", "14 septembre 2025",
                 "12 mars 2026", 39021.15);
         demandList.add(demand);
         handler.RejectDemand(demandList, demand.getId());
@@ -39,9 +39,9 @@ public class AgentDemandFormHandlerTest {
 
     @Test
     void acceptDemandSendsCorrectMessage() {
-        AgentDemandFormHandler handler = new AgentDemandFormHandler();
-        ArrayList<DemandForm> demandList = new ArrayList<>();
-        DemandForm demand = new DemandForm("titre", EnumWorkType.RoadWork, "chez moi", "demande de projet pour problème x", "12 novembre 2025",
+        AgentPrestataireInteractions handler = new AgentPrestataireInteractions();
+        ArrayList<PrestataireForm> demandList = new ArrayList<>();
+        PrestataireForm demand = new PrestataireForm("titre", EnumWorkType.RoadWork, "chez moi", "demande de projet pour problème x", "12 novembre 2025",
                 "7 février 2026", 56789.67);
         demandList.add(demand);
 
@@ -60,9 +60,9 @@ public class AgentDemandFormHandlerTest {
 
     @Test
     void rejectDemandSendsCorrectMessage() {
-        AgentDemandFormHandler handler = new AgentDemandFormHandler();
-        ArrayList<DemandForm> demandList = new ArrayList<>();
-        DemandForm demand = new DemandForm("titre", EnumWorkType.RoadWork, "quelque part", "demande de projet pour problème x", "14 septembre 2025",
+        AgentPrestataireInteractions handler = new AgentPrestataireInteractions();
+        ArrayList<PrestataireForm> demandList = new ArrayList<>();
+        PrestataireForm demand = new PrestataireForm("titre", EnumWorkType.RoadWork, "quelque part", "demande de projet pour problème x", "14 septembre 2025",
                 "12 mars 2026", 39021.15);
         demandList.add(demand);
 

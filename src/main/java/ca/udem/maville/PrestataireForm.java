@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true) //to ignore the _id property
-public class DemandForm {
+public class PrestataireForm {
     @JsonIgnore
 
     private String id;
@@ -18,8 +18,8 @@ public class DemandForm {
     private double costEstimate;
     private EnumStatus status;
 
-    public DemandForm(String projectTitle, EnumWorkType workType, String location, String description, String startDate,
-                      String endDate, double costEstimate) {
+    public PrestataireForm(String projectTitle, EnumWorkType workType, String location, String description, String startDate,
+                           String endDate, double costEstimate) {
         this.id = IdGenerator.generateID();
         this.projectTitle = projectTitle;
         this.workType = workType;

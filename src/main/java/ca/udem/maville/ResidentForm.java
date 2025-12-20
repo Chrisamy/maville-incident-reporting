@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true) //to ignore the _id property
-public class ProblemForm {
+public class ResidentForm {
     private final String id;
     private EnumWorkType workType;
     private String location;
@@ -17,21 +17,21 @@ public class ProblemForm {
     private long date; // submission timestamp (server-side)
 
     //constructor for JSON deserialization
-    public ProblemForm() {
+    public ResidentForm() {
         this.id = IdGenerator.generateID();
         this.workType = EnumWorkType.notDefined;
         this.priority = EnumPriority.notAssigned;
         this.status = EnumStatus.waitingForApproval;
     }
 
-    public ProblemForm(String location, String username, String description) {
+    public ResidentForm(String location, String username, String description) {
         this();
         this.location = location;
         this.username = username;
         this.description = description;
     }
 
-    public ProblemForm(String id, EnumWorkType workType, EnumBoroughID boroughId, EnumPriority priority, String description , EnumStatus status, String username) {
+    public ResidentForm(String id, EnumWorkType workType, EnumBoroughID boroughId, EnumPriority priority, String description , EnumStatus status, String username) {
         this.id = id;
         this.workType = workType;
         this.boroughId = boroughId;
@@ -106,7 +106,7 @@ public class ProblemForm {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ProblemForm that)) return false;
+        if (!(o instanceof ResidentForm that)) return false;
         return Objects.equals(id, that.id);
     }
 

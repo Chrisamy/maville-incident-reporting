@@ -8,15 +8,15 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AgentProblemFormHandlerTest {
+class AgentResidentInteractionsTest {
 
     //Test pour vérifier que les attributs du problème sont bien attribués
 
     @Test
     void acceptProblemSetsFieldsAndStatus() {
-        AgentProblemFormHandler handler = new AgentProblemFormHandler();
-        ArrayList<ProblemForm> list = new ArrayList<>();
-        ProblemForm form = new ProblemForm("123 rue OursBrun", "petit ours brun", "les abeilles sont en feu");
+        AgentResidentInteractions handler = new AgentResidentInteractions();
+        ArrayList<ResidentForm> list = new ArrayList<>();
+        ResidentForm form = new ResidentForm("123 rue OursBrun", "petit ours brun", "les abeilles sont en feu");
         list.add(form);
 
         handler.AcceptProblem(list, form.getId(), EnumWorkType.RoadWork, EnumPriority.high);
@@ -30,9 +30,9 @@ class AgentProblemFormHandlerTest {
 
     @Test
     void rejectProblemSetsStatus() {
-        AgentProblemFormHandler handler = new AgentProblemFormHandler();
-        ArrayList<ProblemForm> list = new ArrayList<>();
-        ProblemForm form = new ProblemForm("45 rue tkt", "gars mystérieux", "y'a un trou dans ma toile de piscine");
+        AgentResidentInteractions handler = new AgentResidentInteractions();
+        ArrayList<ResidentForm> list = new ArrayList<>();
+        ResidentForm form = new ResidentForm("45 rue tkt", "gars mystérieux", "y'a un trou dans ma toile de piscine");
         list.add(form);
 
         handler.RefuseProblem(list, form.getId());
@@ -43,9 +43,9 @@ class AgentProblemFormHandlerTest {
 
     @Test
     void refuseProblemSendsCorrectMessage() {
-        AgentProblemFormHandler handler = new AgentProblemFormHandler();
-        ArrayList<ProblemForm> list = new ArrayList<>();
-        ProblemForm p = new ProblemForm("loc", "username", "desc");
+        AgentResidentInteractions handler = new AgentResidentInteractions();
+        ArrayList<ResidentForm> list = new ArrayList<>();
+        ResidentForm p = new ResidentForm("loc", "username", "desc");
         list.add(p);
 
         try (MockedStatic<Server> serverMock = Mockito.mockStatic(Server.class)) {
@@ -63,9 +63,9 @@ class AgentProblemFormHandlerTest {
 
     @Test
     void acceptProblemSendsCorrectMessage() {
-        AgentProblemFormHandler handler = new AgentProblemFormHandler();
-        ArrayList<ProblemForm> list = new ArrayList<>();
-        ProblemForm p = new ProblemForm("loc", "username", "desc");
+        AgentResidentInteractions handler = new AgentResidentInteractions();
+        ArrayList<ResidentForm> list = new ArrayList<>();
+        ResidentForm p = new ResidentForm("loc", "username", "desc");
         list.add(p);
 
         try (MockedStatic<Server> serverMock = Mockito.mockStatic(Server.class)) {

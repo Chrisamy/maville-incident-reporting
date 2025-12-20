@@ -8,7 +8,7 @@ public class Resident extends User{
 
     //Méthode pour soumettre un formulaire
 
-    public void submitForm(ProblemForm form){
+    public void submitForm(ResidentForm form){
         ProblemRepository.addForm(form);
         Server.sendMessageToUI("Probleme Soumis!");
     }

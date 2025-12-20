@@ -27,9 +27,9 @@ public class Server {
     private static final List<String> messageQueue = new ArrayList<>();
 
     public static ProblemRepository problemList = ProblemRepository.getInstance();
-    public static AgentProblemFormHandler problemFormHandler = new AgentProblemFormHandler();
+    public static AgentResidentInteractions problemFormHandler = new AgentResidentInteractions();
 
-    public static DemandRepository demandeList = DemandRepository.getInstance();
+    public static CandidatRepository demandeList = CandidatRepository.getInstance();
 
 
     static Resident currentResident;
@@ -115,25 +115,25 @@ public class Server {
             System.out.println("[SERVER] /api/resident-form-send received: address='" + addr + "' details='" + details + "'");
             System.out.println("[SERVER] currentResident object: " + (currentResident == null ? "null" : currentResident.getUsername()));
 
-            ProblemForm problemForm = new ProblemForm(addr, currentResident == null ? "anonymous" : currentResident.getUsername(), details);
+            ResidentForm residentForm = new ResidentForm(addr, currentResident == null ? "anonymous" : currentResident.getUsername(), details);
             // read arrondissement from form param 'borough' if present and set enum
             String boroughParam = ctx.formParam("borough");
             if (boroughParam != null && !boroughParam.isEmpty()) {
                 try {
-                    problemForm.setBoroughId(EnumBoroughID.valueOf(boroughParam));
+                    residentForm.setBoroughId(EnumBoroughID.valueOf(boroughParam));
                 } catch (Exception e) {
                     System.err.println("Invalid borough parameter: " + boroughParam);
                 }
             }
             // set server-side submission timestamp
-            problemForm.setDate(System.currentTimeMillis());
+            residentForm.setDate(System.currentTimeMillis());
 
-            System.out.println("[SERVER] created ProblemForm: " + problemForm);
+            System.out.println("[SERVER] created ProblemForm: " + residentForm);
             // add to repository (resident association if available)
             if (currentResident != null) {
-                currentResident.submitForm(problemForm);
+                currentResident.submitForm(residentForm);
             } else {
-                ProblemRepository.addForm(problemForm);
+                ProblemRepository.addForm(residentForm);
                 System.out.println("[SERVER] No current resident; form saved in repository without association.");
             }
 
@@ -141,11 +141,11 @@ public class Server {
             // FIX: load existing problems.json, append the new form, then write merged list.
             try {
                 ObjectMapper problemsMapper = new ObjectMapper();
-                java.util.List<ProblemForm> merged = new java.util.ArrayList<>();
+                java.util.List<ResidentForm> merged = new java.util.ArrayList<>();
                 File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
                 try {
                     if (problemsFileSrc.exists()) {
-                        java.util.List<ProblemForm> loaded = problemsMapper.readValue(problemsFileSrc, new com.fasterxml.jackson.core.type.TypeReference<java.util.ArrayList<ProblemForm>>(){});
+                        java.util.List<ResidentForm> loaded = problemsMapper.readValue(problemsFileSrc, new com.fasterxml.jackson.core.type.TypeReference<java.util.ArrayList<ResidentForm>>(){});
                         if (loaded != null) merged.addAll(loaded);
                     }
                 } catch (Exception e) {
@@ -153,7 +153,7 @@ public class Server {
                 }
 
                 // append the new submission
-                merged.add(problemForm);
+                merged.add(residentForm);
 
                 // write merged list back to src file (and target copies)
                 File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc != null && !dirSrc.exists()) dirSrc.mkdirs();
@@ -180,7 +180,7 @@ public class Server {
             } catch (Exception e) { /* ignore notification errors */ }
 
             // return created form for client if needed
-            ctx.json(problemForm);
+            ctx.json(residentForm);
         });
 
         /**=============================================================================================================
@@ -199,8 +199,8 @@ public class Server {
              problemFormHandler.RefuseProblem(problemList.getFormList(), formId);
              // Notify resident about refusal
              try {
-                 ProblemForm f = null;
-                 for (ProblemForm p : problemList.getFormList()) if (p.getId().equals(formId)) { f = p; break; }
+                 ResidentForm f = null;
+                 for (ResidentForm p : problemList.getFormList()) if (p.getId().equals(formId)) { f = p; break; }
                 // apply parsed enums to in-memory object so persistence will include them
                 if (f != null) { f.setWorkType(parsedWorkType); f.setPriority(parsedPriority); }
                 System.out.println("[SERVER] agent-refuse: formId=" + formId + " parsedWorkType=" + parsedWorkType + " parsedPriority=" + parsedPriority + " in-memory f=" + f);
@@ -243,9 +243,9 @@ public class Server {
                      if (!updatedOnDisk) {
                         // if not found on disk, ensure in-memory list is written (append if needed)
                         // but do not remove existing entries
-                        java.util.List<ProblemForm> mem = problemList.getFormList();
+                        java.util.List<ResidentForm> mem = problemList.getFormList();
                         // ensure diskList contains mem items by id to avoid duplicates
-                        for (ProblemForm pf : mem) {
+                        for (ResidentForm pf : mem) {
                             boolean found = false;
                             for (java.util.Map<String,Object> m : diskList) {
                                 if (pf.getId().equals(String.valueOf(m.get("id")))) { found = true; break; }
@@ -278,14 +278,14 @@ public class Server {
                      try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, diskList); } catch (Exception ignore) {}
 
                    // also update in-memory copy if present
-                   for (ProblemForm p : problemList.getFormList()) {
+                   for (ResidentForm p : problemList.getFormList()) {
                        if (p.getId().equals(formId)) { p.setStatus(EnumStatus.rejected); break; }
                    }
                } catch (Exception e) { System.err.println("Failed to persist problems.json after refuse: " + e.getMessage()); }
                 // persist the full in-memory problems list so priority/workType changes persist
                 try {
                     ObjectMapper problemsMapper = new ObjectMapper();
-                    java.util.List<ProblemForm> full = problemList.getFormList();
+                    java.util.List<ResidentForm> full = problemList.getFormList();
                     File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
                     File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
                     problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, full);
@@ -319,13 +319,13 @@ public class Server {
 
             problemFormHandler.AcceptProblem(problemList.getFormList(), formId, newWorkType, newPriority);
              // Ensure in-memory object reflects parsed values (defensive in case handler missed it)
-             for (ProblemForm p : problemList.getFormList()) {
+             for (ResidentForm p : problemList.getFormList()) {
                  if (p.getId().equals(formId)) { p.setWorkType(newWorkType); p.setPriority(newPriority); break; }
              }
              // Notify resident about approval and persist
              try {
-                 ProblemForm f = null;
-                 for (ProblemForm p : problemList.getFormList()) if (p.getId().equals(formId)) { f = p; break; }
+                 ResidentForm f = null;
+                 for (ResidentForm p : problemList.getFormList()) if (p.getId().equals(formId)) { f = p; break; }
                 System.out.println("[SERVER] after AcceptProblem, found form f=" + f);
                  if (f != null && f.getUsername() != null) {
                      Notification notif = new Notification("resident", "Demande approuvée", "Votre demande a été approuvée par un agent.");
@@ -361,8 +361,8 @@ public class Server {
                          }
                      }
                      if (!updatedOnDisk) {
-                        java.util.List<ProblemForm> mem = problemList.getFormList();
-                        for (ProblemForm pf : mem) {
+                        java.util.List<ResidentForm> mem = problemList.getFormList();
+                        for (ResidentForm pf : mem) {
                             boolean found = false;
                             for (java.util.Map<String,Object> m : diskList) {
                                 if (pf.getId().equals(String.valueOf(m.get("id")))) { found = true; break; }
@@ -391,14 +391,14 @@ public class Server {
                      File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
                      try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, diskList); } catch (Exception ignore) {}
 
-                   for (ProblemForm p : problemList.getFormList()) {
+                   for (ResidentForm p : problemList.getFormList()) {
                        if (p.getId().equals(formId)) { p.setStatus(EnumStatus.approved); break; }
                    }
                 } catch (Exception e) { System.err.println("Failed to persist problems.json after accept: " + e.getMessage()); }
                 // persist the full in-memory problems list so priority/workType changes persist
                 try {
                     ObjectMapper problemsMapper = new ObjectMapper();
-                    java.util.List<ProblemForm> full = problemList.getFormList();
+                    java.util.List<ResidentForm> full = problemList.getFormList();
                     File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
                     File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
                     problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, full);
@@ -429,7 +429,7 @@ public class Server {
             try { if (priorityParam != null && !priorityParam.isEmpty()) parsedPriority = EnumPriority.valueOf(priorityParam); } catch (Exception ignored) {}
              // set problem status to onHold via handler
              problemFormHandler.RefuseProblem(problemList.getFormList(), formId); // reuse refuse to set status? keep consistent
-             for (ProblemForm p : problemList.getFormList()) {
+             for (ResidentForm p : problemList.getFormList()) {
                  if (p.getId().equals(formId)) {
                      p.setStatus(EnumStatus.onHold);
                      p.setWorkType(parsedWorkType);
@@ -439,8 +439,8 @@ public class Server {
              }
              // Notify resident about requested modification
              try {
-                 ProblemForm f = null;
-                 for (ProblemForm p : problemList.getFormList()) if (p.getId().equals(formId)) { f = p; break; }
+                 ResidentForm f = null;
+                 for (ResidentForm p : problemList.getFormList()) if (p.getId().equals(formId)) { f = p; break; }
                  if (f != null && f.getUsername() != null) {
                      Notification notif = new Notification("resident", "Modification demandée", (message != null && !message.isEmpty()) ? ("Un agent a demandé : " + message) : "Un agent a demandé des modifications à votre demande.");
                      notif.setRole("resident");
@@ -477,8 +477,8 @@ public class Server {
                          }
                      }
                      if (!updatedOnDisk) {
-                        java.util.List<ProblemForm> mem = problemList.getFormList();
-                        for (ProblemForm pf : mem) {
+                        java.util.List<ResidentForm> mem = problemList.getFormList();
+                        for (ResidentForm pf : mem) {
                             boolean found = false;
                             for (java.util.Map<String,Object> m : diskList) {
                                 if (pf.getId().equals(String.valueOf(m.get("id")))) { found = true; break; }
@@ -508,14 +508,14 @@ public class Server {
                      File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
                      try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, diskList); } catch (Exception ignore) {}
 
-                   for (ProblemForm p : problemList.getFormList()) {
+                   for (ResidentForm p : problemList.getFormList()) {
                        if (p.getId().equals(formId)) { p.setStatus(EnumStatus.onHold); break; }
                    }
                 } catch (Exception e) { System.err.println("Failed to persist problems.json after request-modification: " + e.getMessage()); }
                  // persist the full in-memory problems list so priority/workType changes persist
                  try {
                      ObjectMapper problemsMapper = new ObjectMapper();
-                     java.util.List<ProblemForm> full = problemList.getFormList();
+                     java.util.List<ResidentForm> full = problemList.getFormList();
                      File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
                      File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
                      problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, full);
@@ -529,7 +529,7 @@ public class Server {
 
                  Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("newStatus", "onHold");
                  // include priority if available
-                 ProblemForm ff = null; for (ProblemForm pp : problemList.getFormList()) if (pp.getId().equals(formId)) { ff = pp; break; }
+                 ResidentForm ff = null; for (ResidentForm pp : problemList.getFormList()) if (pp.getId().equals(formId)) { ff = pp; break; }
                  if (ff != null) out.put("newPriority", ff.getPriority() == null ? EnumPriority.notAssigned.name() : ff.getPriority().name());
                  ctx.json(out);
               } catch (Exception e) { /* ignore notification errors */ ctx.status(500); }
@@ -537,8 +537,8 @@ public class Server {
 
         ObjectMapper mapper = new ObjectMapper();
         // a seemingly complicated way to create the placeholders of problems from our json using jackson
-        problemList.getFormList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/problems.json"), new TypeReference<ArrayList<ProblemForm>>() {}));
-        demandeList.getDemandList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/demands.json"), new TypeReference<ArrayList<DemandForm>>() {}));
+        problemList.getFormList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/problems.json"), new TypeReference<ArrayList<ResidentForm>>() {}));
+        demandeList.getDemandList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/demands.json"), new TypeReference<ArrayList<PrestataireForm>>() {}));
 
 
     }

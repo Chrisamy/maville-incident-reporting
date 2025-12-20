@@ -26,7 +26,7 @@ class RepositoryTest {
 
     @Test
     void testInstanceOfDemandRepoNotNull() {
-        DemandRepository repo = DemandRepository.getInstance();
+        CandidatRepository repo = CandidatRepository.getInstance();
         assertNotNull(repo);
     }
 
@@ -34,7 +34,7 @@ class RepositoryTest {
 
     @Test
     void getDemandListReturnsList() {
-        DemandRepository repo = DemandRepository.getInstance();
+        CandidatRepository repo = CandidatRepository.getInstance();
         assertNotNull(repo.getDemandList());
     }
 }
