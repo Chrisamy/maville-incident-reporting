@@ -137,39 +137,11 @@ public class Server {
                 System.out.println("[SERVER] No current resident; form saved in repository without association.");
             }
 
-            // Persist problems list so the agent page (which can read JSON) sees the new submission.
-            // FIX: load existing problems.json, append the new form, then write merged list.
+            // Persist the new submission safely by merging with disk to avoid deleting older entries.
             try {
-                ObjectMapper problemsMapper = new ObjectMapper();
-                java.util.List<ResidentForm> merged = new java.util.ArrayList<>();
-                File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
-                try {
-                    if (problemsFileSrc.exists()) {
-                        java.util.List<ResidentForm> loaded = problemsMapper.readValue(problemsFileSrc, new com.fasterxml.jackson.core.type.TypeReference<java.util.ArrayList<ResidentForm>>(){});
-                        if (loaded != null) merged.addAll(loaded);
-                    }
-                } catch (Exception e) {
-                    System.err.println("Warning: failed to read existing problems.json (will append anyway): " + e.getMessage());
-                }
-
-                // append the new submission
-                merged.add(residentForm);
-
-                // write merged list back to src file (and target copies)
-                File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc != null && !dirSrc.exists()) dirSrc.mkdirs();
-                problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, merged);
-
-                File problemsFileTarget = new File("target/public/JSON_files/problems.json");
-                File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
-                try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, merged); } catch (Exception ignore) {}
-
-                File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
-                File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
-                try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, merged); } catch (Exception ignore) {}
-
+                saveProblemsSafely(java.util.Collections.singletonList(residentForm));
             } catch (Exception e) {
-                // Log but don't fail the request — submission stays in-memory.
-                System.err.println("Failed to persist problems.json: " + e.getMessage());
+                System.err.println("Failed to persist problems.json (safe save): " + e.getMessage());
             }
 
             // Notify agent when resident submits a request
@@ -182,10 +154,6 @@ public class Server {
             // return created form for client if needed
             ctx.json(residentForm);
         });
-
-        /**=============================================================================================================
-         API MANIPULATION FOR THE AGENT
-         =============================================================================================================*/
 
         app.post("/api/agent-refuse-problem", ctx -> {
 
@@ -212,90 +180,11 @@ public class Server {
                      notifications.add(notif);
                      saveNotifications();
                  }
-
-                 // persist updated problems list so agent JSON source sees the change
-                 try {
-                     // Robust update: load on-disk problems.json, update the matching item status, and write full list back
-                     ObjectMapper problemsMapper = new ObjectMapper();
-                     File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
-                     java.util.List<java.util.Map<String,Object>> diskList = new java.util.ArrayList<>();
-                     if (problemsFileSrc.exists()) {
-                         try {
-                             diskList = problemsMapper.readValue(problemsFileSrc, new TypeReference<java.util.ArrayList<java.util.Map<String,Object>>>(){});
-                         } catch (Exception readEx) {
-                             System.err.println("Warning: failed to read problems.json for refuse update: " + readEx.getMessage());
-                             // fallback: continue and write in-memory list
-                         }
-                     }
-                     boolean updatedOnDisk = false;
-                     for (java.util.Map<String,Object> m : diskList) {
-                         Object idObj = m.get("id");
-                         if (idObj != null && formId.equals(String.valueOf(idObj))) {
-                             m.put("status", EnumStatus.rejected.name());
-                            // persist priority/workType tokens if present
-                            if (f != null && f.getPriority() != null) m.put("priority", f.getPriority().name());
-                            if (f != null && f.getWorkType() != null) m.put("workType", f.getWorkType().name());
-                             m.put("decisionDate", System.currentTimeMillis());
-                             updatedOnDisk = true;
-                             break;
-                         }
-                     }
-                     if (!updatedOnDisk) {
-                        // if not found on disk, ensure in-memory list is written (append if needed)
-                        // but do not remove existing entries
-                        java.util.List<ResidentForm> mem = problemList.getFormList();
-                        // ensure diskList contains mem items by id to avoid duplicates
-                        for (ResidentForm pf : mem) {
-                            boolean found = false;
-                            for (java.util.Map<String,Object> m : diskList) {
-                                if (pf.getId().equals(String.valueOf(m.get("id")))) { found = true; break; }
-                            }
-                            if (!found) {
-                                // convert pf to Map via mapper
-                                java.util.Map<String,Object> conv = problemsMapper.convertValue(pf, new TypeReference<java.util.Map<String,Object>>(){});
-                                diskList.add(conv);
-                            }
-                        }
-                        // update the matching mem entry if present
-                        for (java.util.Map<String,Object> m : diskList) {
-                            if (formId.equals(String.valueOf(m.get("id")))) {
-                                m.put("status", EnumStatus.rejected.name());
-                                if (f != null && f.getPriority() != null) m.put("priority", f.getPriority().name());
-                                if (f != null && f.getWorkType() != null) m.put("workType", f.getWorkType().name());
-                                m.put("decisionDate", System.currentTimeMillis());
-                                break;
-                            }
-                        }
-                     }
-                     // write back full diskList
-                     File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
-                     problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, diskList);
-                     File problemsFileTarget = new File("target/public/JSON_files/problems.json");
-                     File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
-                     try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, diskList); } catch (Exception ignore) {}
-                     File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
-                     File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
-                     try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, diskList); } catch (Exception ignore) {}
-
-                   // also update in-memory copy if present
-                   for (ResidentForm p : problemList.getFormList()) {
-                       if (p.getId().equals(formId)) { p.setStatus(EnumStatus.rejected); break; }
-                   }
-               } catch (Exception e) { System.err.println("Failed to persist problems.json after refuse: " + e.getMessage()); }
-                // persist the full in-memory problems list so priority/workType changes persist
+                // persist the specific updated form and merge with disk so older entries are preserved
                 try {
-                    ObjectMapper problemsMapper = new ObjectMapper();
-                    java.util.List<ResidentForm> full = problemList.getFormList();
-                    File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
-                    File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
-                    problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, full);
-                    File problemsFileTarget = new File("target/public/JSON_files/problems.json");
-                    File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
-                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, full); } catch (Exception ignore) {}
-                    File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
-                    File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
-                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, full); } catch (Exception ignore) {}
-                } catch (Exception e) { System.err.println("Failed to persist problems.json after refuse: " + e.getMessage()); }
+                    if (f != null) saveProblemsSafely(java.util.Collections.singletonList(f));
+                    else saveProblemsSafely(problemList.getFormList());
+                } catch (Exception e) { System.err.println("Failed to persist problems.json after refuse (safe): " + e.getMessage()); }
 
                 Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("newStatus", (f==null?"rejected":f.getStatus().name()));
                 if (f != null) out.put("newPriority", f.getPriority() == null ? EnumPriority.notAssigned.name() : f.getPriority().name());
@@ -335,85 +224,15 @@ public class Server {
                      saveNotifications();
                  }
 
-                 // persist updated problems list so agent JSON source sees the change
-                 try {
-                     ObjectMapper problemsMapper = new ObjectMapper();
-                     File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
-                     java.util.List<java.util.Map<String,Object>> diskList = new java.util.ArrayList<>();
-                     if (problemsFileSrc.exists()) {
-                         try {
-                             diskList = problemsMapper.readValue(problemsFileSrc, new TypeReference<java.util.ArrayList<java.util.Map<String,Object>>>(){});
-                         } catch (Exception readEx) {
-                             System.err.println("Warning: failed to read problems.json for accept update: " + readEx.getMessage());
-                         }
-                     }
-                     boolean updatedOnDisk = false;
-                     for (java.util.Map<String,Object> m : diskList) {
-                         Object idObj = m.get("id");
-                         if (idObj != null && formId.equals(String.valueOf(idObj))) {
-                             m.put("status", EnumStatus.approved.name());
-                            // persist priority/workType tokens so front-end and static JSON reflect them
-                            if (f != null && f.getPriority() != null) m.put("priority", f.getPriority().name());
-                            if (f != null && f.getWorkType() != null) m.put("workType", f.getWorkType().name());
-                             m.put("decisionDate", System.currentTimeMillis());
-                             updatedOnDisk = true;
-                             break;
-                         }
-                     }
-                     if (!updatedOnDisk) {
-                        java.util.List<ResidentForm> mem = problemList.getFormList();
-                        for (ResidentForm pf : mem) {
-                            boolean found = false;
-                            for (java.util.Map<String,Object> m : diskList) {
-                                if (pf.getId().equals(String.valueOf(m.get("id")))) { found = true; break; }
-                            }
-                            if (!found) {
-                                java.util.Map<String,Object> conv = problemsMapper.convertValue(pf, new TypeReference<java.util.Map<String,Object>>(){});
-                                diskList.add(conv);
-                            }
-                        }
-                        for (java.util.Map<String,Object> m : diskList) {
-                            if (formId.equals(String.valueOf(m.get("id")))) {
-                                m.put("status", EnumStatus.approved.name());
-                                if (f != null && f.getPriority() != null) m.put("priority", f.getPriority().name());
-                                if (f != null && f.getWorkType() != null) m.put("workType", f.getWorkType().name());
-                                m.put("decisionDate", System.currentTimeMillis());
-                                break;
-                            }
-                        }
-                     }
-                     File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
-                     problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, diskList);
-                     File problemsFileTarget = new File("target/public/JSON_files/problems.json");
-                     File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
-                     try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, diskList); } catch (Exception ignore) {}
-                     File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
-                     File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
-                     try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, diskList); } catch (Exception ignore) {}
-
-                   for (ResidentForm p : problemList.getFormList()) {
-                       if (p.getId().equals(formId)) { p.setStatus(EnumStatus.approved); break; }
-                   }
-                } catch (Exception e) { System.err.println("Failed to persist problems.json after accept: " + e.getMessage()); }
-                // persist the full in-memory problems list so priority/workType changes persist
+                 // persist the changed problems safely (merge with disk)
                 try {
-                    ObjectMapper problemsMapper = new ObjectMapper();
-                    java.util.List<ResidentForm> full = problemList.getFormList();
-                    File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
-                    File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
-                    problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, full);
-                    File problemsFileTarget = new File("target/public/JSON_files/problems.json");
-                    File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
-                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, full); } catch (Exception ignore) {}
-                    File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
-                    File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
-                    try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, full); } catch (Exception ignore) {}
-                } catch (Exception e) { System.err.println("Failed to persist problems.json after accept: " + e.getMessage()); }
+                    saveProblemsSafely(problemList.getFormList());
+                } catch (Exception e) { System.err.println("Failed to persist problems.json after accept (safe): " + e.getMessage()); }
 
-                Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("newStatus", (f==null?"approved":f.getStatus().name()));
-                if (f != null) out.put("newPriority", f.getPriority() == null ? EnumPriority.notAssigned.name() : f.getPriority().name());
-                ctx.json(out);
-            } catch (Exception e) { /* ignore notification errors */ ctx.status(500); }
+                 Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("newStatus", (f==null?"approved":f.getStatus().name()));
+                 if (f != null) out.put("newPriority", f.getPriority() == null ? EnumPriority.notAssigned.name() : f.getPriority().name());
+                 ctx.json(out);
+             } catch (Exception e) { /* ignore notification errors */ ctx.status(500); }
          });
 
          // Agent requests modification for a problem
@@ -449,83 +268,9 @@ public class Server {
                      saveNotifications();
                  }
 
-                 // persist updated problems list so agent JSON source sees the change
-                 try {
-                     System.out.println("[SERVER] agent-request-modification: formId=" + formId + " parsedWorkType=" + parsedWorkType + " parsedPriority=" + parsedPriority + " f=" + f);
-                     ObjectMapper problemsMapper = new ObjectMapper();
-                     File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
-                     java.util.List<java.util.Map<String,Object>> diskList = new java.util.ArrayList<>();
-                     if (problemsFileSrc.exists()) {
-                         try {
-                             diskList = problemsMapper.readValue(problemsFileSrc, new TypeReference<java.util.ArrayList<java.util.Map<String,Object>>>(){});
-                         } catch (Exception readEx) {
-                             System.err.println("Warning: failed to read problems.json for modify update: " + readEx.getMessage());
-                         }
-                     }
-                     boolean updatedOnDisk = false;
-                     for (java.util.Map<String,Object> m : diskList) {
-                         Object idObj = m.get("id");
-                         if (idObj != null && formId.equals(String.valueOf(idObj))) {
-                             m.put("status", "onHold");
-                            System.out.println("[SERVER] updating disk entry id=" + idObj + " setting priority/workType from f");
-                            // persist priority/workType tokens if present on the in-memory object
-                            if (f != null && f.getPriority() != null) m.put("priority", f.getPriority().name());
-                            if (f != null && f.getWorkType() != null) m.put("workType", f.getWorkType().name());
-                            m.put("decisionDate", System.currentTimeMillis());
-                            updatedOnDisk = true;
-                            break;
-                         }
-                     }
-                     if (!updatedOnDisk) {
-                        java.util.List<ResidentForm> mem = problemList.getFormList();
-                        for (ResidentForm pf : mem) {
-                            boolean found = false;
-                            for (java.util.Map<String,Object> m : diskList) {
-                                if (pf.getId().equals(String.valueOf(m.get("id")))) { found = true; break; }
-                            }
-                            if (!found) {
-                                java.util.Map<String,Object> conv = problemsMapper.convertValue(pf, new TypeReference<java.util.Map<String,Object>>(){});
-                                diskList.add(conv);
-                            }
-                        }
-                        for (java.util.Map<String,Object> m : diskList) {
-                            if (formId.equals(String.valueOf(m.get("id")))) {
-                                m.put("status", "onHold");
-                                // also persist priority/workType if available
-                                if (f != null && f.getPriority() != null) m.put("priority", f.getPriority().name());
-                                if (f != null && f.getWorkType() != null) m.put("workType", f.getWorkType().name());
-                                m.put("decisionDate", System.currentTimeMillis());
-                                break;
-                            }
-                        }
-                     }
-                     File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
-                     problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, diskList);
-                     File problemsFileTarget = new File("target/public/JSON_files/problems.json");
-                     File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
-                     try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, diskList); } catch (Exception ignore) {}
-                     File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
-                     File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
-                     try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, diskList); } catch (Exception ignore) {}
-
-                   for (ResidentForm p : problemList.getFormList()) {
-                       if (p.getId().equals(formId)) { p.setStatus(EnumStatus.onHold); break; }
-                   }
-                } catch (Exception e) { System.err.println("Failed to persist problems.json after request-modification: " + e.getMessage()); }
-                 // persist the full in-memory problems list so priority/workType changes persist
-                 try {
-                     ObjectMapper problemsMapper = new ObjectMapper();
-                     java.util.List<ResidentForm> full = problemList.getFormList();
-                     File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
-                     File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc!=null && !dirSrc.exists()) dirSrc.mkdirs();
-                     problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, full);
-                     File problemsFileTarget = new File("target/public/JSON_files/problems.json");
-                     File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
-                     try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, full); } catch (Exception ignore) {}
-                     File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
-                     File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
-                     try { problemsMapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, full); } catch (Exception ignore) {}
-                 } catch (Exception e) { System.err.println("Failed to persist problems.json after request-modification: " + e.getMessage()); }
+                try {
+                    saveProblemsSafely(problemList.getFormList());
+                } catch (Exception e) { System.err.println("Failed to persist problems.json after request-modification (safe): " + e.getMessage()); }
 
                  Map<String,Object> out = new HashMap<>(); out.put("success", true); out.put("newStatus", "onHold");
                  // include priority if available
@@ -602,7 +347,55 @@ public class Server {
         messageQueue.add(msg);
     }
 
-    public void showList(){
+        public void showList(){
 
-    }}
+        }
 
+        // --- helper methods for safe persistence of problems.json ---
+
+        /**
+         * Loads the list of ResidentForm from disk, or returns an empty list if not found or error.
+         */
+        public static synchronized List<ResidentForm> loadProblemsFromDisk() {
+            try {
+                File f = new File("src/main/resources/public/JSON_files/problems.json");
+                if (!f.exists()) return new ArrayList<>();
+                ObjectMapper mapper = new ObjectMapper();
+                List<ResidentForm> loaded = mapper.readValue(f, new TypeReference<List<ResidentForm>>() {});
+                return loaded != null ? loaded : new ArrayList<>();
+            } catch (Exception e) {
+                System.err.println("Failed to load problems.json: " + e.getMessage());
+                return new ArrayList<>();
+            }
+        }
+
+        /**
+         * Safely saves the given list of ResidentForm to disk, merging with any existing disk entries
+         * (by id) to avoid overwriting unrelated forms. This is synchronized to avoid concurrent writes.
+         * The merged list is written to all relevant locations.
+         */
+        public static synchronized void saveProblemsSafely(List<ResidentForm> toSave) throws IOException {
+            ObjectMapper mapper = new ObjectMapper();
+            File problemsFileSrc = new File("src/main/resources/public/JSON_files/problems.json");
+            List<ResidentForm> disk = loadProblemsFromDisk();
+            // Merge: update or add by id
+            Map<String, ResidentForm> merged = new LinkedHashMap<>();
+            for (ResidentForm f : disk) {
+                if (f != null && f.getId() != null) merged.put(f.getId(), f);
+            }
+            for (ResidentForm f : toSave) {
+                if (f != null && f.getId() != null) merged.put(f.getId(), f);
+            }
+            List<ResidentForm> mergedList = new ArrayList<>(merged.values());
+            File dirSrc = problemsFileSrc.getParentFile(); if (dirSrc != null && !dirSrc.exists()) dirSrc.mkdirs();
+            mapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileSrc, mergedList);
+
+            File problemsFileTarget = new File("target/public/JSON_files/problems.json");
+            File dirTarget = problemsFileTarget.getParentFile(); if (dirTarget!=null && !dirTarget.exists()) dirTarget.mkdirs();
+            try { mapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTarget, mergedList); } catch (Exception ignore) {}
+
+            File problemsFileTargetClasses = new File("target/classes/public/JSON_files/problems.json");
+            File dirTargetClasses = problemsFileTargetClasses.getParentFile(); if (dirTargetClasses!=null && !dirTargetClasses.exists()) dirTargetClasses.mkdirs();
+            try { mapper.writerWithDefaultPrettyPrinter().writeValue(problemsFileTargetClasses, mergedList); } catch (Exception ignore) {}
+        }
+    }
