@@ -4,15 +4,15 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PrestataireDemandHandlerTest {
+public class PrestataireFormModifierTest {
 
     //Test qui vérifie qu'une date de départ d'un projet est bien modifiée
 
     @Test
     public void changeStartDateTest() {
-        PrestataireDemandHandler handler = new PrestataireDemandHandler();
-        ArrayList<DemandForm> DemandList = new ArrayList<>();
-        DemandForm demand = new DemandForm("titre", EnumWorkType.RoadWork, "quelque part",
+        PrestataireFormModifier handler = new PrestataireFormModifier();
+        ArrayList<PrestataireForm> DemandList = new ArrayList<>();
+        PrestataireForm demand = new PrestataireForm("titre", EnumWorkType.RoadWork, "quelque part",
                 "demande de projet pour problème x", "14 septembre 2025", "12 mars 2026",
                 39021.15);
         DemandList.add(demand);
@@ -24,9 +24,9 @@ public class PrestataireDemandHandlerTest {
 
     @Test
     public void changeEndDateTest() {
-        PrestataireDemandHandler handler = new PrestataireDemandHandler();
-        ArrayList<DemandForm> DemandList = new ArrayList<>();
-        DemandForm demand = new DemandForm("titre", EnumWorkType.RoadWork, "quelque part",
+        PrestataireFormModifier handler = new PrestataireFormModifier();
+        ArrayList<PrestataireForm> DemandList = new ArrayList<>();
+        PrestataireForm demand = new PrestataireForm("titre", EnumWorkType.RoadWork, "quelque part",
                 "demande de projet pour problème x", "14 septembre 2025", "12 mars 2026",
                 39021.15);
         DemandList.add(demand);
@@ -38,9 +38,9 @@ public class PrestataireDemandHandlerTest {
 
     @Test
     public void changeStatusTest() {
-        PrestataireDemandHandler handler = new PrestataireDemandHandler();
-        ArrayList<DemandForm> DemandList = new ArrayList<>();
-        DemandForm demand = new DemandForm("titre", EnumWorkType.RoadWork, "quelque part",
+        PrestataireFormModifier handler = new PrestataireFormModifier();
+        ArrayList<PrestataireForm> DemandList = new ArrayList<>();
+        PrestataireForm demand = new PrestataireForm("titre", EnumWorkType.RoadWork, "quelque part",
                 "demande de projet pour problème x", "14 septembre 2025", "12 mars 2026",
                 39021.15);
         DemandList.add(demand);
@@ -52,9 +52,9 @@ public class PrestataireDemandHandlerTest {
 
     @Test
     public void changeCostEstimateTest() {
-        PrestataireDemandHandler handler = new PrestataireDemandHandler();
-        ArrayList<DemandForm> DemandList = new ArrayList<>();
-        DemandForm demand = new DemandForm("titre", EnumWorkType.RoadWork, "quelque part",
+        PrestataireFormModifier handler = new PrestataireFormModifier();
+        ArrayList<PrestataireForm> DemandList = new ArrayList<>();
+        PrestataireForm demand = new PrestataireForm("titre", EnumWorkType.RoadWork, "quelque part",
                 "demande de projet pour problème x", "14 septembre 2025", "12 mars 2026",
                 39021.15);
         DemandList.add(demand);

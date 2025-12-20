@@ -8,7 +8,7 @@ public class ProblemRepository {
     //On utilise une instance globale
 
     private static ProblemRepository instance = null;
-    public static ArrayList<ProblemForm> FormList;
+    public static ArrayList<ResidentForm> FormList;
 
     private ProblemRepository() {
         FormList = new ArrayList<>();
@@ -22,11 +22,11 @@ public class ProblemRepository {
     }
 
 
-    public ArrayList<ProblemForm> getFormList(){
+    public ArrayList<ResidentForm> getFormList(){
         return FormList;
     }
 
-    public static void addForm(ProblemForm form){
+    public static void addForm(ResidentForm form){
         FormList.add(form);
     }
 }

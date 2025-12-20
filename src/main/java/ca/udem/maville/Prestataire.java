@@ -14,8 +14,8 @@ public class Prestataire extends User {
 
     //Méthode pour envoyer une demande de projet
 
-    public void submitDemand(DemandForm demandForm) {
-        DemandRepository.addDemand(demandForm);
+    public void submitDemand(PrestataireForm prestataireForm) {
+        CandidatRepository.addDemand(prestataireForm);
         Server.sendMessageToUI("Demande Soumise!");
     }
 

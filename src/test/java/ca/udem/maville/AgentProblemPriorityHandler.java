@@ -14,9 +14,9 @@ public class AgentProblemPriorityHandler {
 
     @Test
     public void assignNewPriorityChangesProblemPriority() {
-        AgentProblemFormHandler handler = new AgentProblemFormHandler();
-        ArrayList<ProblemForm> list = new ArrayList<>();
-        ProblemForm problem = new ProblemForm("1234 rue chez moi", "Jean", "besion d'aide pour qqch");
+        AgentResidentInteractions handler = new AgentResidentInteractions();
+        ArrayList<ResidentForm> list = new ArrayList<>();
+        ResidentForm problem = new ResidentForm("1234 rue chez moi", "Jean", "besion d'aide pour qqch");
         list.add(problem);
 
         handler.AssignProblemPriority(list, problem.getId(), EnumPriority.low);
@@ -29,10 +29,10 @@ public class AgentProblemPriorityHandler {
 
     @Test
     public void assignNewPriorityDoesNotAffectOtherProblems() {
-        AgentProblemFormHandler handler = new AgentProblemFormHandler();
-        ArrayList<ProblemForm> list = new ArrayList<>();
-        ProblemForm problem1 = new ProblemForm("chez moi", "Jean", "besion d'aide pour qqch");
-        ProblemForm problem2 = new ProblemForm("chez toi", "Pierre", "besion d'aide pour qqch");
+        AgentResidentInteractions handler = new AgentResidentInteractions();
+        ArrayList<ResidentForm> list = new ArrayList<>();
+        ResidentForm problem1 = new ResidentForm("chez moi", "Jean", "besion d'aide pour qqch");
+        ResidentForm problem2 = new ResidentForm("chez toi", "Pierre", "besion d'aide pour qqch");
         list.add(problem1);
         list.add(problem2);
 
@@ -46,9 +46,9 @@ public class AgentProblemPriorityHandler {
 
     @Test
     public void assignPrioritySendsCorrectMessageToServer() {
-        AgentProblemFormHandler handler = new AgentProblemFormHandler();
-        ArrayList<ProblemForm> list = new ArrayList<>();
-        ProblemForm p = new ProblemForm("loc", "username", "desc");
+        AgentResidentInteractions handler = new AgentResidentInteractions();
+        ArrayList<ResidentForm> list = new ArrayList<>();
+        ResidentForm p = new ResidentForm("loc", "username", "desc");
         list.add(p);
 
         try (MockedStatic<Server> serverMock = Mockito.mockStatic(Server.class)) {
