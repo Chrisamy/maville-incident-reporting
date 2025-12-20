@@ -1,0 +1,10 @@
+[ {
+  "id" : "adb7e43c-eff2-4b64-b300-459c7b4b40c6",
+  "role" : "resident",
+  "title" : "Demande approuvée",
+  "text" : "Votre demande a été approuvée par un agent.",
+  "time" : 1766203442098,
+  "read" : false,
+  "type" : "info",
+  "userId" : "Claudette"
+} ]
