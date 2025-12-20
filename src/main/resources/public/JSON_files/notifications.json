@@ -7,4 +7,40 @@
   "read" : false,
   "type" : "info",
   "userId" : "Claudette"
+}, {
+  "id" : "333e9856-ffee-4403-8c2b-7e744733454a",
+  "role" : "agent",
+  "title" : "Nouvelle demande",
+  "text" : "Une nouvelle demande a été soumise par un résident",
+  "time" : 1766207655120,
+  "read" : false,
+  "type" : "info",
+  "userId" : null
+}, {
+  "id" : "85337b07-7ce0-4b94-b9fb-42cdb5f7d809",
+  "role" : "resident",
+  "title" : "Demande approuvée",
+  "text" : "Votre demande a été approuvée par un agent.",
+  "time" : 1766207672020,
+  "read" : false,
+  "type" : "info",
+  "userId" : "Claudette"
+}, {
+  "id" : "34441d50-8878-4c9b-9926-6df8023ee615",
+  "role" : "agent",
+  "title" : "Nouvelle demande",
+  "text" : "Une nouvelle demande a été soumise par un résident",
+  "time" : 1766207826526,
+  "read" : false,
+  "type" : "info",
+  "userId" : null
+}, {
+  "id" : "632bb1ad-d69e-44f9-a234-0602728554bd",
+  "role" : "resident",
+  "title" : "Demande approuvée",
+  "text" : "Votre demande a été approuvée par un agent.",
+  "time" : 1766207838733,
+  "read" : false,
+  "type" : "info",
+  "userId" : "Claudette"
 } ]

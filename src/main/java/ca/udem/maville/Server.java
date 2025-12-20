@@ -535,10 +535,38 @@ public class Server {
               } catch (Exception e) { /* ignore notification errors */ ctx.status(500); }
           });
 
-        ObjectMapper mapper = new ObjectMapper();
-        // a seemingly complicated way to create the placeholders of problems from our json using jackson
-        problemList.getFormList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/problems.json"), new TypeReference<ArrayList<ResidentForm>>() {}));
-        demandeList.getDemandList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/demands.json"), new TypeReference<ArrayList<PrestataireForm>>() {}));
+         // --- Notifications endpoints ---
+         app.get("/notifications", ctx -> {
+             String role = ctx.queryParam("role");
+             String sessionUser = ctx.sessionAttribute("username");
+             if (role == null) role = (String) ctx.sessionAttribute("role");
+             java.util.List<Notification> result = new java.util.ArrayList<>();
+             if ("agent".equals(role)) {
+                 for (Notification n : notifications) if ("agent".equals(n.getRole())) result.add(n);
+             } else if ("resident".equals(role)) {
+                 for (Notification n : notifications) if ("resident".equals(n.getRole()) && n.getUserId()!=null && n.getUserId().equals(sessionUser)) result.add(n);
+             } else if ("prestataire".equals(role)) {
+                 for (Notification n : notifications) if ("prestataire".equals(n.getRole())) result.add(n);
+             } else {
+                 // fallback: return empty list
+             }
+             System.out.println("[SERVER] GET /notifications role=" + role + " user=" + sessionUser + " returning " + result.size());
+             ctx.json(result);
+         });
+
+         app.post("/notifications/mark-read/:id", ctx -> {
+             String id = ctx.pathParam("id");
+             for (Notification n : notifications) {
+                 if (n.getId().equals(id)) { n.setRead(true); break; }
+             }
+             saveNotifications();
+             ctx.status(200);
+         });
+
+         ObjectMapper mapper = new ObjectMapper();
+         // a seemingly complicated way to create the placeholders of problems from our json using jackson
+         problemList.getFormList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/problems.json"), new TypeReference<ArrayList<ResidentForm>>() {}));
+         demandeList.getDemandList().addAll(mapper.readValue(new File("src/main/resources/public/JSON_files/demands.json"), new TypeReference<ArrayList<PrestataireForm>>() {}));
 
 
     }
@@ -576,70 +604,5 @@ public class Server {
 
     public void showList(){
 
-    }
-
-    /**=============================================================================================================
-     API MANIPULATION FOR THE PRESTATAIRE
-     =============================================================================================================*/
-
-}
-
-/* private static void loadDemandeFromJson(){
-        String jsonContent = new String(Files.readAllBytes(Paths.get(MTLjson)));
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode rootNode = objectMapper.readTree(jsonContent);
-        JsonNode itemsArray = rootNode.path("records");
-
-        for (int i=0; i < 5; i++){
-            JsonNode item = itemsArray.get(i);
-            String id = item.get("id").asText();
-            String borough = item.get("borough").asText();
-            EnumBoroughID enumBoroughID;
-            switch (borough) {
-                case "Anjou":
-                    enumBoroughID = EnumBoroughID.anjou;
-                case "Côte-des-Neiges—Notre-Dame-de-Grâce":
-                    enumBoroughID = EnumBoroughID.coteDesNeigesNotreDameDeGrace;
-                case "Le Plateau-Mont-Royal":
-                    enumBoroughID = EnumBoroughID.lePlateauMontRoyal;
-                case "Le Sud-Ouest":
-                    enumBoroughID = EnumBoroughID.leSudOuest;
-                case "Mercier–Hochelaga-Maisonneuve":
-                    enumBoroughID = EnumBoroughID.mercierHochelagaMaisonneuve;
-                case "Montréal-Nord":
-                    enumBoroughID = EnumBoroughID.montrealNord;
-                case "Outremont":
-                    enumBoroughID = EnumBoroughID.outremont;
-                case "Rivière-des-Prairies—Pointe-aux-Trembles":
-                    enumBoroughID = EnumBoroughID.riviereDesPrairiesPointeAuxTrembles;
-                case "Rosemont—La Petite-Patrie":
-                    enumBoroughID = EnumBoroughID.rosemontLaPetitePatrie;
-                case "Saint-Léonard":
-                    enumBoroughID = EnumBoroughID.saintLeonard;
-                case "Villeray—Saint-Michel—Parc-Extension":
-                    enumBoroughID = EnumBoroughID.villeraySaintMichelParcExtension;
-                case "Ville-Marie":
-                    enumBoroughID = EnumBoroughID.villeMarie;
-                default:
-                    throw new IllegalArgumentException("Unknown borough: " + borough);
-            }
-
-
-        }
-
-    }*/
-
-
-
-
-
-
-
-
-
-
-
-
-
+    }}
 

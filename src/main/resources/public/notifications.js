@@ -197,7 +197,7 @@ function initNotificationsPerWrapper(wrapper) {
   const badge = wrapper.querySelector('.notif-badge');
   const role = wrapper.dataset.role || wrapper.getAttribute('data-role') || window.PAGE_ROLE || 'resident';
 
-  NotificationStore.ensureSeed(role);
+  // NotificationStore.ensureSeed(role);
 
   function refreshList() {
     const items = NotificationStore.list(role);
