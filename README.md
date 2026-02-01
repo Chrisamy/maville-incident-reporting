@@ -1,5 +1,8 @@
 # MAVILLE Application
 
+This project was originally developed as part of a university Software Engineering course.
+This repository is a public showcase version of my work.
+
 ## About the Application
 
 MAVILLE was developed for the STPM to make city maintenance faster and more transparent.
